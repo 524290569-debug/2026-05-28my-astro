@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Post Punk Rooftop mark">
+  <rect width="64" height="64" fill="#071014"/>
+  <path d="M9 42h46v8H9z" fill="#a5b7c7"/>
+  <path d="M15 17h8v25h-8zM28 10h10v32H28zM43 21h6v21h-6z" fill="#29383e"/>
+  <path d="M13 42h38" stroke="#8ff4ff" stroke-width="2"/>
+  <path d="M39 10l-9 18h8l-6 18 17-24H39z" fill="#ff355e"/>
+</svg>
