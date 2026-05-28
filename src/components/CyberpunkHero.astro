@@ -1,0 +1,118 @@
+---
+const navItems = ["HOME", "ABOUT", "WORKS", "BLOG", "CONTACT"];
+
+const assetLayers = [
+  {
+    name: "storm-sky",
+    src: "/assets/hero/sky-v4.png",
+    depth: 0.025,
+    className: "storm-sky-asset",
+    note: "Generated standalone storm sky plate."
+  },
+  {
+    name: "distant-city",
+    src: "/assets/hero/city-v4.png",
+    depth: 0.14,
+    className: "distant-city-asset",
+    note: "Generated transparent city skyline layer."
+  },
+  {
+    name: "foreground-rooftop",
+    src: "/assets/hero/rooftop-v4.png",
+    depth: 0.42,
+    className: "foreground-rooftop-asset",
+    note: "Generated transparent wet rooftop foreground layer."
+  }
+];
+---
+
+<main class="page-shell">
+  <section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
+    <header class="hero-nav" aria-label="Primary navigation">
+      <a class="hero-brand" href="#home" aria-label="YUNFEI home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>YUNFEI</span>
+      </a>
+      <nav class="hero-menu">
+        {navItems.map((item) => <a href={`#${item.toLowerCase()}`}>{item}</a>)}
+      </nav>
+    </header>
+
+    <div class="hero-stage" aria-hidden="true">
+      {
+        assetLayers.map((layer) => (
+          <div
+            class={`asset-layer ${layer.className}`}
+            data-depth={layer.depth}
+            data-layer={layer.name}
+          >
+            <img src={layer.src} alt="" loading="eager" decoding="async" />
+            <span class="sr-only">{layer.note}</span>
+          </div>
+        ))
+      }
+      <div class="city-haze-layer" data-depth="0.1"></div>
+      <div class="css-rain-layer"></div>
+      <div class="fog-gradient-layer"></div>
+      <div class="grain-layer"></div>
+      <div class="vignette-layer"></div>
+    </div>
+
+    <div class="hero-content">
+      <p class="hero-kicker">CODE / DESIGN / NIGHT CITY</p>
+      <h1>YUNFEI</h1>
+      <p class="hero-copy">Building quiet interfaces for a noisy future.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const hero = document.querySelector("[data-cyberpunk-hero]");
+
+  if (hero) {
+    const layers = Array.from(hero.querySelectorAll("[data-depth]"));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let frame = 0;
+
+    const setPointer = (clientX, clientY) => {
+      const rect = hero.getBoundingClientRect();
+      targetX = (clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+      targetY = (clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+    };
+
+    const render = () => {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      layers.forEach((layer) => {
+        const depth = Number(layer.dataset.depth || 0);
+        layer.style.transform = `translate3d(${-currentX * depth * 300}px, ${-currentY * depth * 170}px, 0)`;
+      });
+
+      frame = window.requestAnimationFrame(render);
+    };
+
+    hero.addEventListener("pointermove", (event) => setPointer(event.clientX, event.clientY), {
+      passive: true
+    });
+
+    hero.addEventListener(
+      "pointerleave",
+      () => {
+        targetX = 0;
+        targetY = 0;
+      },
+      { passive: true }
+    );
+
+    if (!reduceMotion.matches) {
+      frame = window.requestAnimationFrame(render);
+    }
+
+    window.addEventListener("beforeunload", () => window.cancelAnimationFrame(frame));
+  }
+</script>
