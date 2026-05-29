@@ -1,8 +1,6 @@
-import { defineConfig } from "astro/config";
+import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  devToolbar: {
-    enabled: false
-  },
-  output: "static"
+  site: 'https://524290569-debug.github.io',
+  base: '/2026-05-28my-astro',
 });
