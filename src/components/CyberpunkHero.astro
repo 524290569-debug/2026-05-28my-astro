@@ -1,27 +1,28 @@
 ---
 const navItems = ["HOME", "ABOUT", "WORKS", "BLOG", "CONTACT"];
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (path) => `${basePath}${path}`;
 
 const assetLayers = [
   {
     name: "storm-sky",
-    src: "/assets/hero/sky-v4.png",
+    src: assetPath("assets/hero/sky-v4.png"),
     depth: 0.025,
-    className: "storm-sky-asset",
-    note: "Generated standalone storm sky plate."
+    className: "storm-sky-asset"
   },
   {
     name: "distant-city",
-    src: "/assets/hero/city-v4.png",
+    src: assetPath("assets/hero/city-v4.png"),
     depth: 0.14,
-    className: "distant-city-asset",
-    note: "Generated transparent city skyline layer."
+    className: "distant-city-asset"
   },
   {
     name: "foreground-rooftop",
-    src: "/assets/hero/rooftop-v4.png",
+    src: assetPath("assets/hero/rooftop-v4.png"),
     depth: 0.42,
-    className: "foreground-rooftop-asset",
-    note: "Generated transparent wet rooftop foreground layer."
+    className: "foreground-rooftop-asset"
   }
 ];
 ---
@@ -47,7 +48,6 @@ const assetLayers = [
             data-layer={layer.name}
           >
             <img src={layer.src} alt="" loading="eager" decoding="async" />
-            <span class="sr-only">{layer.note}</span>
           </div>
         ))
       }
