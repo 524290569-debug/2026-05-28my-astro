@@ -2,15 +2,8 @@
   color-scheme: dark;
   --black: #03070a;
   --night-900: #050b10;
-  --night-800: #071219;
   --glass: rgba(6, 12, 16, 0.48);
   --ink: #edf4f6;
-  --muted: #a7b8bf;
-  --dim: #62757e;
-  --cyan: #78e9ff;
-  --pink: #f05a9d;
-  --amber: #d7b66a;
-  --line: rgba(190, 223, 232, 0.16);
   --content-max: 72rem;
   --nav-height: 4.75rem;
   font-family:
@@ -57,17 +50,6 @@ a {
 img {
   display: block;
   max-width: 100%;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 .page-shell {
