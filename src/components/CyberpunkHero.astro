@@ -8,63 +8,61 @@ const assetPath = (path) => `${basePath}${path}`;
 const assetLayers = [
   {
     name: "storm-sky",
-    src: assetPath("assets/hero/sky-v4.png"),
+    src: assetPath("assets/hero/sky-v5.webp"),
     depth: 0.025,
     className: "storm-sky-asset"
   },
   {
     name: "distant-city",
-    src: assetPath("assets/hero/city-v4.png"),
+    src: assetPath("assets/hero/city-v5.webp"),
     depth: 0.14,
     className: "distant-city-asset"
   },
   {
     name: "foreground-rooftop",
-    src: assetPath("assets/hero/rooftop-v4.png"),
+    src: assetPath("assets/hero/rooftop-v5.webp"),
     depth: 0.42,
     className: "foreground-rooftop-asset"
   }
 ];
 ---
 
-<main class="page-shell">
-  <section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
-    <header class="hero-nav" aria-label="Primary navigation">
-      <a class="hero-brand" href="#home" aria-label="YUNFEI home">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>YUNFEI</span>
-      </a>
-      <nav class="hero-menu">
-        {navItems.map((item) => <a href={`#${item.toLowerCase()}`}>{item}</a>)}
-      </nav>
-    </header>
+<section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
+  <header class="hero-nav" aria-label="Primary navigation">
+    <a class="hero-brand" href="#home" aria-label="YUNFEI home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>YUNFEI</span>
+    </a>
+    <nav class="hero-menu">
+      {navItems.map((item) => <a href={`#${item.toLowerCase()}`}>{item}</a>)}
+    </nav>
+  </header>
 
-    <div class="hero-stage" aria-hidden="true">
-      {
-        assetLayers.map((layer) => (
-          <div
-            class={`asset-layer ${layer.className}`}
-            data-depth={layer.depth}
-            data-layer={layer.name}
-          >
-            <img src={layer.src} alt="" loading="eager" decoding="async" />
-          </div>
-        ))
-      }
-      <div class="city-haze-layer" data-depth="0.1"></div>
-      <div class="css-rain-layer"></div>
-      <div class="fog-gradient-layer"></div>
-      <div class="grain-layer"></div>
-      <div class="vignette-layer"></div>
-    </div>
+  <div class="hero-stage" aria-hidden="true">
+    {
+      assetLayers.map((layer) => (
+        <div
+          class={`asset-layer ${layer.className}`}
+          data-depth={layer.depth}
+          data-layer={layer.name}
+        >
+          <img src={layer.src} alt="" loading="eager" decoding="async" />
+        </div>
+      ))
+    }
+    <div class="city-haze-layer" data-depth="0.1"></div>
+    <div class="css-rain-layer"></div>
+    <div class="fog-gradient-layer"></div>
+    <div class="grain-layer"></div>
+    <div class="vignette-layer"></div>
+  </div>
 
-    <div class="hero-content">
-      <p class="hero-kicker">CODE / DESIGN / NIGHT CITY</p>
-      <h1>YUNFEI</h1>
-      <p class="hero-copy">Building quiet interfaces for a noisy future.</p>
-    </div>
-  </section>
-</main>
+  <div class="hero-content">
+    <p class="hero-kicker">CODE / DESIGN / NIGHT CITY</p>
+    <h1>YUNFEI</h1>
+    <p class="hero-copy">Building quiet interfaces for a noisy future.</p>
+  </div>
+</section>
 
 <script>
   const hero = document.querySelector("[data-cyberpunk-hero]");

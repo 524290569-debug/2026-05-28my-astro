@@ -7,5 +7,130 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
   title="YUNFEI - Night City"
   description="A quiet personal homepage set in a rainy cyberpunk night city."
 >
-  <CyberpunkHero />
+  <main class="page-shell">
+    <CyberpunkHero />
+
+    <section id="about" class="content-section about-section">
+      <div class="section-shell about-grid">
+        <div class="section-copy">
+          <p class="section-label">ABOUT / LOW LIGHT PRACTICE</p>
+          <h2>Building calm digital rooms under heavy weather.</h2>
+          <p>
+            I design and build personal tools, visual systems, and small web products
+            with a focus on atmosphere, restraint, and clear interaction.
+          </p>
+          <p>
+            The work sits between code and visual direction: sharp enough to ship,
+            quiet enough to live with, and detailed enough to feel intentional.
+          </p>
+        </div>
+
+        <aside class="signal-panel" aria-label="Profile signals">
+          <div class="signal-row">
+            <span>Focus</span>
+            <strong>Interface systems</strong>
+          </div>
+          <div class="signal-row">
+            <span>Mode</span>
+            <strong>Design / Front-end</strong>
+          </div>
+          <div class="signal-row">
+            <span>Palette</span>
+            <strong>Cold glass / neon noise</strong>
+          </div>
+          <div class="signal-row">
+            <span>Current</span>
+            <strong>Personal web experiments</strong>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="works" class="content-section works-section">
+      <div class="section-shell">
+        <div class="section-heading">
+          <p class="section-label">WORKS / RECENT SIGNALS</p>
+          <h2>Selected builds and visual studies.</h2>
+        </div>
+
+        <div class="works-grid">
+          <article class="work-card">
+            <div class="work-visual work-visual-a" aria-hidden="true"></div>
+            <p class="work-index">01</p>
+            <h3>Rooftop Afterimage</h3>
+            <p>Rainy night hero system with layered city plates, parallax, fog, and restrained motion.</p>
+          </article>
+
+          <article class="work-card">
+            <div class="work-visual work-visual-b" aria-hidden="true"></div>
+            <p class="work-index">02</p>
+            <h3>Signal Archive</h3>
+            <p>A compact writing index for notes, references, fragments, and project logs.</p>
+          </article>
+
+          <article class="work-card">
+            <div class="work-visual work-visual-c" aria-hidden="true"></div>
+            <p class="work-index">03</p>
+            <h3>Quiet Console</h3>
+            <p>A personal dashboard direction: low contrast panels, useful status, no visual noise.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="blog" class="content-section blog-section">
+      <div class="section-shell blog-layout">
+        <div class="section-heading">
+          <p class="section-label">BLOG / FIELD NOTES</p>
+          <h2>Small notes from the night shift.</h2>
+        </div>
+
+        <div class="post-list">
+          <article class="post-row">
+            <time datetime="2026-05-29">2026.05.29</time>
+            <div>
+              <h3>How much motion is enough?</h3>
+              <p>Parallax should make depth readable, not turn the page into a game screen.</p>
+            </div>
+          </article>
+
+          <article class="post-row">
+            <time datetime="2026-05-28">2026.05.28</time>
+            <div>
+              <h3>Reference is not a background</h3>
+              <p>Using moodboards to define structure, then rebuilding the scene with clean assets.</p>
+            </div>
+          </article>
+
+          <article class="post-row">
+            <time datetime="2026-05-25">2026.05.25</time>
+            <div>
+              <h3>Cold color, warm windows</h3>
+              <p>A few yellow lights can make a blue-black city feel inhabited without becoming bright.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="content-section contact-section">
+      <div class="section-shell contact-grid">
+        <div class="section-copy">
+          <p class="section-label">CONTACT / OPEN CHANNEL</p>
+          <h2>For quiet products, visual systems, and web experiments.</h2>
+          <p>
+            Send a short signal if you want to build something with a strong mood,
+            a clear interface, and fewer unnecessary decorations.
+          </p>
+        </div>
+
+        <div class="contact-panel">
+          <a href="https://github.com/524290569-debug" target="_blank" rel="noreferrer">
+            GitHub / 524290569-debug
+          </a>
+          <a href="#home">Back to rooftop</a>
+        </div>
+      </div>
+    </section>
+  </main>
 </BaseLayout>
