@@ -1,228 +1,125 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import CyberpunkHero from "../components/CyberpunkHero.astro";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (path) => `${basePath}${path}`;
+
+const workImages = [
+  assetPath("assets/works/postpunk-rooftop.webp"),
+  assetPath("assets/works/postpunk-passage.webp"),
+  assetPath("assets/works/postpunk-bridge.webp")
+];
 ---
 
-<BaseLayout
-  title="灰雨电台 - 后朋克夜城档案"
-  description="一个关于后朋克、雨夜屋顶和冷色城市回声的虚构站点。"
->
-  <main class="page-shell">
+<BaseLayout title="灰雨电台" description="雨夜城市个人网站">
+  <main class="page-shell page-shell-visual">
     <CyberpunkHero />
 
-    <section class="surface-brief" aria-label="电台状态">
-      <div class="brief-track">
-        <div>
-          <span>频段</span>
-          <strong>03:17 / 雨声未停</strong>
-        </div>
-        <div>
-          <span>位置</span>
-          <strong>旧楼天台 / 北侧风口</strong>
-        </div>
-        <div>
-          <span>声场</span>
-          <strong>低频 / 混响 / 电流底噪</strong>
-        </div>
-        <div>
-          <span>状态</span>
-          <strong>无人值守播放</strong>
-        </div>
+    <section class="surface-brief surface-brief-visual" aria-label="状态层">
+      <div class="brief-track visual-track" aria-hidden="true">
+        {Array.from({ length: 4 }).map(() => (
+          <div>
+            <i></i>
+            <b></b>
+          </div>
+        ))}
       </div>
     </section>
 
-    <section id="about" class="content-section about-section">
+    <section id="about" class="content-section about-section visual-section" aria-label="第一部分">
       <div class="section-shell about-grid">
-        <div class="section-copy">
-          <p class="section-label">宣言 / 冷光频段</p>
-          <h2>我们不追逐霓虹，只记录霓虹熄灭后的余光。</h2>
-          <p>
-            灰雨电台是一个虚构的夜间频段，收集后朋克、废墟城市、屋顶风声和二次元边缘感之间的碎片。
-          </p>
-          <p>
-            这里没有明亮的广告牌，也没有胜利的倒计时。只有潮湿墙面、失真的贝斯线、远处闪烁的窗光，以及还没被整理成答案的情绪。
-          </p>
-
-          <div class="process-strip" aria-label="播放结构">
-            <span>噪声</span>
-            <span>回声</span>
-            <span>余像</span>
+        <div class="visual-copy" aria-hidden="true">
+          <span class="visual-kicker"></span>
+          <span class="visual-title"></span>
+          <span class="visual-title visual-title-short"></span>
+          <div class="visual-paragraph">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-
-          <div class="tool-cloud" aria-label="情绪标签">
-            <span>后朋克</span>
-            <span>雨夜屋顶</span>
-            <span>冷色城市</span>
-            <span>失真低频</span>
-            <span>废墟浪漫</span>
+          <div class="process-strip process-strip-blank">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         </div>
 
-        <aside class="profile-stack" aria-label="频道参数">
-          <div class="profile-visual" aria-hidden="true">
+        <aside class="profile-stack" aria-hidden="true">
+          <div class="profile-visual">
             <span class="profile-core"></span>
             <span class="profile-ring profile-ring-a"></span>
             <span class="profile-ring profile-ring-b"></span>
           </div>
 
-          <div class="signal-panel">
-            <div class="signal-row">
-              <span>主色</span>
-              <strong>蓝黑 / 雾灰 / 暗紫</strong>
-            </div>
-            <div class="signal-row">
-              <span>节拍</span>
-              <strong>缓慢 / 重复 / 克制</strong>
-            </div>
-            <div class="signal-row">
-              <span>画面</span>
-              <strong>天台 / 雨幕 / 远城</strong>
-            </div>
-            <div class="signal-row">
-              <span>温度</span>
-              <strong>低温，仍有窗光</strong>
-            </div>
-          </div>
-
-          <div class="availability-card">
-            <span>今晚播送</span>
-            <strong>旧磁带采样 / 城市雨声 / 未命名现场录音</strong>
+          <div class="signal-panel signal-panel-blank">
+            {Array.from({ length: 4 }).map(() => (
+              <div class="signal-row">
+                <span></span>
+                <strong></strong>
+              </div>
+            ))}
           </div>
         </aside>
       </div>
     </section>
 
-    <section id="works" class="content-section works-section">
+    <section id="works" class="content-section works-section image-section" aria-label="第三部分图片">
       <div class="section-shell">
-        <div class="section-heading">
-          <p class="section-label">现场 / 三段夜间记录</p>
-          <h2>来自城市边缘的三段低光现场。</h2>
-        </div>
-
-        <div class="works-grid">
-          <article class="work-card work-card-large">
-            <div class="work-visual work-visual-a" aria-hidden="true"></div>
-            <div class="work-meta">
-              <p class="work-index">01 / 雨中</p>
-              <span>屋顶</span>
-            </div>
-            <h3>天台回声排练</h3>
-            <p>凌晨三点的开放屋顶，鼓机从防水布下面漏出，贝斯线被雨幕切成断续的信号。</p>
-            <div class="work-tags">
-              <span>湿冷</span>
-              <span>低频</span>
-              <span>天线</span>
-            </div>
-          </article>
-
-          <article class="work-card">
-            <div class="work-visual work-visual-b" aria-hidden="true"></div>
-            <div class="work-meta">
-              <p class="work-index">02 / 断讯</p>
-              <span>地下</span>
-            </div>
-            <h3>地下通道合成器</h3>
-            <p>废弃商业街的卷帘门后，合成器只保留两个和弦，像一盏快要熄灭的蓝色灯。</p>
-            <div class="work-tags">
-              <span>回授</span>
-              <span>暗巷</span>
-            </div>
-          </article>
-
-          <article class="work-card">
-            <div class="work-visual work-visual-c" aria-hidden="true"></div>
-            <div class="work-meta">
-              <p class="work-index">03 / 余温</p>
-              <span>远城</span>
-            </div>
-            <h3>高架桥下的窗光</h3>
-            <p>列车经过后，水面短暂发亮。那些黄色窗口像幸存的鼓点，不响，却一直在。</p>
-            <div class="work-tags">
-              <span>远景</span>
-              <span>微光</span>
-            </div>
-          </article>
-
-        </div>
-
-        <div class="works-note">
-          <span>现场说明</span>
-          <p>
-            这些不是正式演出，更像被雨水保存下来的片段。音量不高，边缘很重，适合一个人站在楼顶听。
-          </p>
+        <div class="image-stage-grid" aria-hidden="true">
+          {workImages.map((image, index) => (
+            <figure class={`work-image-card work-image-card-${index + 1}`}>
+              <img src={image} alt="" loading="lazy" decoding="async" />
+            </figure>
+          ))}
         </div>
       </div>
     </section>
 
-    <section id="blog" class="content-section blog-section">
-      <div class="section-shell blog-layout">
-        <div class="section-heading">
-          <p class="section-label">档案 / 雨夜短记</p>
-          <h2>几条从旧硬盘里恢复的文字轨道。</h2>
+    <section id="blog" class="content-section archive-section visual-section" aria-label="第四部分">
+      <div class="section-shell archive-grid" aria-hidden="true">
+        <div class="archive-panel archive-panel-large">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-
-        <div class="post-list">
-          <article class="post-row">
-            <time datetime="2026-05-29">2026.05.29</time>
-            <div>
-              <p class="post-tag">动效</p>
-              <h3>雨丝的速度不能太快</h3>
-              <p>如果雨落得像子弹，城市会变成游戏画面。真正的夜晚更慢，也更难解释。</p>
+        <div class="archive-stack">
+          {Array.from({ length: 3 }).map(() => (
+            <div class="archive-row">
+              <i></i>
+              <b></b>
             </div>
-          </article>
-
-          <article class="post-row">
-            <time datetime="2026-05-28">2026.05.28</time>
-            <div>
-              <p class="post-tag">过程</p>
-              <h3>不要把霓虹开到最大</h3>
-              <p>后朋克的城市不需要满屏高饱和。更重要的是黑暗里的轮廓，以及偶尔亮起的窗口。</p>
-            </div>
-          </article>
-
-          <article class="post-row">
-            <time datetime="2026-05-25">2026.05.25</time>
-            <div>
-              <p class="post-tag">色彩</p>
-              <h3>废墟不等于毁灭</h3>
-              <p>有些楼只是停止营业，有些人只是停止说话。城市还在呼吸，只是声音变低了。</p>
-            </div>
-          </article>
-        </div>
-
-        <aside class="reading-card" aria-label="档案说明">
-          <span>档案口径</span>
-          <p>只记录低亮度的东西：雨声、楼顶、旧电台、远处的窗光，以及那些没有被白天收编的情绪。</p>
-        </aside>
-      </div>
-    </section>
-
-    <section id="contact" class="content-section contact-section">
-      <div class="section-shell contact-grid">
-        <div class="section-copy">
-          <p class="section-label">联络 / 无人接线</p>
-          <h2>如果你也在雨夜里收听，可以留下一个微弱信号。</h2>
-          <p>
-            频道不保证立刻回复。它通常在凌晨醒来，在天亮前把消息藏进城市的底噪里。
-          </p>
-        </div>
-
-        <div class="contact-panel">
-          <a href="mailto:hello@example.com">
-            暂停接收投稿
-          </a>
-          <a href="https://github.com/524290569-debug" target="_blank" rel="noreferrer">
-            旧天线 / 公开仓库
-          </a>
-          <a href="#home">返回雨夜入口</a>
+          ))}
         </div>
       </div>
     </section>
 
-    <footer class="site-footer">
+    <section id="contact" class="content-section contact-section visual-section" aria-label="第五部分">
+      <div class="section-shell contact-grid contact-grid-visual" aria-hidden="true">
+        <div class="visual-copy">
+          <span class="visual-kicker"></span>
+          <span class="visual-title"></span>
+          <span class="visual-title visual-title-short"></span>
+          <div class="visual-paragraph">
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="contact-panel contact-panel-blank">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer visual-footer" aria-hidden="true">
       <div class="footer-inner">
-        <span>灰雨电台 / 后朋克夜城档案</span>
-        <span>东八区 / 雨声循环播放</span>
+        <span></span>
+        <span></span>
       </div>
     </footer>
   </main>
