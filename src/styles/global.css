@@ -913,7 +913,7 @@ img {
 
 .contact-panel a::after {
   color: rgba(120, 233, 255, 0.62);
-  content: "OPEN";
+  content: "打开";
   font-size: 0.7rem;
   letter-spacing: 0.16em;
 }
