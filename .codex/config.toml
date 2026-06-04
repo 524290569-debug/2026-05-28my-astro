@@ -1,0 +1,4 @@
+# Project-local Codex settings for this trusted personal website repo.
+# Reload the Codex session after changing this file.
+
+approvals_reviewer = "user"

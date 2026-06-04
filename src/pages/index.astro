@@ -10,6 +10,27 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
   <main class="page-shell">
     <CyberpunkHero />
 
+    <section class="surface-brief" aria-label="Current site status">
+      <div class="brief-track">
+        <div>
+          <span>Status</span>
+          <strong>Open for experiments</strong>
+        </div>
+        <div>
+          <span>Stack</span>
+          <strong>Astro / CSS / Motion</strong>
+        </div>
+        <div>
+          <span>Frequency</span>
+          <strong>Night builds</strong>
+        </div>
+        <div>
+          <span>Signal</span>
+          <strong>Quiet systems</strong>
+        </div>
+      </div>
+    </section>
+
     <section id="about" class="content-section about-section">
       <div class="section-shell about-grid">
         <div class="section-copy">
@@ -23,24 +44,51 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
             The work sits between code and visual direction: sharp enough to ship,
             quiet enough to live with, and detailed enough to feel intentional.
           </p>
+
+          <div class="process-strip" aria-label="Working process">
+            <span>Observe</span>
+            <span>Prototype</span>
+            <span>Refine</span>
+          </div>
+
+          <div class="tool-cloud" aria-label="Preferred tools and interests">
+            <span>Astro</span>
+            <span>CSS architecture</span>
+            <span>Interaction detail</span>
+            <span>Image direction</span>
+            <span>Atmospheric systems</span>
+          </div>
         </div>
 
-        <aside class="signal-panel" aria-label="Profile signals">
-          <div class="signal-row">
-            <span>Focus</span>
-            <strong>Interface systems</strong>
+        <aside class="profile-stack" aria-label="Profile signals">
+          <div class="profile-visual" aria-hidden="true">
+            <span class="profile-core"></span>
+            <span class="profile-ring profile-ring-a"></span>
+            <span class="profile-ring profile-ring-b"></span>
           </div>
-          <div class="signal-row">
-            <span>Mode</span>
-            <strong>Design / Front-end</strong>
+
+          <div class="signal-panel">
+            <div class="signal-row">
+              <span>Focus</span>
+              <strong>Interface systems</strong>
+            </div>
+            <div class="signal-row">
+              <span>Mode</span>
+              <strong>Design / Front-end</strong>
+            </div>
+            <div class="signal-row">
+              <span>Palette</span>
+              <strong>Cold glass / neon noise</strong>
+            </div>
+            <div class="signal-row">
+              <span>Current</span>
+              <strong>Personal web experiments</strong>
+            </div>
           </div>
-          <div class="signal-row">
-            <span>Palette</span>
-            <strong>Cold glass / neon noise</strong>
-          </div>
-          <div class="signal-row">
-            <span>Current</span>
-            <strong>Personal web experiments</strong>
+
+          <div class="availability-card">
+            <span>Availability</span>
+            <strong>Selective collaborations / personal tools / visual systems</strong>
           </div>
         </aside>
       </div>
@@ -54,26 +102,57 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
         </div>
 
         <div class="works-grid">
-          <article class="work-card">
+          <article class="work-card work-card-large">
             <div class="work-visual work-visual-a" aria-hidden="true"></div>
-            <p class="work-index">01</p>
+            <div class="work-meta">
+              <p class="work-index">01 / LIVE</p>
+              <span>Astro</span>
+            </div>
             <h3>Rooftop Afterimage</h3>
             <p>Rainy night hero system with layered city plates, parallax, fog, and restrained motion.</p>
+            <div class="work-tags">
+              <span>Hero direction</span>
+              <span>WebP assets</span>
+              <span>Motion</span>
+            </div>
           </article>
 
           <article class="work-card">
             <div class="work-visual work-visual-b" aria-hidden="true"></div>
-            <p class="work-index">02</p>
+            <div class="work-meta">
+              <p class="work-index">02 / DRAFT</p>
+              <span>Archive</span>
+            </div>
             <h3>Signal Archive</h3>
             <p>A compact writing index for notes, references, fragments, and project logs.</p>
+            <div class="work-tags">
+              <span>Notes</span>
+              <span>Index</span>
+            </div>
           </article>
 
           <article class="work-card">
             <div class="work-visual work-visual-c" aria-hidden="true"></div>
-            <p class="work-index">03</p>
+            <div class="work-meta">
+              <p class="work-index">03 / STUDY</p>
+              <span>Tools</span>
+            </div>
             <h3>Quiet Console</h3>
             <p>A personal dashboard direction: low contrast panels, useful status, no visual noise.</p>
+            <div class="work-tags">
+              <span>Dashboard</span>
+              <span>Systems</span>
+            </div>
           </article>
+
+        </div>
+
+        <div class="works-note">
+          <span>Direction</span>
+          <p>
+            The work section is kept deliberately narrow: fewer projects, stronger atmosphere,
+            clearer status. It should feel like a small archive, not a marketing grid.
+          </p>
         </div>
       </div>
     </section>
@@ -89,6 +168,7 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
           <article class="post-row">
             <time datetime="2026-05-29">2026.05.29</time>
             <div>
+              <p class="post-tag">Motion</p>
               <h3>How much motion is enough?</h3>
               <p>Parallax should make depth readable, not turn the page into a game screen.</p>
             </div>
@@ -97,6 +177,7 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
           <article class="post-row">
             <time datetime="2026-05-28">2026.05.28</time>
             <div>
+              <p class="post-tag">Process</p>
               <h3>Reference is not a background</h3>
               <p>Using moodboards to define structure, then rebuilding the scene with clean assets.</p>
             </div>
@@ -105,11 +186,17 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
           <article class="post-row">
             <time datetime="2026-05-25">2026.05.25</time>
             <div>
+              <p class="post-tag">Color</p>
               <h3>Cold color, warm windows</h3>
               <p>A few yellow lights can make a blue-black city feel inhabited without becoming bright.</p>
             </div>
           </article>
         </div>
+
+        <aside class="reading-card" aria-label="Writing direction">
+          <span>Writing rhythm</span>
+          <p>Short field notes about interface taste, references, asset direction, and the cost of visual noise.</p>
+        </aside>
       </div>
     </section>
 
@@ -125,6 +212,9 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
         </div>
 
         <div class="contact-panel">
+          <a href="mailto:hello@example.com">
+            hello@example.com
+          </a>
           <a href="https://github.com/524290569-debug" target="_blank" rel="noreferrer">
             GitHub / 524290569-debug
           </a>
@@ -132,5 +222,12 @@ import CyberpunkHero from "../components/CyberpunkHero.astro";
         </div>
       </div>
     </section>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>YUNFEI / NIGHT CITY INDEX</span>
+        <span>UTC+8 / built with Astro</span>
+      </div>
+    </footer>
   </main>
 </BaseLayout>
