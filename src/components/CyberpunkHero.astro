@@ -1,5 +1,11 @@
 ---
-const navItems = ["HOME", "ABOUT", "WORKS", "BLOG", "CONTACT"];
+const navItems = [
+  { label: "首页", href: "#home" },
+  { label: "关于", href: "#about" },
+  { label: "作品", href: "#works" },
+  { label: "日志", href: "#blog" },
+  { label: "联系", href: "#contact" }
+];
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -28,13 +34,13 @@ const assetLayers = [
 ---
 
 <section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
-  <header class="hero-nav" aria-label="Primary navigation">
-    <a class="hero-brand" href="#home" aria-label="YUNFEI home">
+  <header class="hero-nav" aria-label="主导航">
+    <a class="hero-brand" href="#home" aria-label="云飞首页">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>YUNFEI</span>
+      <span>云飞</span>
     </a>
     <nav class="hero-menu">
-      {navItems.map((item) => <a href={`#${item.toLowerCase()}`}>{item}</a>)}
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
   </header>
 
@@ -58,9 +64,9 @@ const assetLayers = [
   </div>
 
   <div class="hero-content">
-    <p class="hero-kicker">CODE / DESIGN / NIGHT CITY</p>
-    <h1>YUNFEI</h1>
-    <p class="hero-copy">Building quiet interfaces for a noisy future.</p>
+    <p class="hero-kicker">代码 / 设计 / 夜城</p>
+    <h1>云飞</h1>
+    <p class="hero-copy">在嘈杂的未来里，构建安静、清晰、有温度的界面。</p>
   </div>
 </section>
 
