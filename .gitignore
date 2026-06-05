@@ -2,6 +2,7 @@
 .astro/
 dist/
 screenshots/
+hatch-pet-runs/
 .tmp/
 .env
 .DS_Store
