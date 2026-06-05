@@ -64,7 +64,7 @@ img {
 
 .page-shell-visual::before,
 .page-shell-visual::after {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 40;
   pointer-events: none;
@@ -72,8 +72,7 @@ img {
 }
 
 .page-shell-visual::before {
-  opacity: 0.038;
-  mix-blend-mode: screen;
+  opacity: 0.025;
   background-image: repeating-linear-gradient(
     115deg,
     transparent 0 6rem,
@@ -81,12 +80,10 @@ img {
     transparent 6.2rem 12rem
   );
   background-size: 28rem 32rem;
-  animation: rainFall 14s linear infinite;
 }
 
 .page-shell-visual::after {
-  opacity: 0.16;
-  mix-blend-mode: overlay;
+  opacity: 0.1;
   background:
     radial-gradient(circle at 18% 24%, rgba(120, 233, 255, 0.06), transparent 22rem),
     radial-gradient(circle at 82% 72%, rgba(240, 90, 157, 0.045), transparent 20rem),
@@ -122,11 +119,10 @@ img {
 .surface-brief::after {
   top: 0;
   bottom: 0;
-  left: -16rem;
-  width: 16rem;
-  background: linear-gradient(90deg, transparent, rgba(190, 223, 232, 0.12), transparent);
-  filter: blur(18px);
-  animation: signalSweep 11s ease-in-out infinite;
+  left: 42%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(190, 223, 232, 0.16), transparent);
+  opacity: 0.28;
 }
 
 .brief-track {
@@ -263,16 +259,14 @@ img {
     linear-gradient(180deg, transparent 0 28%, rgba(148, 174, 184, 0.11) 48%, rgba(4, 11, 15, 0.22) 68%, transparent 82%),
     radial-gradient(ellipse at 58% 47%, rgba(167, 191, 201, 0.12), transparent 34%),
     radial-gradient(ellipse at 78% 58%, rgba(77, 105, 122, 0.13), transparent 28%);
-  filter: blur(18px);
-  animation: fogDrift 42s ease-in-out infinite alternate;
+  filter: blur(10px);
 }
 
 /* CSS rain on top, kept subtle so it does not become a game login screen. */
 .css-rain-layer {
   z-index: 9;
   overflow: hidden;
-  opacity: 0.18;
-  mix-blend-mode: screen;
+  opacity: 0.13;
 }
 
 .css-rain-layer::before,
@@ -281,7 +275,8 @@ img {
   inset: -35% -18%;
   background-repeat: repeat;
   content: "";
-  transform: rotate(11deg);
+  transform: rotate(11deg) translate3d(0, -10rem, 0);
+  will-change: transform;
 }
 
 .css-rain-layer::before {
@@ -292,19 +287,11 @@ img {
     transparent 1.66rem 5.2rem
   );
   background-size: 12rem 15rem;
-  animation: rainFall 8.5s linear infinite;
+  animation: rainSlide 10s linear infinite;
 }
 
 .css-rain-layer::after {
-  background-image: repeating-linear-gradient(
-    115deg,
-    transparent 0 4rem,
-    rgba(224, 246, 250, 0.14) 4.05rem 4.16rem,
-    transparent 4.2rem 9.4rem
-  );
-  background-size: 19rem 24rem;
-  filter: blur(0.35px);
-  animation: rainFall 6.8s linear infinite;
+  display: none;
 }
 
 /* CSS fog and dark glass gradients bind the generated layers into one scene. */
@@ -315,14 +302,12 @@ img {
     linear-gradient(180deg, rgba(5, 11, 16, 0.08) 0, transparent 30%, rgba(118, 148, 162, 0.08) 58%, transparent 78%),
     radial-gradient(ellipse at 20% 50%, rgba(2, 7, 10, 0.38), transparent 34%),
     radial-gradient(ellipse at 80% 52%, rgba(116, 145, 165, 0.06), transparent 28%);
-  filter: blur(8px);
-  animation: fogDrift 36s ease-in-out infinite alternate;
+  filter: blur(4px);
 }
 
 .grain-layer {
   z-index: 11;
-  opacity: 0.13;
-  mix-blend-mode: overlay;
+  opacity: 0.08;
   background:
     radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
     radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px),
@@ -358,7 +343,7 @@ img {
   background:
     linear-gradient(180deg, rgba(20, 34, 42, 0.52), rgba(4, 9, 12, 0.34)),
     var(--glass);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(10px);
   box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.28);
   transform: translateX(-50%);
 }
@@ -389,7 +374,6 @@ img {
     linear-gradient(135deg, transparent 0 43%, rgba(240, 90, 157, 0.9) 44% 56%, transparent 57%),
     linear-gradient(90deg, rgba(120, 233, 255, 0.54), rgba(219, 188, 118, 0.18));
   box-shadow: 0 0 1.6rem rgba(120, 233, 255, 0.16);
-  animation: softPulse 4.8s ease-in-out infinite;
 }
 
 .hero-menu {
@@ -431,7 +415,7 @@ img {
 }
 
 .hero-menu-dots a:nth-child(2n) .nav-dot {
-  animation: softPulse 5.8s ease-in-out infinite;
+  border-color: rgba(120, 233, 255, 0.34);
 }
 
 .hero-menu a::after {
@@ -493,7 +477,7 @@ img {
   height: 17rem;
   background: radial-gradient(ellipse at left, rgba(2, 7, 10, 0.78), rgba(2, 7, 10, 0.44) 44%, transparent 74%);
   content: "";
-  filter: blur(8px);
+  filter: blur(4px);
 }
 
 .hero-kicker {
@@ -546,7 +530,6 @@ img {
   height: 1px;
   background: linear-gradient(90deg, rgba(120, 233, 255, 0.5), rgba(190, 223, 232, 0.14), transparent);
   box-shadow: 0 0 1.2rem rgba(120, 233, 255, 0.1);
-  animation: signalBreath 5.5s ease-in-out infinite;
 }
 
 .hero-signal span:nth-child(2) {
@@ -956,7 +939,6 @@ img {
 .profile-ring-a {
   width: 9rem;
   height: 9rem;
-  animation: slowRotate 30s linear infinite;
 }
 
 .profile-ring-b {
@@ -964,7 +946,6 @@ img {
   height: 14rem;
   border-color: rgba(190, 223, 232, 0.08);
   transform: translate(-50%, -50%) rotate(18deg);
-  animation: slowRotateReverse 42s linear infinite;
 }
 
 .signal-panel,
@@ -974,7 +955,7 @@ img {
     linear-gradient(180deg, rgba(18, 34, 42, 0.34), rgba(4, 9, 12, 0.42)),
     rgba(5, 12, 16, 0.46);
   box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(8px);
 }
 
 .signal-panel {
@@ -1053,7 +1034,7 @@ img {
   background:
     radial-gradient(ellipse at 22% 28%, rgba(120, 233, 255, 0.09), transparent 24rem),
     radial-gradient(ellipse at 78% 70%, rgba(240, 90, 157, 0.055), transparent 18rem);
-  filter: blur(18px);
+  filter: blur(8px);
 }
 
 .image-stage-grid::after {
@@ -1115,7 +1096,6 @@ img {
   background:
     linear-gradient(180deg, rgba(3, 7, 10, 0.04), transparent 44%, rgba(3, 7, 10, 0.34)),
     radial-gradient(circle at 18% 18%, rgba(120, 233, 255, 0.12), transparent 14rem);
-  mix-blend-mode: screen;
   opacity: 0.56;
 }
 
@@ -1588,88 +1568,13 @@ img {
   width: 9rem;
 }
 
-@keyframes rainFall {
+@keyframes rainSlide {
   from {
-    background-position: 0 0;
+    transform: rotate(11deg) translate3d(0, -10rem, 0);
   }
 
   to {
-    background-position: 0 36rem;
-  }
-}
-
-@keyframes signalSweep {
-  0%,
-  18% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  42% {
-    opacity: 0.36;
-  }
-
-  72%,
-  100% {
-    transform: translateX(calc(100vw + 32rem));
-    opacity: 0;
-  }
-}
-
-@keyframes softPulse {
-  0%,
-  100% {
-    opacity: 0.72;
-    box-shadow: 0 0 1.1rem rgba(120, 233, 255, 0.08);
-  }
-
-  50% {
-    opacity: 1;
-    box-shadow: 0 0 1.8rem rgba(120, 233, 255, 0.22);
-  }
-}
-
-@keyframes signalBreath {
-  0%,
-  100% {
-    opacity: 0.46;
-    transform: scaleX(0.86);
-    transform-origin: left center;
-  }
-
-  50% {
-    opacity: 0.9;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes slowRotate {
-  from {
-    transform: translate(-50%, -50%) rotate(-12deg);
-  }
-
-  to {
-    transform: translate(-50%, -50%) rotate(348deg);
-  }
-}
-
-@keyframes slowRotateReverse {
-  from {
-    transform: translate(-50%, -50%) rotate(18deg);
-  }
-
-  to {
-    transform: translate(-50%, -50%) rotate(-342deg);
-  }
-}
-
-@keyframes fogDrift {
-  from {
-    transform: translate3d(-2.5rem, 0, 0);
-  }
-
-  to {
-    transform: translate3d(3.8rem, -0.4rem, 0);
+    transform: rotate(11deg) translate3d(0, 10rem, 0);
   }
 }
 

@@ -89,6 +89,7 @@ const assetLayers = [
     let currentX = 0;
     let currentY = 0;
     let frame = 0;
+    const idleThreshold = 0.001;
 
     const setPointer = (clientX, clientY) => {
       const rect = hero.getBoundingClientRect();
@@ -96,7 +97,16 @@ const assetLayers = [
       targetY = (clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
     };
 
+    const scheduleRender = () => {
+      if (frame || reduceMotion.matches) {
+        return;
+      }
+
+      frame = window.requestAnimationFrame(render);
+    };
+
     const render = () => {
+      frame = 0;
       currentX += (targetX - currentX) * 0.08;
       currentY += (targetY - currentY) * 0.08;
 
@@ -105,26 +115,34 @@ const assetLayers = [
         layer.style.transform = `translate3d(${-currentX * depth * 300}px, ${-currentY * depth * 170}px, 0)`;
       });
 
-      frame = window.requestAnimationFrame(render);
+      if (Math.abs(targetX - currentX) > idleThreshold || Math.abs(targetY - currentY) > idleThreshold) {
+        scheduleRender();
+      }
     };
 
-    hero.addEventListener("pointermove", (event) => setPointer(event.clientX, event.clientY), {
-      passive: true
-    });
+    hero.addEventListener(
+      "pointermove",
+      (event) => {
+        setPointer(event.clientX, event.clientY);
+        scheduleRender();
+      },
+      { passive: true }
+    );
 
     hero.addEventListener(
       "pointerleave",
       () => {
         targetX = 0;
         targetY = 0;
+        scheduleRender();
       },
       { passive: true }
     );
 
-    if (!reduceMotion.matches) {
-      frame = window.requestAnimationFrame(render);
-    }
-
-    window.addEventListener("beforeunload", () => window.cancelAnimationFrame(frame));
+    window.addEventListener("beforeunload", () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+    });
   }
 </script>
