@@ -48,6 +48,24 @@ const fieldNotes = [
   }
 ];
 
+const stationSignals = [
+  {
+    label: "SIGNAL",
+    value: "-72 dB",
+    detail: "远城残响稳定"
+  },
+  {
+    label: "RAIN",
+    value: "18 mm",
+    detail: "屋顶反射低亮"
+  },
+  {
+    label: "NOISE",
+    value: "04%",
+    detail: "磁带底噪不过载"
+  }
+];
+
 const textureImage = assetPath("assets/textures/rain-wall.webp");
 const deskImage = assetPath("assets/features/postpunk-desk.webp");
 ---
@@ -76,6 +94,32 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
         <div>
           <span>状态</span>
           <strong>低亮度维护中</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="signal-tape" aria-label="弱信号层">
+      <div class="signal-tape-inner">
+        <div class="signal-tape-meter" aria-hidden="true">
+          <span style="--level: 82%"></span>
+          <span style="--level: 56%"></span>
+          <span style="--level: 68%"></span>
+          <span style="--level: 34%"></span>
+        </div>
+
+        <div class="signal-tape-copy">
+          <span>弱信号 / 城市边缘</span>
+          <p>把雨声、远处窗口和低频噪点压成一条安静的过渡轨，让页面从天台场景慢慢落回内容。</p>
+        </div>
+
+        <div class="signal-tape-grid">
+          {stationSignals.map((signal) => (
+            <div class="signal-tape-card">
+              <span>{signal.label}</span>
+              <strong>{signal.value}</strong>
+              <p>{signal.detail}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
