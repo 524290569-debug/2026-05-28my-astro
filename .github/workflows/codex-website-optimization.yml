@@ -1,0 +1,33 @@
+name: Codex Website Optimization Task
+
+on:
+  schedule:
+    # Run daily at 23:30 UTC, matching Codex网站优化自动化.md.
+    - cron: "30 23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-website-optimization-task
+  cancel-in-progress: false
+
+jobs:
+  task-ready-check:
+    name: Validate automation task definition
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify automation task files
+        run: |
+          test -f "Codex网站优化自动化.md"
+          test -f ".codex/automations/website-optimization.md"
+          test -d "reports/automation"
+
+      - name: Print Codex automation task prompt
+        run: |
+          cat ".codex/automations/website-optimization.md" >> "$GITHUB_STEP_SUMMARY"
