@@ -35,15 +35,14 @@ const assetLayers = [
 
 <section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
   <header class="hero-nav" aria-label="主导航">
-    <a class="hero-brand hero-brand-icon" href="#home" aria-label="入口">
+    <a class="hero-brand" href="#home" aria-label="灰雨电台入口">
       <span class="brand-mark" aria-hidden="true"></span>
+      <span>灰雨电台</span>
     </a>
-    <nav class="hero-menu hero-menu-dots" aria-label="页面分区">
+    <nav class="hero-menu" aria-label="页面分区">
       {
         navItems.map((item) => (
-          <a href={item.href} aria-label={item.label}>
-            <span class="nav-dot" aria-hidden="true"></span>
-          </a>
+          <a href={item.href}>{item.label}</a>
         ))
       }
     </nav>
@@ -68,8 +67,17 @@ const assetLayers = [
     <div class="vignette-layer"></div>
   </div>
 
-  <div class="hero-content hero-content-empty" aria-hidden="true">
-    <div class="hero-signal">
+  <div class="hero-content">
+    <p class="hero-kicker">后朋克 / 雨夜城市 / 低保真界面</p>
+    <h1>灰雨电台</h1>
+    <p class="hero-copy">
+      一个把冷雨、失真低频和屋顶城市压进浏览器里的个人站点。
+    </p>
+    <div class="hero-actions" aria-label="主要入口">
+      <a href="#works">查看现场</a>
+      <a href="#blog">读取档案</a>
+    </div>
+    <div class="hero-signal" aria-hidden="true">
       <span></span>
       <span></span>
       <span></span>

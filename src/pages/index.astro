@@ -8,118 +8,233 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 const assetPath = (path) => `${basePath}${path}`;
 
 const workImages = [
-  assetPath("assets/works/postpunk-rooftop.webp"),
-  assetPath("assets/works/postpunk-passage.webp"),
-  assetPath("assets/works/postpunk-bridge.webp")
+  {
+    src: assetPath("assets/works/postpunk-rooftop.webp"),
+    title: "屋顶回声",
+    meta: "雨幕 / 天线 / 低频"
+  },
+  {
+    src: assetPath("assets/works/postpunk-passage.webp"),
+    title: "地下通道",
+    meta: "湿瓷砖 / 合成器 / 断讯"
+  },
+  {
+    src: assetPath("assets/works/postpunk-bridge.webp"),
+    title: "高架余光",
+    meta: "远城 / 铁轨 / 冷蓝反射"
+  }
 ];
+
+const textureImage = assetPath("assets/textures/rain-wall.webp");
+const deskImage = assetPath("assets/features/postpunk-desk.webp");
 ---
 
-<BaseLayout title="灰雨电台" description="雨夜城市个人网站">
-  <main class="page-shell page-shell-visual">
+<BaseLayout
+  title="灰雨电台 - 雨夜后朋克个人站"
+  description="一个后朋克、雨夜城市、低保真视觉与前端实验交织的个人网站。"
+>
+  <main class="page-shell page-shell-visual" style={`--rain-wall: url("${textureImage}")`}>
     <CyberpunkHero />
 
-    <section class="surface-brief surface-brief-visual" aria-label="状态层">
-      <div class="brief-track visual-track" aria-hidden="true">
-        {Array.from({ length: 4 }).map(() => (
-          <div>
-            <i></i>
-            <b></b>
-          </div>
-        ))}
+    <section class="surface-brief" aria-label="频道状态">
+      <div class="brief-track">
+        <div>
+          <span>频率</span>
+          <strong>03:17 / 冷雨在线</strong>
+        </div>
+        <div>
+          <span>位置</span>
+          <strong>旧楼天台 / 北向窗</strong>
+        </div>
+        <div>
+          <span>声场</span>
+          <strong>后朋克 / 低保真 / 工业噪声</strong>
+        </div>
+        <div>
+          <span>状态</span>
+          <strong>低亮度维护中</strong>
+        </div>
       </div>
     </section>
 
-    <section id="about" class="content-section about-section visual-section" aria-label="第一部分">
+    <section id="about" class="content-section about-section" aria-label="宣言">
       <div class="section-shell about-grid">
-        <div class="visual-copy" aria-hidden="true">
-          <span class="visual-kicker"></span>
-          <span class="visual-title"></span>
-          <span class="visual-title visual-title-short"></span>
-          <div class="visual-paragraph">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="section-copy">
+          <p class="section-label">宣言 / 低保真夜航</p>
+          <h2>把潮湿、失真和城市边缘感整理成可以停留的界面。</h2>
+          <p>
+            灰雨电台是一个个人站点实验：它借用后朋克的内省和实验性，保留低保真的噪点、雨痕与旧设备质感，再把这些东西压进一个安静的网页界面里。
+          </p>
+          <p>
+            它不追求明亮、完整和商业感。更重要的是夜晚的节奏、远处窗光、楼顶管线、过曝之前的霓虹，以及一个人继续写代码时听见的城市底噪。
+          </p>
+
+          <div class="process-strip" aria-label="创作流程">
+            <span>采样</span>
+            <span>降噪</span>
+            <span>成像</span>
           </div>
-          <div class="process-strip process-strip-blank">
-            <span></span>
-            <span></span>
-            <span></span>
+
+          <div class="tool-cloud" aria-label="风格标签">
+            <span>后朋克</span>
+            <span>雨夜屋顶</span>
+            <span>冷色城市</span>
+            <span>低保真纹理</span>
+            <span>轻量交互</span>
           </div>
         </div>
 
-        <aside class="profile-stack" aria-hidden="true">
-          <div class="profile-visual">
+        <aside class="profile-stack" aria-label="视觉参数">
+          <div class="profile-visual profile-visual-active" aria-hidden="true">
             <span class="profile-core"></span>
             <span class="profile-ring profile-ring-a"></span>
             <span class="profile-ring profile-ring-b"></span>
+            <span class="field-dial"></span>
           </div>
 
-          <div class="signal-panel signal-panel-blank">
-            {Array.from({ length: 4 }).map(() => (
-              <div class="signal-row">
-                <span></span>
-                <strong></strong>
-              </div>
-            ))}
+          <div class="signal-panel">
+            <div class="signal-row">
+              <span>色温</span>
+              <strong>蓝黑 / 雾灰 / 暗紫</strong>
+            </div>
+            <div class="signal-row">
+              <span>节拍</span>
+              <strong>缓慢 / 重复 / 克制</strong>
+            </div>
+            <div class="signal-row">
+              <span>材质</span>
+              <strong>雨痕 / 玻璃 / 旧海报</strong>
+            </div>
+            <div class="signal-row">
+              <span>交互</span>
+              <strong>视差 / 微光 / 轻动画</strong>
+            </div>
+          </div>
+
+          <div class="availability-card">
+            <span>本轮目标</span>
+            <strong>让页面从氛围海报变成可持续扩展的个人作品入口。</strong>
           </div>
         </aside>
       </div>
     </section>
 
-    <section id="works" class="content-section works-section image-section" aria-label="第三部分图片">
+    <section id="works" class="content-section works-section image-section" aria-label="现场">
       <div class="section-shell">
-        <div class="image-stage-grid" aria-hidden="true">
+        <div class="section-heading">
+          <p class="section-label">现场 / 三段夜间切片</p>
+          <h2>不是作品集陈列，而是三段从城市边缘截取的低光现场。</h2>
+        </div>
+
+        <div class="image-stage-grid">
           {workImages.map((image, index) => (
             <figure class={`work-image-card work-image-card-${index + 1}`}>
-              <img src={image} alt="" loading="lazy" decoding="async" />
+              <img src={image.src} alt={image.title} loading="lazy" decoding="async" />
+              <figcaption>
+                <strong>{image.title}</strong>
+                <span>{image.meta}</span>
+              </figcaption>
             </figure>
           ))}
         </div>
+
+        <div class="works-note">
+          <span>展示逻辑</span>
+          <p>
+            当前页面先用图片建立空间感，再用少量文字补足叙事。后续可以把这里扩展成项目、摄影、文章或交互实验的入口。
+          </p>
+        </div>
       </div>
     </section>
 
-    <section id="blog" class="content-section archive-section visual-section" aria-label="第四部分">
-      <div class="section-shell archive-grid" aria-hidden="true">
-        <div class="archive-panel archive-panel-large">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div class="archive-stack">
-          {Array.from({ length: 3 }).map(() => (
-            <div class="archive-row">
-              <i></i>
-              <b></b>
+    <section id="blog" class="content-section blog-section archive-section" aria-label="档案">
+      <div class="section-shell blog-layout">
+        <div class="blog-copy-column">
+          <div class="section-heading">
+            <p class="section-label">档案 / 桌面电台</p>
+            <h2>把资料、笔记和界面实验放进同一个夜间工作台。</h2>
+          </div>
+
+          <div class="post-list">
+            <article class="post-row">
+              <time datetime="2026-06-05">2026.06.05</time>
+              <div>
+                <p class="post-tag">视觉</p>
+                <h3>雨夜界面不能只靠黑色</h3>
+                <p>真正有层次的暗色页面，需要雾、反光、低对比纹理和非常节制的霓虹点缀。</p>
+              </div>
+            </article>
+
+            <article class="post-row">
+              <time datetime="2026-06-04">2026.06.04</time>
+              <div>
+                <p class="post-tag">交互</p>
+                <h3>动效应该像远处的灯</h3>
+                <p>它可以存在，但不能抢走阅读和停留。视差、微光、信号条都应该在鼠标离开后安静下来。</p>
+              </div>
+            </article>
+
+            <article class="post-row">
+              <time datetime="2026-06-03">2026.06.03</time>
+              <div>
+                <p class="post-tag">声音</p>
+                <h3>低保真不是粗糙，而是保留痕迹</h3>
+                <p>像磁带底噪、旧墙雨痕和未清理干净的反射，它们让页面从模板里脱离出来。</p>
+              </div>
+            </article>
+          </div>
+
+          <aside class="reading-card" aria-label="资料来源">
+            <span>资料方向</span>
+            <p>
+              文案参考了后朋克的实验与内省、低保真对录音痕迹的保留、工业音乐的机械感，以及赛博朋克对技术城市和边缘个体的想象。
+            </p>
+            <div class="source-links" aria-label="参考资料链接">
+              <a href="https://www.britannica.com/art/postpunk" target="_blank" rel="noreferrer">后朋克</a>
+              <a href="https://www.britannica.com/art/lo-fi-music" target="_blank" rel="noreferrer">低保真</a>
+              <a href="https://www.britannica.com/art/industrial-music" target="_blank" rel="noreferrer">工业音乐</a>
+              <a href="https://www.britannica.com/art/cyberpunk" target="_blank" rel="noreferrer">赛博朋克</a>
             </div>
-          ))}
+          </aside>
         </div>
-      </div>
-    </section>
 
-    <section id="contact" class="content-section contact-section visual-section" aria-label="第五部分">
-      <div class="section-shell contact-grid contact-grid-visual" aria-hidden="true">
-        <div class="visual-copy">
-          <span class="visual-kicker"></span>
-          <span class="visual-title"></span>
-          <span class="visual-title visual-title-short"></span>
-          <div class="visual-paragraph">
-            <span></span>
-            <span></span>
+        <div class="blog-media-column">
+          <div class="feature-photo-card">
+            <img src={deskImage} alt="雨夜窗边的合成器、磁带机和耳机" loading="lazy" decoding="async" />
+            <div class="sound-bars" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="contact-panel contact-panel-blank">
-          <span></span>
-          <span></span>
-          <span></span>
+    <section id="contact" class="content-section contact-section" aria-label="联络">
+      <div class="section-shell contact-grid">
+        <div class="section-copy">
+          <p class="section-label">联络 / 弱信号入口</p>
+          <h2>如果你也偏爱冷雨、低频和不那么明亮的界面，可以从这里接入。</h2>
+          <p>
+            这个站点会继续作为个人视觉和前端实验场更新。下一步可以加入作品详情、音乐播放组件、文章页和更完整的移动端体验。
+          </p>
+        </div>
+
+        <div class="contact-panel">
+          <a href="mailto:hello@example.com">发送邮件</a>
+          <a href="https://github.com/524290569-debug" target="_blank" rel="noreferrer">查看 GitHub</a>
+          <a href="#home">返回顶部</a>
         </div>
       </div>
     </section>
 
-    <footer class="site-footer visual-footer" aria-hidden="true">
+    <footer class="site-footer">
       <div class="footer-inner">
-        <span></span>
-        <span></span>
+        <span>灰雨电台 / 雨声频道</span>
+        <span>后朋克界面记录</span>
       </div>
     </footer>
   </main>
