@@ -1452,6 +1452,95 @@ img {
   border-top: 1px solid rgba(190, 223, 232, 0.12);
 }
 
+.field-note-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.blog-layout .field-note-grid {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.field-note {
+  position: relative;
+  min-height: 10rem;
+  overflow: hidden;
+  border: 1px solid rgba(190, 223, 232, 0.1);
+  background:
+    linear-gradient(135deg, rgba(120, 233, 255, 0.06), transparent 36%),
+    linear-gradient(180deg, rgba(18, 34, 42, 0.24), rgba(3, 7, 10, 0.5)),
+    rgba(5, 12, 16, 0.38);
+  padding: 1.05rem;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.field-note::before,
+.field-note::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+}
+
+.field-note::before {
+  top: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(120, 233, 255, 0.2), transparent);
+  opacity: 0.64;
+}
+
+.field-note::after {
+  right: -3rem;
+  bottom: -4rem;
+  width: 9rem;
+  height: 9rem;
+  border: 1px solid rgba(190, 223, 232, 0.06);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 44%, rgba(120, 233, 255, 0.06) 45% 46%, transparent 47%),
+    conic-gradient(from 16deg, transparent, rgba(240, 90, 157, 0.06), transparent 34%);
+}
+
+.field-note:hover {
+  border-color: rgba(120, 233, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.field-note span {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(120, 233, 255, 0.18);
+  background: rgba(3, 7, 10, 0.34);
+  padding: 0.28rem 0.42rem;
+  color: rgba(120, 233, 255, 0.68);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+}
+
+.field-note h3 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: rgba(239, 247, 249, 0.9);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.field-note p {
+  position: relative;
+  z-index: 1;
+  margin: 0.65rem 0 0;
+  color: rgba(188, 205, 211, 0.7);
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.72;
+}
+
 .post-row {
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr);
@@ -1480,6 +1569,27 @@ img {
     radial-gradient(circle at 18% 18%, rgba(120, 233, 255, 0.09), transparent 10rem),
     rgba(5, 12, 16, 0.32);
   padding: 1.35rem;
+}
+
+.blog-layout > .reading-card {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(7rem, 0.18fr) minmax(0, 1fr);
+  gap: 0.9rem 1.4rem;
+  align-items: start;
+}
+
+.blog-layout > .reading-card span {
+  margin-bottom: 0;
+}
+
+.blog-layout > .reading-card p {
+  max-width: 56rem;
+}
+
+.blog-layout > .reading-card .source-links {
+  grid-column: 2;
+  margin-top: 0;
 }
 
 .source-links {
@@ -1806,6 +1916,15 @@ img {
     grid-column: auto;
   }
 
+  .blog-layout .field-note-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .blog-layout > .reading-card,
+  .blog-layout > .reading-card .source-links {
+    grid-column: auto;
+  }
+
   .image-stage-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
@@ -1912,6 +2031,26 @@ img {
   .post-row {
     grid-template-columns: 1fr;
     gap: 0.6rem;
+  }
+
+  .field-note-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-layout .field-note-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-note {
+    min-height: auto;
+  }
+
+  .blog-layout > .reading-card {
+    display: block;
+  }
+
+  .blog-layout > .reading-card .source-links {
+    margin-top: 1rem;
   }
 
   .signal-row {

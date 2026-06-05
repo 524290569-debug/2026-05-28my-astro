@@ -25,6 +25,29 @@ const workImages = [
   }
 ];
 
+const fieldNotes = [
+  {
+    code: "POST",
+    title: "内向节拍",
+    body: "后朋克的线索不放在口号里，而放在重复、空隙和一点点不稳定的灯光里。"
+  },
+  {
+    code: "LOFI",
+    title: "保留噪点",
+    body: "页面不把痕迹擦干净：雨纹、低对比颗粒和暗处反光负责把空间留住。"
+  },
+  {
+    code: "IND",
+    title: "机械低频",
+    body: "工业音乐的硬边被压成细线、刻度和信号条，只留下冷硬的节奏感。"
+  },
+  {
+    code: "EDGE",
+    title: "城市边缘",
+    body: "赛博末世感来自远处技术城市和近处旧屋顶之间的距离，不靠高饱和霓虹硬撑。"
+  }
+];
+
 const textureImage = assetPath("assets/textures/rain-wall.webp");
 const deskImage = assetPath("assets/features/postpunk-desk.webp");
 ---
@@ -129,7 +152,15 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
         <div class="image-stage-grid">
           {workImages.map((image, index) => (
             <figure class={`work-image-card work-image-card-${index + 1}`}>
-              <img src={image.src} alt={image.title} loading="lazy" decoding="async" />
+              <img
+                src={image.src}
+                alt={image.title}
+                loading="lazy"
+                decoding="async"
+                sizes={index === 0
+                  ? "(max-width: 720px) calc(100vw - 2rem), (max-width: 980px) 50vw, 54vw"
+                  : "(max-width: 720px) calc(100vw - 2rem), (max-width: 980px) 50vw, 34vw"}
+              />
               <figcaption>
                 <strong>{image.title}</strong>
                 <span>{image.meta}</span>
@@ -183,24 +214,17 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
               </div>
             </article>
           </div>
-
-          <aside class="reading-card" aria-label="资料来源">
-            <span>资料方向</span>
-            <p>
-              文案参考了后朋克的实验与内省、低保真对录音痕迹的保留、工业音乐的机械感，以及赛博朋克对技术城市和边缘个体的想象。
-            </p>
-            <div class="source-links" aria-label="参考资料链接">
-              <a href="https://www.britannica.com/art/postpunk" target="_blank" rel="noreferrer">后朋克</a>
-              <a href="https://www.britannica.com/art/lo-fi-music" target="_blank" rel="noreferrer">低保真</a>
-              <a href="https://www.britannica.com/art/industrial-music" target="_blank" rel="noreferrer">工业音乐</a>
-              <a href="https://www.britannica.com/art/cyberpunk" target="_blank" rel="noreferrer">赛博朋克</a>
-            </div>
-          </aside>
         </div>
 
         <div class="blog-media-column">
           <div class="feature-photo-card">
-            <img src={deskImage} alt="雨夜窗边的合成器、磁带机和耳机" loading="lazy" decoding="async" />
+            <img
+              src={deskImage}
+              alt="雨夜窗边的合成器、磁带机和耳机"
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 980px) calc(100vw - 2rem), 44vw"
+            />
             <div class="sound-bars" aria-hidden="true">
               <span></span>
               <span></span>
@@ -210,6 +234,29 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
             </div>
           </div>
         </div>
+
+        <div class="field-note-grid" aria-label="夜间采样记录">
+          {fieldNotes.map((note) => (
+            <article class="field-note">
+              <span>{note.code}</span>
+              <h3>{note.title}</h3>
+              <p>{note.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <aside class="reading-card" aria-label="资料来源">
+          <span>资料方向</span>
+          <p>
+            本轮文案把资料压成页面语气：后朋克保留实验和内省，低保真保留不完美的录音痕迹，工业音乐留下机械节奏，赛博朋克只取技术城市和边缘个体之间的冷距离。
+          </p>
+          <div class="source-links" aria-label="参考资料链接">
+            <a href="https://www.britannica.com/art/postpunk" target="_blank" rel="noreferrer">后朋克</a>
+            <a href="https://www.britannica.com/art/lo-fi-music" target="_blank" rel="noreferrer">低保真</a>
+            <a href="https://www.britannica.com/art/industrial-music" target="_blank" rel="noreferrer">工业音乐</a>
+            <a href="https://www.britannica.com/art/cyberpunk" target="_blank" rel="noreferrer">赛博朋克</a>
+          </div>
+        </aside>
       </div>
     </section>
 
