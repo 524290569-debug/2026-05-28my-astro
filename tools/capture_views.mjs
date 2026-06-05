@@ -9,18 +9,36 @@ const baseUrl = `http://127.0.0.1:${port}/2026-05-28my-astro/`;
 const screenshotDir = join(root, "screenshots");
 const edgeProfile = join(root, ".tmp", `edge-profile-${Date.now()}`);
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+const captureVersion = process.env.CAPTURE_VERSION ?? "v001";
 
-const shots = [
-  ["home", "#home"],
-  ["about", "#about"],
-  ["works", "#works"],
-  ["blog", "#blog"],
-  ["contact", "#contact"]
+const capturePlans = [
+  { name: "home", selector: "#home", width: 1440, height: 900, mobile: false },
+  { name: "about", selector: "#about", width: 1440, height: 900, mobile: false },
+  { name: "works", selector: "#works", width: 1440, height: 900, mobile: false },
+  { name: "blog", selector: "#blog", width: 1440, height: 900, mobile: false },
+  { name: "blog-notes", selector: ".field-note-grid", width: 1440, height: 900, mobile: false, offset: 180 },
+  { name: "contact", selector: "#contact", width: 1440, height: 900, mobile: false },
+  { name: "mobile-home", selector: "#home", width: 390, height: 844, mobile: true },
+  { name: "mobile-blog-notes", selector: ".field-note-grid", width: 390, height: 844, mobile: true, offset: 120 }
 ];
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+function pad(value) {
+  return String(value).padStart(2, "0");
+}
+
+function formatCaptureStamp(date) {
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join("-") + `-${pad(date.getHours())}${pad(date.getMinutes())}`;
+}
+
+const capturePrefix = process.env.CAPTURE_PREFIX ?? `auto-${formatCaptureStamp(new Date())}-${captureVersion}`;
 
 function run(command, args) {
   return new Promise((resolve, reject) => {
@@ -131,12 +149,27 @@ function connectCdp(wsUrl) {
   return { ws, send, once };
 }
 
-async function captureSection(cdp, name, selector) {
+async function loadViewport(cdp, width, height, mobile) {
+  await cdp.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height,
+    deviceScaleFactor: 1,
+    mobile
+  });
+
+  const loaded = cdp.once("Page.loadEventFired");
+  await cdp.send("Page.navigate", { url: baseUrl });
+  await Promise.race([loaded, delay(5000)]);
+  await delay(1000);
+}
+
+async function captureSection(cdp, plan) {
+  const offset = plan.offset ?? 88;
   await cdp.send("Runtime.evaluate", {
     expression:
-      selector === "#home"
+      plan.selector === "#home"
         ? "document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, 0);"
-        : `document.documentElement.style.scrollBehavior = 'auto'; { const element = document.querySelector(${JSON.stringify(selector)}); if (element) { const top = element.getBoundingClientRect().top + window.scrollY - 88; window.scrollTo(0, Math.max(0, top)); } }`,
+        : `document.documentElement.style.scrollBehavior = 'auto'; { const element = document.querySelector(${JSON.stringify(plan.selector)}); if (element) { const top = element.getBoundingClientRect().top + window.scrollY - ${offset}; window.scrollTo(0, Math.max(0, top)); } }`,
     awaitPromise: false
   });
   await delay(700);
@@ -147,7 +180,7 @@ async function captureSection(cdp, name, selector) {
     captureBeyondViewport: false
   });
 
-  const output = join(screenshotDir, `review-${name}-1440x900.png`);
+  const output = join(screenshotDir, `${capturePrefix}-${plan.name}.png`);
   await writeFile(output, Buffer.from(result.data, "base64"));
   console.log(`captured ${output}`);
 }
@@ -191,20 +224,17 @@ try {
   const cdp = connectCdp(target.webSocketDebuggerUrl);
   await cdp.send("Page.enable");
   await cdp.send("Runtime.enable");
-  await cdp.send("Emulation.setDeviceMetricsOverride", {
-    width: 1440,
-    height: 900,
-    deviceScaleFactor: 1,
-    mobile: false
-  });
 
-  const loaded = cdp.once("Page.loadEventFired");
-  await cdp.send("Page.navigate", { url: baseUrl });
-  await Promise.race([loaded, delay(5000)]);
-  await delay(1000);
+  let activeViewport = "";
 
-  for (const [name, selector] of shots) {
-    await captureSection(cdp, name, selector);
+  for (const plan of capturePlans) {
+    const viewportKey = `${plan.width}x${plan.height}-${plan.mobile}`;
+    if (viewportKey !== activeViewport) {
+      await loadViewport(cdp, plan.width, plan.height, plan.mobile);
+      activeViewport = viewportKey;
+    }
+
+    await captureSection(cdp, plan);
   }
 
   cdp.ws.close();
