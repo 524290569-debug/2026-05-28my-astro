@@ -1,8 +1,24 @@
-﻿node_modules/
+node_modules/
 .astro/
 dist/
+
+# Local verification output
 screenshots/
 hatch-pet-runs/
 .tmp/
+
+# Private/local automation, reports, source references, and helper tools
+.codex/
+.github/workflows/codex-website-optimization.yml
+reports/automation/
+Codex网站优化自动化.md
+README.md
+启动说明.md
+素材/
+tools/
+
+# Local environment and OS noise
 .env
+.env.*
+!.env.example
 .DS_Store

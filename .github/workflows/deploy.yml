@@ -1,5 +1,8 @@
 name: Deploy to GitHub Pages
 
+env:
+  ASTRO_TELEMETRY_DISABLED: "1"
+
 on:
   push:
     branches:
