@@ -1,6 +1,12 @@
 ---
 import "../styles/global.css";
 
+interface PreloadImage {
+  href: string;
+  type?: string;
+  fetchPriority?: "high" | "low" | "auto";
+}
+
 interface Props {
   title?: string;
   description?: string;
@@ -9,6 +15,7 @@ interface Props {
   imageWidth?: number;
   imageHeight?: number;
   imageType?: string;
+  preloadImages?: PreloadImage[];
 }
 
 const {
@@ -18,14 +25,24 @@ const {
   imageAlt = "灰雨电台的雨夜屋顶城市分享预览图",
   imageWidth = 1200,
   imageHeight = 630,
-  imageType = "image/webp"
+  imageType = "image/webp",
+  preloadImages = []
 } = Astro.props;
 
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const canonicalUrl = Astro.url.toString();
-const previewImage = new URL(`${basePath}${image}`, Astro.site ?? Astro.url).toString();
+const assetUrl = (path: string) =>
+  /^(?:https?:|\/)/.test(path) ? path : `${basePath}${path}`;
+const absoluteAssetUrl = (path: string) =>
+  new URL(assetUrl(path), Astro.site ?? Astro.url).toString();
+const previewImage = absoluteAssetUrl(image);
+const headPreloadImages = preloadImages.map((item) => ({
+  href: assetUrl(item.href),
+  type: item.type ?? "image/webp",
+  fetchPriority: item.fetchPriority ?? "auto"
+}));
 ---
 
 <!doctype html>
@@ -38,6 +55,17 @@ const previewImage = new URL(`${basePath}${image}`, Astro.site ?? Astro.url).toS
     <meta name="theme-color" content="#03070a" />
     <meta name="application-name" content="灰雨电台" />
     <link rel="canonical" href={canonicalUrl} />
+    {
+      headPreloadImages.map((item) => (
+        <link
+          rel="preload"
+          as="image"
+          href={item.href}
+          type={item.type}
+          fetchpriority={item.fetchPriority}
+        />
+      ))
+    }
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:site_name" content="灰雨电台" />
