@@ -154,6 +154,48 @@ const transmissionSignals = [
   }
 ];
 
+const archivePosts = [
+  {
+    date: "2026-06-05",
+    displayDate: "2026.06.05",
+    tag: "视觉",
+    title: "雨夜界面不能只靠黑色",
+    body: "真正有层次的暗色页面，需要雾、反光、低对比纹理和非常节制的霓虹点缀。",
+    signal: {
+      label: "LIGHT",
+      value: "18%",
+      detail: "窗光低亮",
+      level: "18%"
+    }
+  },
+  {
+    date: "2026-06-04",
+    displayDate: "2026.06.04",
+    tag: "交互",
+    title: "动效应该像远处的灯",
+    body: "它可以存在，但不能抢走阅读和停留。视差、微光、信号条都应该在鼠标离开后安静下来。",
+    signal: {
+      label: "MOTION",
+      value: "24%",
+      detail: "低频微动",
+      level: "24%"
+    }
+  },
+  {
+    date: "2026-06-03",
+    displayDate: "2026.06.03",
+    tag: "声音",
+    title: "低保真不是粗糙，而是保留痕迹",
+    body: "像磁带底噪、旧墙雨痕和未清理干净的反射，它们让页面从模板里脱离出来。",
+    signal: {
+      label: "NOISE",
+      value: "41%",
+      detail: "底噪保留",
+      level: "41%"
+    }
+  }
+];
+
 const textureImage = assetPath("assets/textures/rain-wall.webp");
 const deskImage = assetPath("assets/features/postpunk-desk.webp");
 const deskImageSize = { width: 1200, height: 900 };
@@ -332,32 +374,26 @@ const deskImageSize = { width: 1200, height: 900 };
           </div>
 
           <div class="post-list">
-            <article class="post-row">
-              <time datetime="2026-06-05">2026.06.05</time>
-              <div>
-                <p class="post-tag">视觉</p>
-                <h3>雨夜界面不能只靠黑色</h3>
-                <p>真正有层次的暗色页面，需要雾、反光、低对比纹理和非常节制的霓虹点缀。</p>
-              </div>
-            </article>
-
-            <article class="post-row">
-              <time datetime="2026-06-04">2026.06.04</time>
-              <div>
-                <p class="post-tag">交互</p>
-                <h3>动效应该像远处的灯</h3>
-                <p>它可以存在，但不能抢走阅读和停留。视差、微光、信号条都应该在鼠标离开后安静下来。</p>
-              </div>
-            </article>
-
-            <article class="post-row">
-              <time datetime="2026-06-03">2026.06.03</time>
-              <div>
-                <p class="post-tag">声音</p>
-                <h3>低保真不是粗糙，而是保留痕迹</h3>
-                <p>像磁带底噪、旧墙雨痕和未清理干净的反射，它们让页面从模板里脱离出来。</p>
-              </div>
-            </article>
+            {archivePosts.map((post) => (
+              <article class="post-row">
+                <time datetime={post.date}>{post.displayDate}</time>
+                <div>
+                  <p class="post-tag">{post.tag}</p>
+                  <h3>{post.title}</h3>
+                  <p>{post.body}</p>
+                  <div
+                    class="post-signal-strip"
+                    style={`--level: ${post.signal.level}`}
+                    aria-label={`${post.signal.label}：${post.signal.value}，${post.signal.detail}`}
+                  >
+                    <span>{post.signal.label}</span>
+                    <i aria-hidden="true"></i>
+                    <strong>{post.signal.value}</strong>
+                    <small>{post.signal.detail}</small>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
 

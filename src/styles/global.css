@@ -1950,11 +1950,40 @@ img {
 }
 
 .post-row {
+  position: relative;
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr);
   gap: 1.5rem;
   padding: 1.25rem 0;
   border-bottom: 1px solid rgba(190, 223, 232, 0.1);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.post-row::before {
+  position: absolute;
+  top: 1.25rem;
+  bottom: 1.25rem;
+  left: -0.78rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(120, 233, 255, 0.24), transparent);
+  content: "";
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.post-row:hover {
+  border-bottom-color: rgba(120, 233, 255, 0.18);
+  background: linear-gradient(90deg, rgba(120, 233, 255, 0.028), transparent 68%);
+}
+
+.post-row:hover::before {
+  opacity: 1;
+}
+
+.post-row > div {
+  min-width: 0;
 }
 
 .post-row time {
@@ -1969,6 +1998,57 @@ img {
   font-size: 0.68rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+}
+
+.post-signal-strip {
+  display: grid;
+  grid-template-columns: minmax(3.8rem, auto) minmax(5rem, 1fr) auto minmax(0, auto);
+  gap: 0.62rem;
+  align-items: center;
+  margin-top: 0.95rem;
+  color: rgba(166, 184, 190, 0.62);
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.post-signal-strip span,
+.post-signal-strip strong,
+.post-signal-strip small {
+  min-width: 0;
+}
+
+.post-signal-strip span {
+  color: rgba(120, 233, 255, 0.58);
+  font-weight: 500;
+}
+
+.post-signal-strip i {
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(120, 233, 255, 0.58) 0 var(--level),
+    rgba(190, 223, 232, 0.12) var(--level),
+    transparent 100%
+  );
+  box-shadow: 0 0 0.85rem rgba(120, 233, 255, 0.09);
+}
+
+.post-signal-strip strong {
+  color: rgba(239, 247, 249, 0.78);
+  font-size: 0.7rem;
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.post-signal-strip small {
+  color: rgba(180, 199, 205, 0.58);
+  font-size: 0.64rem;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .reading-card {
@@ -2682,6 +2762,10 @@ img {
     gap: 0.6rem;
   }
 
+  .post-row::before {
+    left: -0.5rem;
+  }
+
   .field-note-grid {
     grid-template-columns: 1fr;
   }
@@ -2912,6 +2996,16 @@ img {
   .contact-link-list a small {
     text-align: left;
     white-space: normal;
+  }
+
+  .post-signal-strip {
+    grid-template-columns: minmax(3.8rem, auto) minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+
+  .post-signal-strip small {
+    grid-column: 1 / -1;
+    text-align: left;
   }
 
   .transmission-log {
