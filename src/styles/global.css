@@ -1734,6 +1734,13 @@ img {
   border-top: 1px solid rgba(190, 223, 232, 0.12);
   padding: 0.82rem 0 0 0.85rem;
   color: rgba(190, 207, 213, 0.7);
+  overflow-wrap: anywhere;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .source-links a::before {
@@ -1748,6 +1755,18 @@ img {
   transition:
     opacity 180ms ease,
     background 180ms ease;
+}
+
+.source-links a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.18rem;
+  left: 0.85rem;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(120, 233, 255, 0.28), transparent);
+  content: "";
+  opacity: 0;
+  transition: opacity 180ms ease;
 }
 
 .source-links small {
@@ -1774,6 +1793,8 @@ img {
 .source-links a:hover,
 .source-links a:focus-visible {
   border-top-color: rgba(120, 233, 255, 0.34);
+  background: rgba(120, 233, 255, 0.026);
+  box-shadow: inset 0 0 0 1px rgba(120, 233, 255, 0.055);
   color: rgba(239, 247, 249, 0.86);
   outline: none;
 }
@@ -1782,6 +1803,15 @@ img {
 .source-links a:focus-visible::before {
   background: linear-gradient(180deg, rgba(120, 233, 255, 0.72), rgba(240, 90, 157, 0.18), transparent);
   opacity: 1;
+}
+
+.source-links a:hover::after,
+.source-links a:focus-visible::after {
+  opacity: 1;
+}
+
+.source-links a:active {
+  transform: translateY(1px);
 }
 
 .archive-grid {
@@ -1917,16 +1947,38 @@ img {
 }
 
 .contact-link-list a {
+  position: relative;
   display: flex;
   min-height: 4.7rem;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  overflow: hidden;
   padding: 0 1.25rem;
   border-bottom: 1px solid rgba(190, 223, 232, 0.1);
   color: rgba(230, 240, 243, 0.84);
   font-size: 0.95rem;
   font-weight: 300;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.contact-link-list a::before {
+  position: absolute;
+  top: 0.8rem;
+  bottom: 0.8rem;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(120, 233, 255, 0.68), rgba(240, 90, 157, 0.16), transparent);
+  content: "";
+  opacity: 0;
+  transform: scaleY(0.35);
+  transform-origin: center;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
 }
 
 .contact-link-list a span {
@@ -1942,6 +1994,7 @@ img {
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.16em;
+  overflow-wrap: anywhere;
   text-align: right;
   white-space: nowrap;
 }
@@ -2029,6 +2082,7 @@ img {
   font-size: 0.78rem;
   font-weight: 300;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .contact-grid-visual {
@@ -2097,6 +2151,16 @@ img {
   background: rgba(120, 233, 255, 0.045);
   color: var(--ink);
   outline: none;
+}
+
+.contact-link-list a:hover::before,
+.contact-link-list a:focus-visible::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.contact-link-list a:active {
+  transform: translateY(1px);
 }
 
 .site-footer {
@@ -2326,6 +2390,7 @@ img {
 
   .blog-layout > .reading-card {
     display: block;
+    padding: 1.15rem;
   }
 
   .blog-layout > .reading-card .source-links {
@@ -2334,10 +2399,28 @@ img {
 
   .source-links {
     grid-template-columns: 1fr;
+    gap: 0.72rem;
   }
 
   .source-links a {
     min-height: 0;
+    border-top-color: rgba(190, 223, 232, 0.1);
+    background:
+      linear-gradient(90deg, rgba(120, 233, 255, 0.042), transparent 68%),
+      rgba(3, 7, 10, 0.18);
+    padding: 0.78rem 0.8rem 0.86rem 1rem;
+  }
+
+  .source-links a::before {
+    top: 0.78rem;
+    bottom: 0.78rem;
+    left: 0.55rem;
+  }
+
+  .source-links a::after {
+    right: 0.8rem;
+    bottom: 0.52rem;
+    left: 1rem;
   }
 
   .signal-row {
@@ -2477,11 +2560,23 @@ img {
     flex-direction: column;
     justify-content: center;
     gap: 0.35rem;
+    padding: 0.85rem 1rem;
   }
 
   .contact-link-list a small {
     text-align: left;
     white-space: normal;
+  }
+
+  .transmission-log {
+    gap: 0.72rem;
+    padding: 1rem;
+  }
+
+  .transmission-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.22rem;
   }
 
   .transmission-row div {
