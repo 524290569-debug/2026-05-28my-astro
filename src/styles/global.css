@@ -1909,13 +1909,19 @@ img {
 .contact-panel {
   display: grid;
   gap: 0;
+  overflow: hidden;
 }
 
-.contact-panel a {
+.contact-link-list {
+  display: grid;
+}
+
+.contact-link-list a {
   display: flex;
   min-height: 4.7rem;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0 1.25rem;
   border-bottom: 1px solid rgba(190, 223, 232, 0.1);
   color: rgba(230, 240, 243, 0.84);
@@ -1923,15 +1929,106 @@ img {
   font-weight: 300;
 }
 
-.contact-panel a:last-child {
+.contact-link-list a span {
+  min-width: 0;
+}
+
+.contact-link-list a:last-child {
   border-bottom: 0;
 }
 
-.contact-panel a::after {
+.contact-link-list a small {
   color: rgba(120, 233, 255, 0.62);
-  content: "";
   font-size: 0.7rem;
+  font-weight: 500;
   letter-spacing: 0.16em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.transmission-log {
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  border-top: 1px solid rgba(190, 223, 232, 0.12);
+  background:
+    radial-gradient(circle at 78% 10%, rgba(240, 90, 157, 0.085), transparent 9rem),
+    linear-gradient(180deg, rgba(3, 7, 10, 0.24), rgba(3, 7, 10, 0.48));
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.transmission-log::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 0.8rem),
+    linear-gradient(90deg, rgba(120, 233, 255, 0.05), transparent 55%);
+  content: "";
+  opacity: 0.52;
+}
+
+.transmission-header,
+.transmission-row {
+  position: relative;
+  z-index: 1;
+}
+
+.transmission-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.transmission-header span,
+.transmission-row span {
+  color: rgba(120, 233, 255, 0.62);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.transmission-header strong,
+.transmission-row strong {
+  color: rgba(239, 247, 249, 0.88);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.transmission-row {
+  display: grid;
+  gap: 0.42rem;
+  padding-top: 0.78rem;
+  border-top: 1px solid rgba(190, 223, 232, 0.08);
+}
+
+.transmission-row div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.transmission-row i {
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(120, 233, 255, 0.62) 0 var(--level),
+    rgba(190, 223, 232, 0.12) var(--level),
+    transparent 100%
+  );
+  box-shadow: 0 0 1rem rgba(120, 233, 255, 0.1);
+}
+
+.transmission-row p {
+  margin: 0;
+  color: rgba(166, 184, 190, 0.64);
+  font-size: 0.78rem;
+  font-weight: 300;
+  line-height: 1.55;
 }
 
 .contact-grid-visual {
@@ -1995,8 +2092,8 @@ img {
   border-color: rgba(240, 90, 157, 0.1);
 }
 
-.contact-panel a:hover,
-.contact-panel a:focus-visible {
+.contact-link-list a:hover,
+.contact-link-list a:focus-visible {
   background: rgba(120, 233, 255, 0.045);
   color: var(--ink);
   outline: none;
@@ -2374,12 +2471,23 @@ img {
     border-bottom: 0;
   }
 
-  .contact-panel a {
+  .contact-link-list a {
     min-height: 4.2rem;
     align-items: flex-start;
     flex-direction: column;
     justify-content: center;
     gap: 0.35rem;
+  }
+
+  .contact-link-list a small {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .transmission-row div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.24rem;
   }
 
   .footer-inner {

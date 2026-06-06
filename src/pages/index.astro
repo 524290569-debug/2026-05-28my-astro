@@ -99,6 +99,46 @@ const stationSignals = [
   }
 ];
 
+const contactRoutes = [
+  {
+    label: "发送邮件",
+    meta: "MAIL / DIRECT",
+    href: "mailto:hello@example.com"
+  },
+  {
+    label: "查看 GitHub",
+    meta: "REPO / PUBLIC",
+    href: "https://github.com/524290569-debug",
+    external: true
+  },
+  {
+    label: "返回顶部",
+    meta: "HOME / SIGNAL",
+    href: "#home"
+  }
+];
+
+const transmissionSignals = [
+  {
+    label: "CHANNEL",
+    value: "OPEN",
+    detail: "弱信号入口保持在线",
+    level: "82%"
+  },
+  {
+    label: "LATENCY",
+    value: "03 ms",
+    detail: "低频回声轻微延迟",
+    level: "54%"
+  },
+  {
+    label: "WINDOW",
+    value: "LOW",
+    detail: "只保留一格暖黄窗光",
+    level: "38%"
+  }
+];
+
 const textureImage = assetPath("assets/textures/rain-wall.webp");
 const deskImage = assetPath("assets/features/postpunk-desk.webp");
 const deskImageSize = { width: 1200, height: 900 };
@@ -355,10 +395,37 @@ const deskImageSize = { width: 1200, height: 900 };
           </p>
         </div>
 
-        <div class="contact-panel">
-          <a href="mailto:hello@example.com">发送邮件</a>
-          <a href="https://github.com/524290569-debug" target="_blank" rel="noreferrer">查看 GitHub</a>
-          <a href="#home">返回顶部</a>
+        <div class="contact-panel" aria-label="弱信号联络面板">
+          <div class="contact-link-list" aria-label="联络入口">
+            {contactRoutes.map((route) => (
+              <a
+                href={route.href}
+                target={route.external ? "_blank" : undefined}
+                rel={route.external ? "noreferrer" : undefined}
+              >
+                <span>{route.label}</span>
+                <small>{route.meta}</small>
+              </a>
+            ))}
+          </div>
+
+          <div class="transmission-log" aria-label="传输状态">
+            <div class="transmission-header">
+              <span>TRANSMISSION LOG</span>
+              <strong>03:17</strong>
+            </div>
+
+            {transmissionSignals.map((signal) => (
+              <div class="transmission-row" style={`--level: ${signal.level}`}>
+                <div>
+                  <span>{signal.label}</span>
+                  <strong>{signal.value}</strong>
+                </div>
+                <i aria-hidden="true"></i>
+                <p>{signal.detail}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
