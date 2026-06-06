@@ -13,21 +13,36 @@ const workImages = [
     width: 1280,
     height: 720,
     title: "屋顶回声",
-    meta: "雨幕 / 天线 / 低频"
+    meta: "雨幕 / 天线 / 低频",
+    signal: {
+      code: "ANT-03",
+      value: "82%",
+      label: "天线余响"
+    }
   },
   {
     src: assetPath("assets/works/postpunk-passage.webp"),
     width: 1280,
     height: 720,
     title: "地下通道",
-    meta: "湿瓷砖 / 合成器 / 断讯"
+    meta: "湿瓷砖 / 合成器 / 断讯",
+    signal: {
+      code: "SUB-11",
+      value: "-6 dB",
+      label: "通道底噪"
+    }
   },
   {
     src: assetPath("assets/works/postpunk-bridge.webp"),
     width: 1280,
     height: 720,
     title: "高架余光",
-    meta: "远城 / 铁轨 / 冷蓝反射"
+    meta: "远城 / 铁轨 / 冷蓝反射",
+    signal: {
+      code: "TRK-07",
+      value: "41%",
+      label: "远城反射"
+    }
   }
 ];
 
@@ -281,6 +296,11 @@ const deskImageSize = { width: 1200, height: 900 };
                   ? "(max-width: 720px) calc(100vw - 2rem), (max-width: 980px) 50vw, 54vw"
                   : "(max-width: 720px) calc(100vw - 2rem), (max-width: 980px) 50vw, 34vw"}
               />
+              <div class="work-image-readout" aria-label={`${image.signal.label}：${image.signal.value}`}>
+                <span>{image.signal.code}</span>
+                <strong>{image.signal.value}</strong>
+                <small>{image.signal.label}</small>
+              </div>
               <figcaption>
                 <strong>{image.title}</strong>
                 <span>{image.meta}</span>
