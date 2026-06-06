@@ -10,16 +10,22 @@ const assetPath = (path) => `${basePath}${path}`;
 const workImages = [
   {
     src: assetPath("assets/works/postpunk-rooftop.webp"),
+    width: 1280,
+    height: 720,
     title: "屋顶回声",
     meta: "雨幕 / 天线 / 低频"
   },
   {
     src: assetPath("assets/works/postpunk-passage.webp"),
+    width: 1280,
+    height: 720,
     title: "地下通道",
     meta: "湿瓷砖 / 合成器 / 断讯"
   },
   {
     src: assetPath("assets/works/postpunk-bridge.webp"),
+    width: 1280,
+    height: 720,
     title: "高架余光",
     meta: "远城 / 铁轨 / 冷蓝反射"
   }
@@ -68,6 +74,7 @@ const stationSignals = [
 
 const textureImage = assetPath("assets/textures/rain-wall.webp");
 const deskImage = assetPath("assets/features/postpunk-desk.webp");
+const deskImageSize = { width: 1200, height: 900 };
 ---
 
 <BaseLayout
@@ -199,6 +206,8 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
               <img
                 src={image.src}
                 alt={image.title}
+                width={image.width}
+                height={image.height}
                 loading="lazy"
                 decoding="async"
                 sizes={index === 0
@@ -265,6 +274,8 @@ const deskImage = assetPath("assets/features/postpunk-desk.webp");
             <img
               src={deskImage}
               alt="雨夜窗边的合成器、磁带机和耳机"
+              width={deskImageSize.width}
+              height={deskImageSize.height}
               loading="lazy"
               decoding="async"
               sizes="(max-width: 980px) calc(100vw - 2rem), 44vw"

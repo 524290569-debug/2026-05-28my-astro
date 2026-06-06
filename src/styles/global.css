@@ -1216,6 +1216,7 @@ img {
 .work-image-card {
   position: relative;
   z-index: 1;
+  aspect-ratio: 16 / 9;
   min-height: 15.5rem;
   overflow: hidden;
   margin: 0;
@@ -1227,6 +1228,7 @@ img {
 }
 
 .work-image-card:first-child {
+  aspect-ratio: auto;
   grid-row: 1 / span 2;
 }
 
@@ -1241,6 +1243,7 @@ img {
 .work-image-card img {
   width: 100%;
   height: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   filter: brightness(0.82) saturate(0.76) contrast(1.05);
   transform: scale(1.01);
@@ -1501,6 +1504,7 @@ img {
 .feature-photo-card {
   position: relative;
   overflow: hidden;
+  aspect-ratio: 4 / 3;
   min-height: 29rem;
   border: 1px solid rgba(190, 223, 232, 0.12);
   background:
@@ -1514,6 +1518,7 @@ img {
 .feature-photo-card img {
   width: 100%;
   height: 100%;
+  aspect-ratio: 4 / 3;
   min-height: 29rem;
   object-fit: cover;
   filter: brightness(0.82) saturate(0.78) contrast(1.04);
@@ -2140,6 +2145,7 @@ img {
   }
 
   .work-image-card:first-child {
+    aspect-ratio: 16 / 9;
     grid-row: auto;
   }
 
@@ -2259,7 +2265,7 @@ img {
   }
 
   .work-image-card {
-    min-height: 14rem;
+    min-height: 0;
   }
 
   .work-image-card figcaption {
@@ -2270,7 +2276,7 @@ img {
 
   .feature-photo-card,
   .feature-photo-card img {
-    min-height: 18rem;
+    min-height: 0;
   }
 
   .process-strip {
@@ -2281,10 +2287,24 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .surface-brief::after {
+    display: none;
+  }
+
   .brief-track div,
   .brief-track div:last-child {
-    min-height: 5rem;
+    min-height: 4.35rem;
     border-right: 1px solid rgba(190, 223, 232, 0.08);
+    padding: 1rem;
+  }
+
+  .brief-track span {
+    margin-bottom: 0.35rem;
+  }
+
+  .brief-track strong {
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
 
   .process-strip span {

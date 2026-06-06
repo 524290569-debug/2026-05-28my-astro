@@ -15,18 +15,24 @@ const assetLayers = [
   {
     name: "storm-sky",
     src: assetPath("assets/hero/sky-v5.webp"),
+    width: 1600,
+    height: 686,
     depth: 0.025,
     className: "storm-sky-asset"
   },
   {
     name: "distant-city",
     src: assetPath("assets/hero/city-v5.webp"),
+    width: 64,
+    height: 44,
     depth: 0.14,
     className: "distant-city-asset"
   },
   {
     name: "foreground-rooftop",
     src: assetPath("assets/hero/rooftop-v5.webp"),
+    width: 64,
+    height: 11,
     depth: 0.42,
     className: "foreground-rooftop-asset"
   }
@@ -59,6 +65,8 @@ const assetLayers = [
           <img
             src={layer.src}
             alt=""
+            width={layer.width}
+            height={layer.height}
             loading="eager"
             decoding="async"
             fetchpriority={layer.name === "distant-city" ? "high" : "auto"}
