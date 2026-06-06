@@ -37,6 +37,24 @@ const assetLayers = [
     className: "foreground-rooftop-asset"
   }
 ];
+
+const stationReadouts = [
+  {
+    label: "RAIN",
+    value: "03:17",
+    detail: "冷雨持续压低城市噪声"
+  },
+  {
+    label: "BAND",
+    value: "-72 dB",
+    detail: "远处霓虹只保留残响"
+  },
+  {
+    label: "LIGHT",
+    value: "01",
+    detail: "只留一格暖黄窗光"
+  }
+];
 ---
 
 <section id="home" class="cyberpunk-hero" data-cyberpunk-hero>
@@ -99,6 +117,21 @@ const assetLayers = [
       <span></span>
       <span></span>
     </div>
+    <aside class="hero-station-panel" aria-label="屋顶电台状态">
+      <div class="station-panel-head">
+        <span>ROOFTOP STATION</span>
+        <strong>ON AIR</strong>
+      </div>
+      <div class="station-panel-grid">
+        {stationReadouts.map((readout) => (
+          <div class="station-readout">
+            <span>{readout.label}</span>
+            <strong>{readout.value}</strong>
+            <p>{readout.detail}</p>
+          </div>
+        ))}
+      </div>
+    </aside>
   </div>
 </section>
 
