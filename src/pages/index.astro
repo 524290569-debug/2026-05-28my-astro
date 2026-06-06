@@ -54,6 +54,33 @@ const fieldNotes = [
   }
 ];
 
+const readingSources = [
+  {
+    code: "POST",
+    title: "后朋克",
+    body: "把朋克之后的实验性和内向感，压进重复、空隙和冷光节奏里。",
+    href: "https://www.britannica.com/art/postpunk"
+  },
+  {
+    code: "LOFI",
+    title: "低保真",
+    body: "保留底噪、失真和不完美，让页面材质像旧录音一样可触摸。",
+    href: "https://www.britannica.com/art/lo-fi-music"
+  },
+  {
+    code: "IND",
+    title: "工业音乐",
+    body: "用噪声、机械节拍和磁带循环感，给界面留下一层硬边。",
+    href: "https://www.britannica.com/art/industrial-music"
+  },
+  {
+    code: "CYBER",
+    title: "赛博朋克",
+    body: "只取高技术城市和边缘个体之间的冷距离，不把霓虹推到过载。",
+    href: "https://www.britannica.com/art/cyberpunk"
+  }
+];
+
 const stationSignals = [
   {
     label: "SIGNAL",
@@ -306,10 +333,13 @@ const deskImageSize = { width: 1200, height: 900 };
             本轮文案把资料压成页面语气：后朋克保留实验和内省，低保真保留不完美的录音痕迹，工业音乐留下机械节奏，赛博朋克只取技术城市和边缘个体之间的冷距离。
           </p>
           <div class="source-links" aria-label="参考资料链接">
-            <a href="https://www.britannica.com/art/postpunk" target="_blank" rel="noreferrer">后朋克</a>
-            <a href="https://www.britannica.com/art/lo-fi-music" target="_blank" rel="noreferrer">低保真</a>
-            <a href="https://www.britannica.com/art/industrial-music" target="_blank" rel="noreferrer">工业音乐</a>
-            <a href="https://www.britannica.com/art/cyberpunk" target="_blank" rel="noreferrer">赛博朋克</a>
+            {readingSources.map((source) => (
+              <a href={source.href} target="_blank" rel="noreferrer">
+                <small>{source.code}</small>
+                <strong>{source.title}</strong>
+                <p>{source.body}</p>
+              </a>
+            ))}
           </div>
         </aside>
       </div>
