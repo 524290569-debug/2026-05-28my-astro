@@ -5,12 +5,20 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
 }
 
 const {
   title = "灰雨电台",
   description = "后朋克、冷雨屋顶和夜城低频的虚构档案。",
-  image = "assets/works/postpunk-rooftop.webp"
+  image = "assets/social/gray-rain-radio-og.webp",
+  imageAlt = "灰雨电台的雨夜屋顶城市分享预览图",
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageType = "image/webp"
 } = Astro.props;
 
 const basePath = import.meta.env.BASE_URL.endsWith("/")
@@ -37,11 +45,15 @@ const previewImage = new URL(`${basePath}${image}`, Astro.site ?? Astro.url).toS
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={previewImage} />
-    <meta property="og:image:alt" content="雨夜屋顶、远处城市和低保真后朋克视觉" />
+    <meta property="og:image:type" content={imageType} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={previewImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <title>{title}</title>
   </head>
   <body>
