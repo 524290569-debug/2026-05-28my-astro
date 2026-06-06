@@ -535,6 +535,7 @@ img {
 
 .hero-menu {
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .hero-menu-dots {
@@ -544,6 +545,7 @@ img {
 .hero-menu a {
   position: relative;
   display: inline-flex;
+  flex: 0 0 auto;
   min-height: 2.6rem;
   align-items: center;
   justify-content: center;
@@ -2663,15 +2665,34 @@ img {
 
   .hero-nav {
     min-height: 4rem;
-    padding: 0 0.85rem;
+    gap: 0.7rem;
+    overflow: hidden;
+    padding: 0 0.75rem;
   }
 
   .hero-brand {
+    flex: 0 0 auto;
     font-size: 0.8rem;
   }
 
-  .hero-menu a:nth-child(n + 4) {
+  .hero-menu {
+    max-width: min(24rem, calc(100vw - 10.5rem));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.12rem;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, transparent, #000 0.75rem, #000 calc(100% - 0.75rem), transparent);
+  }
+
+  .hero-menu::-webkit-scrollbar {
     display: none;
+  }
+
+  .hero-menu a {
+    padding: 0 0.48rem;
+    scroll-snap-align: center;
   }
 
   .hero-content {
@@ -2866,11 +2887,19 @@ img {
   }
 
   .hero-nav {
-    justify-content: center;
+    justify-content: space-between;
+    gap: 0.48rem;
+    padding: 0 0.62rem;
   }
 
   .hero-menu {
-    display: none;
+    max-width: min(14.2rem, calc(100vw - 10.4rem));
+  }
+
+  .hero-menu a {
+    min-height: 2.35rem;
+    padding: 0 0.42rem;
+    font-size: 0.66rem;
   }
 
   .hero-content h1 {
