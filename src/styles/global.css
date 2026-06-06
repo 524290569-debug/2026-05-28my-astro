@@ -595,6 +595,24 @@ img {
   outline: none;
 }
 
+.hero-menu a[aria-current="location"] {
+  color: rgba(239, 247, 249, 0.94);
+}
+
+.hero-menu a[aria-current="location"]::before {
+  position: absolute;
+  top: 0.58rem;
+  left: 50%;
+  width: 0.34rem;
+  height: 0.34rem;
+  background: rgba(120, 233, 255, 0.72);
+  box-shadow:
+    0 0 0.85rem rgba(120, 233, 255, 0.42),
+    0 0 0 1px rgba(120, 233, 255, 0.16);
+  content: "";
+  transform: translateX(-50%);
+}
+
 .hero-menu a:hover .nav-dot,
 .hero-menu a:focus-visible .nav-dot {
   border-color: rgba(120, 233, 255, 0.72);
@@ -604,7 +622,8 @@ img {
 }
 
 .hero-menu a:hover::after,
-.hero-menu a:focus-visible::after {
+.hero-menu a:focus-visible::after,
+.hero-menu a[aria-current="location"]::after {
   opacity: 1;
   transform: scaleX(1);
 }
