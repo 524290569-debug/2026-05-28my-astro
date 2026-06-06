@@ -47,6 +47,40 @@ a {
   text-decoration: none;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 0.85rem;
+  left: 50%;
+  display: inline-flex;
+  min-height: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(120, 233, 255, 0.42);
+  background:
+    linear-gradient(180deg, rgba(18, 34, 42, 0.86), rgba(4, 9, 12, 0.92)),
+    rgba(3, 7, 10, 0.94);
+  padding: 0 1rem;
+  color: rgba(239, 247, 249, 0.92);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -130%);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  opacity: 1;
+  outline: none;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
 img {
   display: block;
   max-width: 100%;

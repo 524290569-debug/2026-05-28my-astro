@@ -4,12 +4,20 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
 
 const {
   title = "灰雨电台",
-  description = "后朋克、冷雨屋顶和夜城低频的虚构档案。"
+  description = "后朋克、冷雨屋顶和夜城低频的虚构档案。",
+  image = "assets/works/postpunk-rooftop.webp"
 } = Astro.props;
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const canonicalUrl = Astro.url.toString();
+const previewImage = new URL(`${basePath}${image}`, Astro.site ?? Astro.url).toString();
 ---
 
 <!doctype html>
@@ -19,9 +27,25 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#03070a" />
+    <meta name="application-name" content="灰雨电台" />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="灰雨电台" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={previewImage} />
+    <meta property="og:image:alt" content="雨夜屋顶、远处城市和低保真后朋克视觉" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={previewImage} />
     <title>{title}</title>
   </head>
   <body>
+    <a class="skip-link" href="#about">跳到正文</a>
     <slot />
   </body>
 </html>
