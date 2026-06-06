@@ -932,6 +932,47 @@ img {
   padding: 8rem 0;
 }
 
+.section-copy,
+.section-heading {
+  position: relative;
+  --section-rail-offset: clamp(0.82rem, 1.7vw, 1.25rem);
+}
+
+.section-copy::before,
+.section-heading::before,
+.section-copy::after,
+.section-heading::after {
+  position: absolute;
+  left: calc(var(--section-rail-offset) * -1);
+  pointer-events: none;
+  content: "";
+}
+
+.section-copy::before,
+.section-heading::before {
+  top: 0.16rem;
+  bottom: 0.28rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(120, 233, 255, 0.64),
+    rgba(120, 233, 255, 0.16) 42%,
+    rgba(240, 90, 157, 0.12) 72%,
+    transparent
+  );
+  box-shadow: 0 0 1rem rgba(120, 233, 255, 0.12);
+  opacity: 0.52;
+}
+
+.section-copy::after,
+.section-heading::after {
+  top: 0.16rem;
+  width: 0.72rem;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(120, 233, 255, 0.68), transparent);
+  opacity: 0.64;
+}
+
 .visual-section .section-shell::before,
 .image-section .section-shell::before,
 .visual-section .section-shell::after,
