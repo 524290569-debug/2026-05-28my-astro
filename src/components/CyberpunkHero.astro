@@ -162,6 +162,7 @@ const stationReadouts = [
     let currentY = 0;
     let frame = 0;
     let navFrame = 0;
+    let interactionIdleTimer = 0;
     let activeSectionId = "";
     let lockedHashId = "";
     let hashLockUntil = 0;
@@ -228,6 +229,23 @@ const stationReadouts = [
       setActiveSection(nextSectionId);
     };
 
+    const keepParallaxLayerWarm = () => {
+      if (reduceMotion.matches) {
+        return;
+      }
+
+      hero.classList.add("hero-is-interacting");
+
+      if (interactionIdleTimer) {
+        window.clearTimeout(interactionIdleTimer);
+      }
+
+      interactionIdleTimer = window.setTimeout(() => {
+        interactionIdleTimer = 0;
+        hero.classList.remove("hero-is-interacting");
+      }, 900);
+    };
+
     const scheduleNavUpdate = () => {
       if (navFrame) {
         return;
@@ -271,6 +289,7 @@ const stationReadouts = [
     hero.addEventListener(
       "pointermove",
       (event) => {
+        keepParallaxLayerWarm();
         setPointer(event.clientX, event.clientY);
         scheduleRender();
       },
@@ -280,6 +299,7 @@ const stationReadouts = [
     hero.addEventListener(
       "pointerleave",
       () => {
+        keepParallaxLayerWarm();
         targetX = 0;
         targetY = 0;
         scheduleRender();
@@ -311,6 +331,10 @@ const stationReadouts = [
 
       if (navFrame) {
         window.cancelAnimationFrame(navFrame);
+      }
+
+      if (interactionIdleTimer) {
+        window.clearTimeout(interactionIdleTimer);
       }
     });
   }

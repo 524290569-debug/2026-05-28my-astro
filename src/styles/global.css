@@ -348,6 +348,9 @@ img {
 
 .asset-layer {
   pointer-events: none;
+}
+
+.cyberpunk-hero.hero-is-interacting .asset-layer {
   will-change: transform;
 }
 
