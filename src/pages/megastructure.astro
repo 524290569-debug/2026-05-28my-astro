@@ -132,10 +132,21 @@ const nodeQuality = {
   "service-slab": { integrity: 58, noise: 33, drift: "HUM" }
 };
 
+const nodeViewport = {
+  "fog-gallery": { frame: "OBS A-01 / FOG", x: 31, y: 44, slit: 30 },
+  "still-pool": { frame: "OBS B-09 / WATER", x: 62, y: 58, slit: 36 },
+  "vertical-void": { frame: "OBS C-17 / SHAFT", x: 48, y: 30, slit: 24 },
+  "column-field": { frame: "OBS D-04 / GRID", x: 56, y: 50, slit: 28 },
+  "low-gate": { frame: "OBS E-12 / EXIT", x: 38, y: 66, slit: 32 },
+  "service-slab": { frame: "OBS F-06 / HUM", x: 45, y: 52, slit: 26 }
+};
+
 const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["fog-gallery"];
+const viewportFor = (nodeId: keyof typeof nodeViewport) => nodeViewport[nodeId] ?? nodeViewport["fog-gallery"];
 const nodesWithQuality = nodes.map((node) => ({
   ...node,
-  quality: qualityFor(node.id as keyof typeof nodeQuality)
+  quality: qualityFor(node.id as keyof typeof nodeQuality),
+  viewport: viewportFor(node.id as keyof typeof nodeViewport)
 }));
 const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
@@ -255,9 +266,11 @@ const firstNode = nodesWithQuality[0];
         <div
           class="mega-panel-screen"
           data-panel-screen
-          style={`--thumb-x: ${firstNode.thumbX}; --thumb-y: ${firstNode.thumbY};`}
+          style={`--thumb-x: ${firstNode.thumbX}; --thumb-y: ${firstNode.thumbY}; --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
           aria-hidden="true"
         >
+          <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
+          <span class="mega-panel-aperture" aria-hidden="true"></span>
           <i></i>
         </div>
         <div class="mega-panel-copy">
@@ -359,6 +372,7 @@ const firstNode = nodesWithQuality[0];
       const nodeState = lab.querySelector("[data-node-state]");
       const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
+      const panelFrameCode = lab.querySelector("[data-panel-frame-code]");
       const qualityIntegrity = lab.querySelector("[data-quality-integrity]");
       const qualityNoise = lab.querySelector("[data-quality-noise]");
       const qualityDrift = lab.querySelector("[data-quality-drift]");
@@ -400,6 +414,20 @@ const firstNode = nodesWithQuality[0];
         if (qualityDrift) qualityDrift.textContent = quality.drift;
         setMeter(qualityMeterIntegrity, quality.integrity);
         setMeter(qualityMeterNoise, quality.noise);
+      };
+
+      const setPanelViewport = (node) => {
+        const viewport = node.viewport || { frame: node.code, x: 50, y: 50, slit: 28 };
+
+        if (panelFrameCode) panelFrameCode.textContent = viewport.frame;
+
+        if (panelScreen) {
+          panelScreen.style.setProperty("--thumb-x", node.thumbX);
+          panelScreen.style.setProperty("--thumb-y", node.thumbY);
+          panelScreen.style.setProperty("--viewport-x", String(viewport.x) + "%");
+          panelScreen.style.setProperty("--viewport-y", String(viewport.y) + "%");
+          panelScreen.style.setProperty("--viewport-slit", String(viewport.slit) + "%");
+        }
       };
 
       const applyMode = (modeId) => {
@@ -493,11 +521,7 @@ const firstNode = nodesWithQuality[0];
         if (nodeState) nodeState.textContent = `${node.code} / ${node.label} / ${node.signal}`;
         if (reopenCode) reopenCode.textContent = node.code;
         setSignalQuality(node);
-
-        if (panelScreen) {
-          panelScreen.style.setProperty("--thumb-x", node.thumbX);
-          panelScreen.style.setProperty("--thumb-y", node.thumbY);
-        }
+        setPanelViewport(node);
 
         applyMode(node.mode);
         setPanelCollapsed(false);

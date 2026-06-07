@@ -3243,18 +3243,21 @@ img {
 
 .mega-panel-screen::before,
 .mega-panel-screen::after,
-.mega-panel-screen i {
+.mega-panel-screen i,
+.mega-panel-frame-code,
+.mega-panel-aperture {
   position: absolute;
   pointer-events: none;
-  content: "";
 }
 
 .mega-panel-screen::before {
   inset: 0;
   background:
+    radial-gradient(ellipse at var(--viewport-x, 50%) var(--viewport-y, 50%), transparent 0 18%, rgba(9, 11, 11, 0.18) 38%, rgba(4, 5, 5, 0.38) 100%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 20%),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 5px);
   opacity: 0.42;
+  content: "";
 }
 
 .mega-panel-screen::after {
@@ -3264,6 +3267,64 @@ img {
   width: 24%;
   background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.14), transparent);
   animation: megaLabSweep 5.5s ease-in-out infinite;
+  content: "";
+}
+
+.mega-panel-frame-code {
+  z-index: 2;
+  top: 0.54rem;
+  left: 0.58rem;
+  max-width: calc(100% - 1.16rem);
+  overflow: hidden;
+  color: rgba(238, 242, 241, 0.66);
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-shadow: 0 0.6rem 1.2rem rgba(0, 0, 0, 0.82);
+  white-space: nowrap;
+}
+
+.mega-panel-aperture {
+  z-index: 2;
+  top: var(--viewport-y, 50%);
+  left: var(--viewport-x, 50%);
+  width: clamp(4.2rem, var(--viewport-slit, 28%), 8.2rem);
+  aspect-ratio: 1.35;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 46%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 12%, transparent), transparent 46%, rgba(4, 5, 5, 0.12)),
+    rgba(4, 5, 5, 0.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    0 0 1.5rem color-mix(in srgb, var(--mode-accent) 14%, transparent);
+  transform: translate(-50%, -50%);
+  transition:
+    border-color 180ms ease,
+    left 240ms ease,
+    top 240ms ease,
+    width 240ms ease;
+}
+
+.mega-panel-aperture::before,
+.mega-panel-aperture::after {
+  position: absolute;
+  content: "";
+}
+
+.mega-panel-aperture::before {
+  inset: 0.42rem;
+  border-top: 1px solid rgba(238, 242, 241, 0.18);
+  border-bottom: 1px solid rgba(238, 242, 241, 0.1);
+}
+
+.mega-panel-aperture::after {
+  top: 50%;
+  right: -0.9rem;
+  left: -0.9rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.26), transparent);
+  transform: translateY(-50%);
 }
 
 .mega-panel-screen i {
@@ -3635,6 +3696,18 @@ img {
 
   .mega-panel-screen {
     aspect-ratio: 2.35 / 1;
+  }
+
+  .mega-panel-frame-code {
+    top: 0.42rem;
+    left: 0.45rem;
+    max-width: calc(100% - 0.9rem);
+    font-size: 0.46rem;
+    letter-spacing: 0.11em;
+  }
+
+  .mega-panel-aperture {
+    width: clamp(3.2rem, var(--viewport-slit, 28%), 6.2rem);
   }
 
   .mega-panel-copy {
