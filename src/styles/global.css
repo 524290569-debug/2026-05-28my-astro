@@ -2751,6 +2751,23 @@ img {
   line-height: 1.6;
 }
 
+.mega-node-state {
+  display: inline-flex;
+  max-width: min(26rem, 100%);
+  min-height: 1.75rem;
+  align-items: center;
+  margin-top: 0.9rem;
+  border-left: 1px solid color-mix(in srgb, var(--mode-accent) 44%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 10%, transparent), transparent 82%),
+    rgba(8, 9, 9, 0.42);
+  padding: 0.28rem 0.72rem;
+  color: rgba(224, 231, 228, 0.72);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
 .mega-mode-rail {
   position: absolute;
   z-index: 8;
@@ -2934,6 +2951,60 @@ img {
   box-shadow:
     0 0 0 0.32rem rgba(224, 231, 228, 0.06),
     0 0 1.2rem color-mix(in srgb, var(--mode-accent) 28%, transparent);
+}
+
+.mega-panel-reopen {
+  position: absolute;
+  z-index: 11;
+  right: max(1.5rem, calc((100% - 78rem) / 2));
+  bottom: clamp(1.25rem, 5vh, 3.4rem);
+  display: grid;
+  width: 5.4rem;
+  min-height: 4.1rem;
+  place-items: center;
+  border: 1px solid var(--lab-border);
+  background:
+    linear-gradient(180deg, rgba(31, 35, 35, 0.72), rgba(6, 7, 7, 0.84)),
+    var(--lab-panel);
+  color: rgba(238, 242, 241, 0.86);
+  cursor: pointer;
+  font: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0.9rem);
+  transition:
+    border-color 180ms ease,
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+
+.mega-panel-reopen span,
+.mega-panel-reopen strong {
+  display: block;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.mega-panel-reopen span {
+  color: var(--lab-dim);
+  font-size: 0.58rem;
+}
+
+.mega-panel-reopen strong {
+  color: var(--mode-accent);
+  font-size: 0.78rem;
+}
+
+.mega-lab.is-panel-collapsed .mega-panel-reopen {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.mega-panel-reopen:hover,
+.mega-panel-reopen:focus-visible {
+  border-color: color-mix(in srgb, var(--mode-accent) 48%, transparent);
+  outline: none;
 }
 
 .mega-panel-head {
@@ -3199,6 +3270,10 @@ img {
     display: none;
   }
 
+  .mega-node-state {
+    display: none;
+  }
+
   .mega-mode-rail {
     top: 11.8rem;
     bottom: auto;
@@ -3265,6 +3340,21 @@ img {
 
   .mega-lab.is-panel-collapsed .mega-observer-panel {
     transform: translateY(calc(100% + 1rem));
+  }
+
+  .mega-panel-reopen {
+    right: 0.85rem;
+    bottom: 0.85rem;
+    width: 4.7rem;
+    min-height: 3.2rem;
+  }
+
+  .mega-panel-reopen span {
+    font-size: 0.52rem;
+  }
+
+  .mega-panel-reopen strong {
+    font-size: 0.68rem;
   }
 
   .mega-panel-screen {

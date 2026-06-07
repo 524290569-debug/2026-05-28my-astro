@@ -66,8 +66,8 @@ const nodes = [
     mode: "pool",
     label: "静池",
     code: "B-09",
-    x: 74,
-    y: 43,
+    x: 58,
+    y: 42,
     thumbX: "100%",
     thumbY: "0%",
     sentence: "水面没有波纹，只复制一盏过亮的天窗。",
@@ -90,7 +90,7 @@ const nodes = [
     mode: "structure",
     label: "柱阵",
     code: "D-04",
-    x: 84,
+    x: 60,
     y: 62,
     thumbX: "100%",
     thumbY: "100%",
@@ -114,7 +114,7 @@ const nodes = [
     mode: "signal",
     label: "服务层",
     code: "F-06",
-    x: 61,
+    x: 51,
     y: 58,
     thumbX: "0%",
     thumbY: "0%",
@@ -171,6 +171,9 @@ const firstNode = nodes[0];
         <p>冷灰混凝土 / 阈限漂移 / 粗野主义结构</p>
         <h1>巨构主义</h1>
         <small data-mode-phrase>{firstMode.phrase}</small>
+        <span class="mega-node-state" data-node-state role="status" aria-live="polite">
+          {firstNode.code} / {firstNode.label} / {firstNode.signal}
+        </span>
       </section>
 
       <nav class="mega-mode-rail" aria-label="空间模式">
@@ -198,6 +201,7 @@ const firstNode = nodes[0];
               data-node-button={node.id}
               data-node-mode={node.mode}
               style={`--x: ${node.x}%; --y: ${node.y}%;`}
+              aria-controls="mega-observer-panel"
               aria-pressed={index === 0 ? "true" : "false"}
               aria-expanded={index === 0 ? "true" : "false"}
             >
@@ -208,7 +212,7 @@ const firstNode = nodes[0];
         }
       </div>
 
-      <aside class="mega-observer-panel" aria-label="空间播放窗口">
+      <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
         <div class="mega-panel-head">
           <span data-node-code>{firstNode.code}</span>
           <div class="mega-panel-actions">
@@ -217,6 +221,8 @@ const firstNode = nodes[0];
               class="mega-panel-collapse"
               type="button"
               data-panel-collapse
+              aria-controls="mega-observer-panel"
+              aria-expanded="true"
               aria-label="收起观察窗口"
             ></button>
           </div>
@@ -241,6 +247,19 @@ const firstNode = nodes[0];
           <b data-scale-value>62</b>
         </label>
       </aside>
+
+      <button
+        class="mega-panel-reopen"
+        type="button"
+        data-panel-reopen
+        aria-controls="mega-observer-panel"
+        aria-expanded="true"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <span>OPEN</span>
+        <strong data-reopen-code>{firstNode.code}</strong>
+      </button>
     </section>
 
     <section class="mega-design-strip" aria-label="功能设计摘要">
@@ -272,6 +291,7 @@ const firstNode = nodes[0];
       const randomButton = lab.querySelector("[data-mega-random]");
       const audioButton = lab.querySelector("[data-audio-toggle]");
       const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
+      const panelReopenButton = lab.querySelector("[data-panel-reopen]");
       const scaleRange = lab.querySelector("[data-scale-range]");
       const scaleValue = lab.querySelector("[data-scale-value]");
       const modePhrase = lab.querySelector("[data-mode-phrase]");
@@ -280,11 +300,14 @@ const firstNode = nodes[0];
       const nodeTitle = lab.querySelector("[data-node-title]");
       const nodeSentence = lab.querySelector("[data-node-sentence]");
       const nodeSignal = lab.querySelector("[data-node-signal]");
+      const nodeState = lab.querySelector("[data-node-state]");
+      const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
       const observerPanel = lab.querySelector(".mega-observer-panel");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       let activeModeId = modes[0].id;
       let activeNodeId = nodes[0].id;
+      let lastNodeId = activeNodeId;
       let isPanelCollapsed = false;
       let pointerFrame = 0;
       let audioContext = null;
@@ -330,6 +353,16 @@ const firstNode = nodes[0];
           observerPanel.setAttribute("aria-hidden", String(collapsed));
         }
 
+        if (panelCollapseButton) {
+          panelCollapseButton.setAttribute("aria-expanded", String(!collapsed));
+        }
+
+        if (panelReopenButton) {
+          panelReopenButton.setAttribute("aria-expanded", String(!collapsed));
+          panelReopenButton.setAttribute("aria-hidden", String(!collapsed));
+          panelReopenButton.setAttribute("tabindex", collapsed ? "0" : "-1");
+        }
+
         nodeButtons.forEach((button) => {
           const isActive = button.dataset.nodeButton === activeNodeId;
           button.setAttribute("aria-expanded", String(isActive && !collapsed));
@@ -347,6 +380,7 @@ const firstNode = nodes[0];
           button.setAttribute("aria-expanded", "false");
         });
 
+        if (nodeState) nodeState.textContent = "NO NODE / OBSERVER COLLAPSED";
         setPanelCollapsed(true);
       };
 
@@ -360,6 +394,7 @@ const firstNode = nodes[0];
         }
 
         activeNodeId = node.id;
+        lastNodeId = node.id;
         lab.style.setProperty("--focus-x", String(node.x) + "%");
         lab.style.setProperty("--focus-y", String(node.y) + "%");
 
@@ -373,6 +408,8 @@ const firstNode = nodes[0];
         if (nodeTitle) nodeTitle.textContent = node.label;
         if (nodeSentence) nodeSentence.textContent = node.sentence;
         if (nodeSignal) nodeSignal.textContent = node.signal;
+        if (nodeState) nodeState.textContent = `${node.code} / ${node.label} / ${node.signal}`;
+        if (reopenCode) reopenCode.textContent = node.code;
 
         if (panelScreen) {
           panelScreen.style.setProperty("--thumb-x", node.thumbX);
@@ -465,6 +502,16 @@ const firstNode = nodes[0];
 
       panelCollapseButton?.addEventListener("click", () => {
         setPanelCollapsed(true);
+        panelReopenButton?.focus({ preventScroll: true });
+      });
+
+      panelReopenButton?.addEventListener("click", () => {
+        if (activeNodeId) {
+          setPanelCollapsed(false);
+          return;
+        }
+
+        applyNode(lastNodeId || nodes[0].id);
       });
 
       scaleRange?.addEventListener("input", () => {
