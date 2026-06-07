@@ -1,15 +1,16 @@
 ---
-const navItems = [
-  { label: "入口", href: "#home" },
-  { label: "宣言", href: "#about" },
-  { label: "现场", href: "#works" },
-  { label: "档案", href: "#blog" },
-  { label: "联络", href: "#contact" }
-];
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const assetPath = (path) => `${basePath}${path}`;
+const navItems = [
+  { label: "入口", href: "#home", section: true },
+  { label: "宣言", href: "#about", section: true },
+  { label: "现场", href: "#works", section: true },
+  { label: "档案", href: "#blog", section: true },
+  { label: "联络", href: "#contact", section: true },
+  { label: "巨构主义", href: `${basePath}megastructure/`, section: false }
+];
 
 const assetLayers = [
   {
@@ -68,8 +69,8 @@ const stationReadouts = [
         navItems.map((item) => (
           <a
             href={item.href}
-            data-section-link
-            aria-current={item.href === "#home" ? "location" : undefined}
+            data-section-link={item.section ? "" : undefined}
+            aria-current={item.section && item.href === "#home" ? "location" : undefined}
           >
             {item.label}
           </a>

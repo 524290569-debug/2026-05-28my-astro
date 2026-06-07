@@ -15,6 +15,7 @@ interface Props {
   imageWidth?: number;
   imageHeight?: number;
   imageType?: string;
+  skipTarget?: string;
   preloadImages?: PreloadImage[];
 }
 
@@ -26,6 +27,7 @@ const {
   imageWidth = 1200,
   imageHeight = 630,
   imageType = "image/webp",
+  skipTarget = "#about",
   preloadImages = []
 } = Astro.props;
 
@@ -85,7 +87,7 @@ const headPreloadImages = preloadImages.map((item) => ({
     <title>{title}</title>
   </head>
   <body>
-    <a class="skip-link" href="#about">跳到正文</a>
+    <a class="skip-link" href={skipTarget}>跳到正文</a>
     <slot />
   </body>
 </html>

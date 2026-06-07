@@ -1,0 +1,433 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (path: string) => `${basePath}${path}`;
+
+const atriumImage = assetPath("assets/megastructure/atrium-cold-concrete.webp");
+const nodeSheetImage = assetPath("assets/megastructure/node-contact-sheet.webp");
+
+const modes = [
+  {
+    id: "structure",
+    label: "结构",
+    code: "FRAME",
+    phrase: "城市被压成一套可插拔骨架。",
+    status: "MASS 92 / GRID 44",
+    accent: "rgba(226, 232, 229, 0.92)",
+    haze: "rgba(154, 170, 170, 0.18)"
+  },
+  {
+    id: "liminal",
+    label: "阈限",
+    code: "DRIFT",
+    phrase: "空间没有路线，只保留进入之后的迟疑。",
+    status: "EXIT 01 / TRUST 03",
+    accent: "rgba(190, 213, 214, 0.9)",
+    haze: "rgba(154, 178, 184, 0.22)"
+  },
+  {
+    id: "pool",
+    label: "池核",
+    code: "WATER",
+    phrase: "水面复制天窗，声音被瓷砖慢慢吃掉。",
+    status: "WATER 02 / TEMP 11",
+    accent: "rgba(159, 196, 196, 0.92)",
+    haze: "rgba(108, 160, 164, 0.24)"
+  },
+  {
+    id: "signal",
+    label: "信号",
+    code: "TRACE",
+    phrase: "每个节点只回传一张小图和一句残留文本。",
+    status: "NOISE 07 / ECHO 19",
+    accent: "rgba(218, 226, 220, 0.88)",
+    haze: "rgba(184, 190, 178, 0.16)"
+  }
+];
+
+const nodes = [
+  {
+    id: "fog-gallery",
+    mode: "liminal",
+    label: "雾廊",
+    code: "A-01",
+    x: 18,
+    y: 54,
+    thumbX: "0%",
+    thumbY: "0%",
+    sentence: "雾从柱脚升起，出口像一段被误删的记忆。",
+    signal: "LIGHT 12 / ECHO 04"
+  },
+  {
+    id: "still-pool",
+    mode: "pool",
+    label: "静池",
+    code: "B-09",
+    x: 74,
+    y: 43,
+    thumbX: "100%",
+    thumbY: "0%",
+    sentence: "水面没有波纹，只复制一盏过亮的天窗。",
+    signal: "WATER 02 / TEMP 11"
+  },
+  {
+    id: "vertical-void",
+    mode: "structure",
+    label: "竖井",
+    code: "C-17",
+    x: 50,
+    y: 26,
+    thumbX: "0%",
+    thumbY: "100%",
+    sentence: "向上看不到楼层，只能看到结构继续重复。",
+    signal: "DEPTH 83 / SCALE 00"
+  },
+  {
+    id: "column-field",
+    mode: "structure",
+    label: "柱阵",
+    code: "D-04",
+    x: 84,
+    y: 62,
+    thumbX: "100%",
+    thumbY: "100%",
+    sentence: "每根柱子都像上一根柱子的回声。",
+    signal: "GRID 64 / NOISE 07"
+  },
+  {
+    id: "low-gate",
+    mode: "liminal",
+    label: "低门",
+    code: "E-12",
+    x: 36,
+    y: 72,
+    thumbX: "100%",
+    thumbY: "100%",
+    sentence: "门开着，但空间没有真正允许你离开。",
+    signal: "EXIT 01 / TRUST 02"
+  },
+  {
+    id: "service-slab",
+    mode: "signal",
+    label: "服务层",
+    code: "F-06",
+    x: 61,
+    y: 58,
+    thumbX: "0%",
+    thumbY: "0%",
+    sentence: "结构背面没有功能，只剩一条低频电流。",
+    signal: "POWER 09 / HUM 33"
+  }
+];
+
+const firstMode = modes[0];
+const firstNode = nodes[0];
+---
+
+<BaseLayout
+  title="巨构主义"
+  description="巨构主义、阈限空间与粗野主义混凝土空间的交互观察器。"
+  image="assets/megastructure/atrium-cold-concrete.webp"
+  imageAlt="冷灰混凝土巨构空间中庭"
+  imageWidth={1536}
+  imageHeight={1024}
+  skipTarget="#megastructure-main"
+  preloadImages={[
+    { href: "assets/megastructure/atrium-cold-concrete.webp", type: "image/webp", fetchPriority: "high" },
+    { href: "assets/megastructure/node-contact-sheet.webp", type: "image/webp", fetchPriority: "auto" }
+  ]}
+>
+  <main
+    id="megastructure-main"
+    class="mega-lab"
+    data-mega-lab
+    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05;`}
+  >
+    <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
+      <img
+        class="mega-lab-backdrop"
+        src={atriumImage}
+        alt=""
+        width="1536"
+        height="1024"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        draggable="false"
+      />
+      <div class="mega-lab-grid" aria-hidden="true"></div>
+      <div class="mega-lab-haze" aria-hidden="true"></div>
+
+      <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
+        <a href={basePath}>灰雨电台</a>
+        <span>MEGASTRUCTURE OBSERVER</span>
+        <button type="button" data-mega-random>No-clip</button>
+      </header>
+
+      <section class="mega-lab-title" aria-label="页面标题">
+        <p>冷灰混凝土 / 阈限漂移 / 粗野主义结构</p>
+        <h1>巨构主义</h1>
+        <small data-mode-phrase>{firstMode.phrase}</small>
+      </section>
+
+      <nav class="mega-mode-rail" aria-label="空间模式">
+        {
+          modes.map((mode, index) => (
+            <button
+              type="button"
+              class={index === 0 ? "is-active" : ""}
+              data-mode-button={mode.id}
+              aria-pressed={index === 0 ? "true" : "false"}
+            >
+              <span>{mode.code}</span>
+              {mode.label}
+            </button>
+          ))
+        }
+      </nav>
+
+      <div class="mega-node-plane" aria-label="空间节点">
+        {
+          nodes.map((node, index) => (
+            <button
+              type="button"
+              class={`mega-lab-node${index === 0 ? " is-active" : ""}`}
+              data-node-button={node.id}
+              data-node-mode={node.mode}
+              style={`--x: ${node.x}%; --y: ${node.y}%;`}
+              aria-pressed={index === 0 ? "true" : "false"}
+            >
+              <span class="mega-node-cross" aria-hidden="true"></span>
+              <span class="mega-node-text">{node.label}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <aside class="mega-observer-panel" aria-label="空间播放窗口">
+        <div class="mega-panel-head">
+          <span data-node-code>{firstNode.code}</span>
+          <button type="button" data-audio-toggle aria-pressed="false">声场</button>
+        </div>
+        <div
+          class="mega-panel-screen"
+          data-panel-screen
+          style={`--thumb-x: ${firstNode.thumbX}; --thumb-y: ${firstNode.thumbY};`}
+          aria-hidden="true"
+        >
+          <i></i>
+        </div>
+        <div class="mega-panel-copy">
+          <small data-mode-code>{firstMode.code}</small>
+          <strong data-node-title>{firstNode.label}</strong>
+          <p data-node-sentence>{firstNode.sentence}</p>
+          <span data-node-signal>{firstNode.signal}</span>
+        </div>
+        <label class="mega-scale-control">
+          <span>尺度压力</span>
+          <input type="range" min="0" max="100" value="62" data-scale-range />
+          <b data-scale-value>62</b>
+        </label>
+      </aside>
+    </section>
+
+    <section class="mega-design-strip" aria-label="功能设计摘要">
+      <article>
+        <span>01 / FRAME</span>
+        <p>模式切换不改变路线，只改变空间的观察权重。</p>
+      </article>
+      <article>
+        <span>02 / DRIFT</span>
+        <p>No-clip 随机选择节点，模拟无目的漂移。</p>
+      </article>
+      <article>
+        <span>03 / NODE</span>
+        <p>节点只返回小图与一句话，后续可逐步扩展。</p>
+      </article>
+      <article>
+        <span>04 / SIGNAL</span>
+        <p>声场必须手动启动，避免自动播放污染体验。</p>
+      </article>
+    </section>
+  </main>
+
+  <script define:vars={{ modes, nodes }}>
+    const lab = document.querySelector("[data-mega-lab]");
+
+    if (lab) {
+      const modeButtons = Array.from(lab.querySelectorAll("[data-mode-button]"));
+      const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
+      const randomButton = lab.querySelector("[data-mega-random]");
+      const audioButton = lab.querySelector("[data-audio-toggle]");
+      const scaleRange = lab.querySelector("[data-scale-range]");
+      const scaleValue = lab.querySelector("[data-scale-value]");
+      const modePhrase = lab.querySelector("[data-mode-phrase]");
+      const modeCode = lab.querySelector("[data-mode-code]");
+      const nodeCode = lab.querySelector("[data-node-code]");
+      const nodeTitle = lab.querySelector("[data-node-title]");
+      const nodeSentence = lab.querySelector("[data-node-sentence]");
+      const nodeSignal = lab.querySelector("[data-node-signal]");
+      const panelScreen = lab.querySelector("[data-panel-screen]");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let activeModeId = modes[0].id;
+      let activeNodeId = nodes[0].id;
+      let pointerFrame = 0;
+      let audioContext = null;
+      let oscillator = null;
+      let gain = null;
+
+      const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
+      const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
+
+      const applyMode = (modeId) => {
+        const mode = findMode(modeId);
+        activeModeId = mode.id;
+        lab.style.setProperty("--mode-accent", mode.accent);
+        lab.style.setProperty("--mode-haze", mode.haze);
+        if (modePhrase) modePhrase.textContent = mode.phrase;
+        if (modeCode) modeCode.textContent = mode.code;
+
+        modeButtons.forEach((button) => {
+          const isActive = button.dataset.modeButton === mode.id;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        nodeButtons.forEach((button) => {
+          button.classList.toggle("is-muted", button.dataset.nodeMode !== mode.id);
+        });
+
+        if (oscillator) {
+          oscillator.frequency.setTargetAtTime(
+            42 + modes.findIndex((item) => item.id === mode.id) * 9,
+            audioContext.currentTime,
+            0.08
+          );
+        }
+      };
+
+      const applyNode = (nodeId) => {
+        const node = findNode(nodeId);
+        activeNodeId = node.id;
+        lab.style.setProperty("--focus-x", String(node.x) + "%");
+        lab.style.setProperty("--focus-y", String(node.y) + "%");
+
+        nodeButtons.forEach((button) => {
+          const isActive = button.dataset.nodeButton === node.id;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        if (nodeCode) nodeCode.textContent = node.code;
+        if (nodeTitle) nodeTitle.textContent = node.label;
+        if (nodeSentence) nodeSentence.textContent = node.sentence;
+        if (nodeSignal) nodeSignal.textContent = node.signal;
+
+        if (panelScreen) {
+          panelScreen.style.setProperty("--thumb-x", node.thumbX);
+          panelScreen.style.setProperty("--thumb-y", node.thumbY);
+        }
+
+        applyMode(node.mode);
+      };
+
+      const setScale = (value) => {
+        const normalized = Number(value || 0);
+        const nextScale = 1 + normalized / 420;
+        lab.style.setProperty("--stage-scale", String(nextScale));
+        lab.style.setProperty("--pressure", String(normalized));
+        if (scaleValue) scaleValue.textContent = String(normalized);
+      };
+
+      const toggleAudio = async () => {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor || !audioButton) {
+          return;
+        }
+
+        if (!audioContext) {
+          audioContext = new AudioCtor();
+          oscillator = audioContext.createOscillator();
+          gain = audioContext.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.value = 42;
+          gain.gain.value = 0.0001;
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start();
+        }
+
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+
+        const isOn = audioButton.getAttribute("aria-pressed") !== "true";
+        audioButton.setAttribute("aria-pressed", String(isOn));
+        audioButton.textContent = isOn ? "静音" : "声场";
+        gain.gain.setTargetAtTime(isOn ? 0.035 : 0.0001, audioContext.currentTime, 0.08);
+      };
+
+      modeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const modeId = button.dataset.modeButton;
+          const firstNodeInMode = nodes.find((node) => node.mode === modeId);
+          applyNode(firstNodeInMode ? firstNodeInMode.id : activeNodeId);
+        });
+      });
+
+      nodeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          applyNode(button.dataset.nodeButton);
+        });
+      });
+
+      randomButton?.addEventListener("click", () => {
+        const nextIndex = Math.floor(Math.random() * nodes.length);
+        applyNode(nodes[nextIndex].id);
+      });
+
+      audioButton?.addEventListener("click", () => {
+        toggleAudio();
+      });
+
+      scaleRange?.addEventListener("input", () => {
+        setScale(scaleRange.value);
+      });
+
+      lab.addEventListener(
+        "pointermove",
+        (event) => {
+          if (reduceMotion.matches || pointerFrame) {
+            return;
+          }
+
+          pointerFrame = window.requestAnimationFrame(() => {
+            pointerFrame = 0;
+            const rect = lab.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+            const y = (event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+            lab.style.setProperty("--drift-x", String(x * 1.2) + "rem");
+            lab.style.setProperty("--drift-y", String(y * 0.8) + "rem");
+          });
+        },
+        { passive: true }
+      );
+
+      window.addEventListener("beforeunload", () => {
+        if (pointerFrame) {
+          window.cancelAnimationFrame(pointerFrame);
+        }
+        if (audioContext) {
+          audioContext.close();
+        }
+      });
+
+      setScale(scaleRange?.value || "62");
+      applyNode(activeNodeId);
+      lab.dataset.ready = "true";
+    }
+  </script>
+</BaseLayout>
