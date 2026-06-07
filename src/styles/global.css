@@ -2971,6 +2971,37 @@ img {
   transition: opacity 180ms ease;
 }
 
+.mega-lab-node::before {
+  position: absolute;
+  z-index: -1;
+  width: 3.9rem;
+  height: 3.9rem;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 26%, transparent);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--mode-accent) 12%, transparent), transparent 58%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 0.58rem,
+      color-mix(in srgb, var(--mode-accent) 10%, transparent) 0.58rem 0.62rem
+    );
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.022),
+    0 0 2.2rem color-mix(in srgb, var(--mode-accent) 16%, transparent);
+  content: "";
+  opacity: 0;
+  transform: rotate(45deg) scale(0.72);
+  transition:
+    border-color 180ms ease,
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+
+.mega-lab-node.is-active::before {
+  border-color: color-mix(in srgb, var(--mode-accent) 42%, transparent);
+  opacity: clamp(0.22, calc(var(--node-integrity, 61) / 150), 0.54);
+  transform: rotate(45deg) scale(calc(0.92 + (var(--node-noise, 28) / 520)));
+}
+
 .mega-lab-node.is-muted {
   opacity: 0.42;
 }
@@ -3262,6 +3293,69 @@ img {
   font-size: 0.92rem;
   font-weight: 300;
   line-height: 1.72;
+}
+
+.mega-signal-readout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-top: 0.78rem;
+  border: 1px solid var(--lab-border-soft);
+  background: rgba(224, 231, 228, 0.08);
+}
+
+.mega-signal-readout span {
+  display: grid;
+  min-width: 0;
+  gap: 0.32rem;
+  background:
+    linear-gradient(180deg, rgba(224, 231, 228, 0.045), rgba(5, 6, 6, 0.28)),
+    rgba(7, 8, 8, 0.72);
+  padding: 0.58rem 0.62rem 0.64rem;
+}
+
+.mega-signal-readout small {
+  overflow: hidden;
+  color: var(--lab-dim);
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mega-signal-readout b {
+  color: rgba(240, 244, 242, 0.86);
+  font-size: 0.8rem;
+  font-weight: 420;
+  letter-spacing: 0.08em;
+}
+
+.mega-signal-readout i {
+  position: relative;
+  display: block;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(224, 231, 228, 0.12);
+}
+
+.mega-signal-readout i::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--meter, 50%);
+  background: linear-gradient(90deg, var(--mode-accent), transparent);
+  content: "";
+}
+
+.mega-signal-readout [data-quality-meter-noise]::before {
+  background: linear-gradient(90deg, rgba(190, 196, 188, 0.72), rgba(120, 130, 128, 0.1));
+}
+
+.mega-signal-readout [data-quality-drift-line] {
+  background:
+    linear-gradient(90deg, var(--mode-accent) 0 18%, transparent 18% 34%, rgba(224, 231, 228, 0.3) 34% 52%, transparent 52%),
+    rgba(224, 231, 228, 0.1);
 }
 
 .mega-scale-control {
@@ -3560,6 +3654,24 @@ img {
     line-height: 1.42;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+  }
+
+  .mega-signal-readout {
+    margin-top: 0.58rem;
+  }
+
+  .mega-signal-readout span {
+    gap: 0.24rem;
+    padding: 0.45rem 0.48rem 0.5rem;
+  }
+
+  .mega-signal-readout small {
+    font-size: 0.48rem;
+    letter-spacing: 0.1em;
+  }
+
+  .mega-signal-readout b {
+    font-size: 0.68rem;
   }
 
   .mega-scale-control {

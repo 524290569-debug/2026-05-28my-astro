@@ -123,8 +123,22 @@ const nodes = [
   }
 ];
 
+const nodeQuality = {
+  "fog-gallery": { integrity: 61, noise: 28, drift: "SLOW" },
+  "still-pool": { integrity: 74, noise: 12, drift: "STILL" },
+  "vertical-void": { integrity: 52, noise: 35, drift: "HIGH" },
+  "column-field": { integrity: 67, noise: 23, drift: "GRID" },
+  "low-gate": { integrity: 46, noise: 42, drift: "LOOP" },
+  "service-slab": { integrity: 58, noise: 33, drift: "HUM" }
+};
+
+const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["fog-gallery"];
+const nodesWithQuality = nodes.map((node) => ({
+  ...node,
+  quality: qualityFor(node.id as keyof typeof nodeQuality)
+}));
 const firstMode = modes[0];
-const firstNode = nodes[0];
+const firstNode = nodesWithQuality[0];
 ---
 
 <BaseLayout
@@ -144,7 +158,7 @@ const firstNode = nodes[0];
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
-    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05;`}
+    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
@@ -205,7 +219,7 @@ const firstNode = nodes[0];
 
       <div class="mega-node-plane" aria-label="空间节点">
         {
-          nodes.map((node, index) => (
+          nodesWithQuality.map((node, index) => (
             <button
               type="button"
               class={`mega-lab-node${index === 0 ? " is-active" : ""}`}
@@ -252,6 +266,37 @@ const firstNode = nodes[0];
           <p data-node-sentence>{firstNode.sentence}</p>
           <span data-node-signal>{firstNode.signal}</span>
         </div>
+        <div class="mega-signal-readout" data-signal-readout aria-label="Signal quality">
+          <span>
+            <small>INTEGRITY</small>
+            <b data-quality-integrity>{firstNode.quality.integrity}</b>
+            <i
+              data-quality-meter-integrity
+              role="meter"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={String(firstNode.quality.integrity)}
+              style={`--meter: ${firstNode.quality.integrity}%;`}
+            ></i>
+          </span>
+          <span>
+            <small>NOISE</small>
+            <b data-quality-noise>{firstNode.quality.noise}</b>
+            <i
+              data-quality-meter-noise
+              role="meter"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={String(firstNode.quality.noise)}
+              style={`--meter: ${firstNode.quality.noise}%;`}
+            ></i>
+          </span>
+          <span>
+            <small>DRIFT</small>
+            <b data-quality-drift>{firstNode.quality.drift}</b>
+            <i data-quality-drift-line aria-hidden="true"></i>
+          </span>
+        </div>
         <label class="mega-scale-control">
           <span>尺度压力</span>
           <input type="range" min="0" max="100" value="62" data-scale-range />
@@ -293,7 +338,7 @@ const firstNode = nodes[0];
     </section>
   </main>
 
-  <script define:vars={{ modes, nodes }}>
+  <script define:vars={{ modes, nodes: nodesWithQuality }}>
     const lab = document.querySelector("[data-mega-lab]");
 
     if (lab) {
@@ -314,6 +359,11 @@ const firstNode = nodes[0];
       const nodeState = lab.querySelector("[data-node-state]");
       const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
+      const qualityIntegrity = lab.querySelector("[data-quality-integrity]");
+      const qualityNoise = lab.querySelector("[data-quality-noise]");
+      const qualityDrift = lab.querySelector("[data-quality-drift]");
+      const qualityMeterIntegrity = lab.querySelector("[data-quality-meter-integrity]");
+      const qualityMeterNoise = lab.querySelector("[data-quality-meter-noise]");
       const observerPanel = lab.querySelector(".mega-observer-panel");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       let activeModeId = modes[0].id;
@@ -330,6 +380,27 @@ const firstNode = nodes[0];
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
+
+      const setMeter = (meter, value) => {
+        if (!meter) {
+          return;
+        }
+
+        meter.style.setProperty("--meter", String(value) + "%");
+        meter.setAttribute("aria-valuenow", String(value));
+      };
+
+      const setSignalQuality = (node) => {
+        const quality = node.quality || { integrity: 0, noise: 0, drift: "NONE" };
+        lab.style.setProperty("--node-integrity", String(quality.integrity));
+        lab.style.setProperty("--node-noise", String(quality.noise));
+
+        if (qualityIntegrity) qualityIntegrity.textContent = String(quality.integrity);
+        if (qualityNoise) qualityNoise.textContent = String(quality.noise);
+        if (qualityDrift) qualityDrift.textContent = quality.drift;
+        setMeter(qualityMeterIntegrity, quality.integrity);
+        setMeter(qualityMeterNoise, quality.noise);
+      };
 
       const applyMode = (modeId) => {
         const mode = findMode(modeId);
@@ -421,6 +492,7 @@ const firstNode = nodes[0];
         if (nodeSignal) nodeSignal.textContent = node.signal;
         if (nodeState) nodeState.textContent = `${node.code} / ${node.label} / ${node.signal}`;
         if (reopenCode) reopenCode.textContent = node.code;
+        setSignalQuality(node);
 
         if (panelScreen) {
           panelScreen.style.setProperty("--thumb-x", node.thumbX);
