@@ -336,9 +336,29 @@ const firstNode = nodes[0];
         });
       };
 
+      const clearNodeFocus = () => {
+        activeNodeId = "";
+        lab.style.setProperty("--focus-x", "50%");
+        lab.style.setProperty("--focus-y", "50%");
+
+        nodeButtons.forEach((button) => {
+          button.classList.remove("is-active");
+          button.setAttribute("aria-pressed", "false");
+          button.setAttribute("aria-expanded", "false");
+        });
+
+        setPanelCollapsed(true);
+      };
+
       const applyNode = (nodeId, options = {}) => {
         const node = findNode(nodeId);
         const isSameNode = node.id === activeNodeId;
+
+        if (options.toggleIfSame && isSameNode && !isPanelCollapsed) {
+          clearNodeFocus();
+          return;
+        }
+
         activeNodeId = node.id;
         lab.style.setProperty("--focus-x", String(node.x) + "%");
         lab.style.setProperty("--focus-y", String(node.y) + "%");
@@ -360,7 +380,7 @@ const firstNode = nodes[0];
         }
 
         applyMode(node.mode);
-        setPanelCollapsed(options.toggleIfSame && isSameNode ? !isPanelCollapsed : false);
+        setPanelCollapsed(false);
       };
 
       const setScale = (value) => {
@@ -424,7 +444,7 @@ const firstNode = nodes[0];
         button.addEventListener("click", () => {
           const modeId = button.dataset.modeButton;
           const firstNodeInMode = nodes.find((node) => node.mode === modeId);
-          applyNode(firstNodeInMode ? firstNodeInMode.id : activeNodeId);
+          applyNode(firstNodeInMode ? firstNodeInMode.id : activeNodeId || nodes[0].id);
         });
       });
 
