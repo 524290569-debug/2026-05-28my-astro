@@ -3520,9 +3520,9 @@ img {
   aspect-ratio: 16 / 9;
   border: 1px solid var(--lab-border-soft);
   background-color: #101212;
-  background-image: var(--mega-sheet);
-  background-position: var(--thumb-x) var(--thumb-y);
-  background-size: 200% 200%;
+  background-image: var(--node-image);
+  background-position: center;
+  background-size: cover;
   filter: saturate(0.78) contrast(1.08);
 }
 

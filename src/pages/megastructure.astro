@@ -7,7 +7,17 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 const assetPath = (path: string) => `${basePath}${path}`;
 
 const atriumImage = assetPath("assets/megastructure/atrium-cold-concrete.webp");
-const nodeSheetImage = assetPath("assets/megastructure/node-contact-sheet.webp");
+const nodeImagePaths = {
+  "fog-gallery": "assets/megastructure/node-fog-gallery-v2.webp",
+  "still-pool": "assets/megastructure/node-still-pool-v2.webp",
+  "vertical-void": "assets/megastructure/node-vertical-void-v2.webp",
+  "column-field": "assets/megastructure/node-column-field-v2.webp",
+  "low-gate": "assets/megastructure/node-low-gate-v2.webp",
+  "service-slab": "assets/megastructure/node-service-slab-v2.webp"
+} as const;
+const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
+  nodeImagePaths[nodeId] ?? nodeImagePaths["fog-gallery"];
+const nodeImageFor = (nodeId: keyof typeof nodeImagePaths) => assetPath(nodeImagePathFor(nodeId));
 
 const modes = [
   {
@@ -59,8 +69,6 @@ const nodes = [
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
-    thumbX: "0%",
-    thumbY: "0%",
     sentence: "雾从柱脚升起，出口像一段被误删的记忆。",
     signal: "LIGHT 12 / ECHO 04"
   },
@@ -74,8 +82,6 @@ const nodes = [
     labelX: 3.1,
     labelY: 0.2,
     labelAlign: "left",
-    thumbX: "100%",
-    thumbY: "0%",
     sentence: "水面没有波纹，只复制一盏过亮的天窗。",
     signal: "WATER 02 / TEMP 11"
   },
@@ -89,8 +95,6 @@ const nodes = [
     labelX: 0,
     labelY: -2.35,
     labelAlign: "center",
-    thumbX: "0%",
-    thumbY: "100%",
     sentence: "向上看不到楼层，只能看到结构继续重复。",
     signal: "DEPTH 83 / SCALE 00"
   },
@@ -104,8 +108,6 @@ const nodes = [
     labelX: 3.05,
     labelY: 1.05,
     labelAlign: "left",
-    thumbX: "100%",
-    thumbY: "100%",
     sentence: "每根柱子都像上一根柱子的回声。",
     signal: "GRID 64 / NOISE 07"
   },
@@ -119,8 +121,6 @@ const nodes = [
     labelX: -3.1,
     labelY: 0.95,
     labelAlign: "right",
-    thumbX: "100%",
-    thumbY: "100%",
     sentence: "门开着，但空间没有真正允许你离开。",
     signal: "EXIT 01 / TRUST 02"
   },
@@ -134,8 +134,6 @@ const nodes = [
     labelX: -2.95,
     labelY: -1.45,
     labelAlign: "right",
-    thumbX: "0%",
-    thumbY: "0%",
     sentence: "结构背面没有功能，只剩一条低频电流。",
     signal: "POWER 09 / HUM 33"
   }
@@ -175,7 +173,9 @@ const panelSignalFor = (quality: { integrity: number; noise: number }) => {
 const nodesWithQuality = nodes.map((node) => ({
   ...node,
   quality: qualityFor(node.id as keyof typeof nodeQuality),
-  viewport: viewportFor(node.id as keyof typeof nodeViewport)
+  viewport: viewportFor(node.id as keyof typeof nodeViewport),
+  imagePath: nodeImagePathFor(node.id as keyof typeof nodeImagePaths),
+  image: nodeImageFor(node.id as keyof typeof nodeImagePaths)
 }));
 const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
@@ -192,14 +192,18 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
   skipTarget="#megastructure-main"
   preloadImages={[
     { href: "assets/megastructure/atrium-cold-concrete.webp", type: "image/webp", fetchPriority: "high" },
-    { href: "assets/megastructure/node-contact-sheet.webp", type: "image/webp", fetchPriority: "auto" }
+    ...nodesWithQuality.map((node, index) => ({
+      href: node.imagePath,
+      type: "image/webp",
+      fetchPriority: index === 0 ? "high" : "auto"
+    }))
   ]}
 >
   <main
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
-    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
+    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
@@ -295,7 +299,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <div
           class="mega-panel-screen"
           data-panel-screen
-          style={`--thumb-x: ${firstNode.thumbX}; --thumb-y: ${firstNode.thumbY}; --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
+          style={`--node-image: url("${firstNode.image}"); --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
           aria-hidden="true"
         >
           <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
@@ -463,12 +467,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       const setPanelViewport = (node) => {
         const viewport = node.viewport || { frame: node.code, x: 50, y: 50, slit: 28 };
+        const nodeImage = node.image || nodes[0].image;
 
         if (panelFrameCode) panelFrameCode.textContent = viewport.frame;
+        if (nodeImage) lab.style.setProperty("--node-image", `url("${nodeImage}")`);
 
         if (panelScreen) {
-          panelScreen.style.setProperty("--thumb-x", node.thumbX);
-          panelScreen.style.setProperty("--thumb-y", node.thumbY);
+          if (nodeImage) panelScreen.style.setProperty("--node-image", `url("${nodeImage}")`);
           panelScreen.style.setProperty("--viewport-x", String(viewport.x) + "%");
           panelScreen.style.setProperty("--viewport-y", String(viewport.y) + "%");
           panelScreen.style.setProperty("--viewport-slit", String(viewport.slit) + "%");
