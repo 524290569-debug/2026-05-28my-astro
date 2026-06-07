@@ -3529,7 +3529,9 @@ img {
 .mega-panel-screen::after,
 .mega-panel-screen i,
 .mega-panel-frame-code,
-.mega-panel-aperture {
+.mega-panel-aperture,
+.mega-panel-condensation,
+.mega-panel-faults {
   position: absolute;
   pointer-events: none;
 }
@@ -3609,6 +3611,67 @@ img {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.26), transparent);
   transform: translateY(-50%);
+}
+
+.mega-panel-condensation {
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at var(--panel-scratch, 48%) 18%, rgba(238, 242, 241, 0.16), transparent 22%),
+    radial-gradient(ellipse at 24% 82%, rgba(238, 242, 241, 0.1), transparent 26%),
+    linear-gradient(115deg, transparent 0 22%, rgba(238, 242, 241, 0.1) 22.2% 22.7%, transparent 23% 58%, rgba(238, 242, 241, 0.07) 58.2% 58.6%, transparent 59%),
+    repeating-linear-gradient(96deg, transparent 0 1.15rem, rgba(238, 242, 241, 0.038) 1.17rem 1.2rem);
+  mix-blend-mode: screen;
+  opacity: var(--panel-wear, 0.34);
+}
+
+.mega-panel-condensation::before,
+.mega-panel-faults::before,
+.mega-panel-faults::after {
+  position: absolute;
+  content: "";
+}
+
+.mega-panel-condensation::before {
+  top: 14%;
+  bottom: 10%;
+  left: var(--panel-scratch, 48%);
+  width: 1px;
+  background:
+    linear-gradient(180deg, transparent, rgba(238, 242, 241, 0.2) 18%, transparent 44%, rgba(238, 242, 241, 0.14) 72%, transparent),
+    rgba(238, 242, 241, 0.035);
+  box-shadow:
+    -2.4rem 4.2rem 0 rgba(238, 242, 241, 0.05),
+    1.8rem 2.1rem 0 rgba(238, 242, 241, 0.04);
+  transform: rotate(3deg);
+}
+
+.mega-panel-faults {
+  inset: 0;
+  z-index: 2;
+  opacity: 0.56;
+}
+
+.mega-panel-faults::before {
+  top: var(--panel-break, 48%);
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background:
+    linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.34) 16%, transparent 38%, rgba(238, 242, 241, 0.18) 62%, transparent),
+    rgba(238, 242, 241, 0.04);
+  box-shadow:
+    0 0.42rem 0 rgba(238, 242, 241, 0.035),
+    0 -0.35rem 0 rgba(2, 3, 3, 0.32);
+}
+
+.mega-panel-faults::after {
+  right: 10%;
+  bottom: 13%;
+  width: 28%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mode-accent));
+  opacity: 0.58;
 }
 
 .mega-panel-screen i {

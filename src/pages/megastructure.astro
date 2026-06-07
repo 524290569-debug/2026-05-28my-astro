@@ -143,6 +143,17 @@ const nodeViewport = {
 
 const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["fog-gallery"];
 const viewportFor = (nodeId: keyof typeof nodeViewport) => nodeViewport[nodeId] ?? nodeViewport["fog-gallery"];
+const panelSignalFor = (quality: { integrity: number; noise: number }) => {
+  const wear = Math.min(0.58, Math.max(0.2, quality.noise * 0.006 + (100 - quality.integrity) * 0.003));
+  const signalBreak = Math.min(82, Math.max(22, Math.round(quality.noise * 1.42 + 10)));
+  const scratch = Math.min(78, Math.max(22, Math.round(((quality.integrity + quality.noise) % 54) + 22)));
+
+  return {
+    wear: wear.toFixed(2),
+    signalBreak: `${signalBreak}%`,
+    scratch: `${scratch}%`
+  };
+};
 const nodesWithQuality = nodes.map((node) => ({
   ...node,
   quality: qualityFor(node.id as keyof typeof nodeQuality),
@@ -150,6 +161,7 @@ const nodesWithQuality = nodes.map((node) => ({
 }));
 const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
+const firstPanelSignal = panelSignalFor(firstNode.quality);
 ---
 
 <BaseLayout
@@ -169,7 +181,7 @@ const firstNode = nodesWithQuality[0];
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
-    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise};`}
+    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
@@ -285,6 +297,8 @@ const firstNode = nodesWithQuality[0];
         >
           <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
           <span class="mega-panel-aperture" aria-hidden="true"></span>
+          <span class="mega-panel-condensation" aria-hidden="true"></span>
+          <span class="mega-panel-faults" aria-hidden="true"></span>
           <i></i>
         </div>
         <div class="mega-panel-copy">
@@ -423,8 +437,14 @@ const firstNode = nodesWithQuality[0];
 
       const setSignalQuality = (node) => {
         const quality = node.quality || { integrity: 0, noise: 0, drift: "NONE" };
+        const panelWear = Math.min(0.58, Math.max(0.2, quality.noise * 0.006 + (100 - quality.integrity) * 0.003));
+        const panelBreak = Math.min(82, Math.max(22, Math.round(quality.noise * 1.42 + 10)));
+        const panelScratch = Math.min(78, Math.max(22, Math.round(((quality.integrity + quality.noise) % 54) + 22)));
         lab.style.setProperty("--node-integrity", String(quality.integrity));
         lab.style.setProperty("--node-noise", String(quality.noise));
+        lab.style.setProperty("--panel-wear", panelWear.toFixed(2));
+        lab.style.setProperty("--panel-break", String(panelBreak) + "%");
+        lab.style.setProperty("--panel-scratch", String(panelScratch) + "%");
 
         if (qualityIntegrity) qualityIntegrity.textContent = String(quality.integrity);
         if (qualityNoise) qualityNoise.textContent = String(quality.noise);
