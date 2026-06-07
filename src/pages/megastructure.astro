@@ -200,7 +200,7 @@ const firstNode = nodesWithQuality[0];
       <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
         <a href={basePath}>灰雨电台</a>
         <span>MEGASTRUCTURE OBSERVER</span>
-        <button type="button" data-mega-random>No-clip</button>
+        <button type="button" data-mega-random aria-label="随机漂移到另一个空间节点">No-clip</button>
       </header>
 
       <section class="mega-lab-title" aria-label="页面标题">
@@ -246,6 +246,10 @@ const firstNode = nodesWithQuality[0];
             </button>
           ))
         }
+      </div>
+      <div class="mega-noclip-trace" data-noclip-trace aria-hidden="true">
+        <span></span>
+        <b data-noclip-code>NO-CLIP / STANDBY</b>
       </div>
       <div class="mega-drift-readout" aria-hidden="true">
         <span>DRIFT / NO NODE</span>
@@ -365,6 +369,8 @@ const firstNode = nodesWithQuality[0];
       const audioButton = lab.querySelector("[data-audio-toggle]");
       const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
       const panelReopenButton = lab.querySelector("[data-panel-reopen]");
+      const noClipTrace = lab.querySelector("[data-noclip-trace]");
+      const noClipCode = lab.querySelector("[data-noclip-code]");
       const scaleRange = lab.querySelector("[data-scale-range]");
       const scaleValue = lab.querySelector("[data-scale-value]");
       const modePhrase = lab.querySelector("[data-mode-phrase]");
@@ -395,6 +401,7 @@ const firstNode = nodesWithQuality[0];
       let lowGain = null;
       let presenceGain = null;
       let gain = null;
+      let noClipTimer = 0;
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
@@ -432,6 +439,49 @@ const firstNode = nodesWithQuality[0];
           panelScreen.style.setProperty("--viewport-y", String(viewport.y) + "%");
           panelScreen.style.setProperty("--viewport-slit", String(viewport.slit) + "%");
         }
+      };
+
+      const setNoClipTrace = (fromNode, toNode) => {
+        if (!noClipTrace || !fromNode || !toNode) {
+          return;
+        }
+
+        const stage = lab.querySelector(".mega-lab-stage");
+        const rect = stage ? stage.getBoundingClientRect() : lab.getBoundingClientRect();
+        const fromX = (Number(fromNode.x) / 100) * rect.width;
+        const fromY = (Number(fromNode.y) / 100) * rect.height;
+        const toX = (Number(toNode.x) / 100) * rect.width;
+        const toY = (Number(toNode.y) / 100) * rect.height;
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const panelRect = observerPanel?.getBoundingClientRect();
+        const hasSidePanel = panelRect && panelRect.left > rect.width * 0.55 && panelRect.width < rect.width * 0.55;
+        const hasBottomPanel = panelRect && panelRect.top > rect.height * 0.45 && panelRect.width > rect.width * 0.75;
+        const labelMaxX = Math.max(14, hasSidePanel ? panelRect.left - 180 : rect.width - 190);
+        const labelMaxY = Math.max(70, hasBottomPanel ? panelRect.top - 42 : rect.height - 70);
+        const labelX = Math.min(Math.max((fromX + toX) / 2, 14), labelMaxX);
+        const labelY = Math.min(Math.max((fromY + toY) / 2, 70), labelMaxY);
+
+        noClipTrace.style.setProperty("--trace-left", String(fromX) + "px");
+        noClipTrace.style.setProperty("--trace-top", String(fromY) + "px");
+        noClipTrace.style.setProperty("--trace-distance", String(Math.max(Math.hypot(dx, dy), 1)) + "px");
+        noClipTrace.style.setProperty("--trace-angle", String(Math.atan2(dy, dx) * 180 / Math.PI) + "deg");
+        noClipTrace.style.setProperty("--trace-label-left", String(labelX) + "px");
+        noClipTrace.style.setProperty("--trace-label-top", String(labelY) + "px");
+        if (noClipCode) noClipCode.textContent = `NO-CLIP / ${fromNode.code} -> ${toNode.code}`;
+
+        lab.classList.remove("is-noclip-tracing");
+        void noClipTrace.offsetWidth;
+        lab.classList.add("is-noclip-tracing");
+
+        if (noClipTimer) {
+          window.clearTimeout(noClipTimer);
+        }
+
+        noClipTimer = window.setTimeout(() => {
+          noClipTimer = 0;
+          lab.classList.remove("is-noclip-tracing");
+        }, 2600);
       };
 
       const applyMode = (modeId) => {
@@ -607,8 +657,13 @@ const firstNode = nodesWithQuality[0];
       });
 
       randomButton?.addEventListener("click", () => {
-        const nextIndex = Math.floor(Math.random() * nodes.length);
-        applyNode(nodes[nextIndex].id);
+        const fromNode = findNode(activeNodeId || lastNodeId || nodes[0].id);
+        const pool = nodes.length > 1
+          ? nodes.filter((node) => node.id !== fromNode.id)
+          : nodes;
+        const nextNode = pool[Math.floor(Math.random() * pool.length)] || nodes[0];
+        setNoClipTrace(fromNode, nextNode);
+        applyNode(nextNode.id);
       });
 
       audioButton?.addEventListener("click", () => {
@@ -658,6 +713,10 @@ const firstNode = nodesWithQuality[0];
         }
         if (audioContext) {
           audioContext.close();
+        }
+
+        if (noClipTimer) {
+          window.clearTimeout(noClipTimer);
         }
       });
 

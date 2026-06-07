@@ -3079,6 +3079,80 @@ img {
   opacity: 1;
 }
 
+.mega-noclip-trace {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.mega-noclip-trace span,
+.mega-noclip-trace b {
+  position: absolute;
+  pointer-events: none;
+}
+
+.mega-noclip-trace span {
+  top: var(--trace-top, 50%);
+  left: var(--trace-left, 50%);
+  width: var(--trace-distance, 0);
+  height: 1px;
+  background:
+    linear-gradient(90deg, rgba(238, 242, 241, 0), color-mix(in srgb, var(--mode-accent) 58%, rgba(238, 242, 241, 0.2)), rgba(238, 242, 241, 0));
+  box-shadow:
+    0 -0.65rem 0 rgba(238, 242, 241, 0.035),
+    0 0.65rem 0 rgba(238, 242, 241, 0.025),
+    0 0 1.8rem color-mix(in srgb, var(--mode-accent) 22%, transparent);
+  transform: rotate(var(--trace-angle, 0deg));
+  transform-origin: left center;
+}
+
+.mega-noclip-trace span::before,
+.mega-noclip-trace span::after {
+  position: absolute;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 54%, transparent);
+  background: rgba(7, 8, 8, 0.74);
+  content: "";
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.mega-noclip-trace span::before {
+  left: -0.22rem;
+  opacity: 0.46;
+}
+
+.mega-noclip-trace span::after {
+  right: -0.22rem;
+  box-shadow: 0 0 1.2rem color-mix(in srgb, var(--mode-accent) 30%, transparent);
+}
+
+.mega-noclip-trace b {
+  top: var(--trace-label-top, 50%);
+  left: var(--trace-label-left, 50%);
+  max-width: min(14rem, calc(100vw - 2rem));
+  border-left: 1px solid color-mix(in srgb, var(--mode-accent) 42%, transparent);
+  background:
+    linear-gradient(90deg, rgba(8, 9, 9, 0.72), rgba(8, 9, 9, 0.08)),
+    rgba(8, 9, 9, 0.34);
+  padding: 0.34rem 0.58rem;
+  color: rgba(238, 242, 241, 0.64);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0.9rem 1.8rem rgba(0, 0, 0, 0.86);
+  transform: translate(0.74rem, -50%);
+  white-space: nowrap;
+}
+
+.mega-lab.is-noclip-tracing .mega-noclip-trace {
+  animation: megaNoClipTrace 2600ms ease both;
+}
+
 .mega-node-cross {
   position: relative;
   width: 0.9rem;
@@ -3592,6 +3666,26 @@ img {
   }
 }
 
+@keyframes megaNoClipTrace {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+  }
+
+  14% {
+    opacity: 0.82;
+    filter: blur(0);
+  }
+
+  68% {
+    opacity: 0.72;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 1080px) {
   .mega-lab-stage {
     min-height: 940px;
@@ -3705,6 +3799,18 @@ img {
   .mega-node-cross::after {
     top: -0.9rem;
     height: 2.6rem;
+  }
+
+  .mega-noclip-trace {
+    z-index: 6;
+  }
+
+  .mega-noclip-trace b {
+    max-width: 9.6rem;
+    padding: 0.26rem 0.42rem;
+    font-size: 0.48rem;
+    letter-spacing: 0.1em;
+    transform: translate(0.52rem, -50%);
   }
 
   .mega-depth-field {
