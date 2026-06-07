@@ -2601,7 +2601,6 @@ img {
 
 .mega-lab-stage::before {
   background:
-    radial-gradient(circle at var(--focus-x, 50%) var(--focus-y, 50%), var(--mode-haze), transparent 22rem),
     linear-gradient(90deg, rgba(0, 0, 0, 0.76), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.58)),
     linear-gradient(180deg, rgba(0, 0, 0, 0.44), transparent 32%, rgba(0, 0, 0, 0.62));
 }
@@ -2888,8 +2887,7 @@ img {
   height: 42%;
   background:
     linear-gradient(180deg, transparent 0, rgba(206, 220, 218, 0.05) 24%, rgba(8, 10, 10, 0.2) 100%),
-    repeating-linear-gradient(168deg, transparent 0 3rem, rgba(226, 232, 229, 0.04) 3.05rem 3.1rem),
-    radial-gradient(ellipse at var(--focus-x, 50%) 18%, var(--mode-haze), transparent 28rem);
+    repeating-linear-gradient(168deg, transparent 0 3rem, rgba(226, 232, 229, 0.04) 3.05rem 3.1rem);
   clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
   mix-blend-mode: screen;
   opacity: 0.34;
@@ -3110,12 +3108,6 @@ img {
     border-color 180ms ease,
     opacity 180ms ease,
     transform 220ms ease;
-}
-
-.mega-lab-node.is-active::before {
-  border-color: color-mix(in srgb, var(--mode-accent) 42%, transparent);
-  opacity: clamp(0.22, calc(var(--node-integrity, 61) / 150), 0.54);
-  transform: rotate(45deg) scale(calc(0.92 + (var(--node-noise, 28) / 520)));
 }
 
 .mega-lab-node.is-muted {

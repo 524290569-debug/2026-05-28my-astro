@@ -711,7 +711,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       panelCollapseButton?.addEventListener("click", () => {
-        setPanelCollapsed(true);
+        clearNodeFocus();
         panelReopenButton?.focus({ preventScroll: true });
       });
 
