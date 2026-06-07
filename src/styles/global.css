@@ -2917,6 +2917,23 @@ img {
     inset 0 0 0 1px rgba(255, 255, 255, 0.018);
   backdrop-filter: blur(14px);
   padding: 0.9rem;
+  transition:
+    opacity 220ms ease,
+    transform 260ms ease,
+    visibility 220ms ease;
+}
+
+.mega-lab.is-panel-collapsed .mega-observer-panel {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(100% + 2rem));
+  visibility: hidden;
+}
+
+.mega-lab.is-panel-collapsed .mega-lab-node.is-active .mega-node-cross {
+  box-shadow:
+    0 0 0 0.32rem rgba(224, 231, 228, 0.06),
+    0 0 1.2rem color-mix(in srgb, var(--mode-accent) 28%, transparent);
 }
 
 .mega-panel-head {
@@ -2925,6 +2942,13 @@ img {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.72rem;
+}
+
+.mega-panel-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .mega-panel-head span,
@@ -2950,6 +2974,18 @@ img {
   font: inherit;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
+}
+
+.mega-panel-head .mega-panel-collapse {
+  width: 2rem;
+  justify-content: center;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.mega-panel-collapse::before {
+  content: ">";
 }
 
 .mega-panel-head button:hover,
@@ -3225,6 +3261,10 @@ img {
     left: 0.85rem;
     width: auto;
     padding: 0.76rem;
+  }
+
+  .mega-lab.is-panel-collapsed .mega-observer-panel {
+    transform: translateY(calc(100% + 1rem));
   }
 
   .mega-panel-screen {

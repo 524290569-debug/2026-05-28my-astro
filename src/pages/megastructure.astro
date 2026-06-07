@@ -199,6 +199,7 @@ const firstNode = nodes[0];
               data-node-mode={node.mode}
               style={`--x: ${node.x}%; --y: ${node.y}%;`}
               aria-pressed={index === 0 ? "true" : "false"}
+              aria-expanded={index === 0 ? "true" : "false"}
             >
               <span class="mega-node-cross" aria-hidden="true"></span>
               <span class="mega-node-text">{node.label}</span>
@@ -210,7 +211,15 @@ const firstNode = nodes[0];
       <aside class="mega-observer-panel" aria-label="空间播放窗口">
         <div class="mega-panel-head">
           <span data-node-code>{firstNode.code}</span>
-          <button type="button" data-audio-toggle aria-pressed="false">声场</button>
+          <div class="mega-panel-actions">
+            <button type="button" data-audio-toggle aria-pressed="false">低频</button>
+            <button
+              class="mega-panel-collapse"
+              type="button"
+              data-panel-collapse
+              aria-label="收起观察窗口"
+            ></button>
+          </div>
         </div>
         <div
           class="mega-panel-screen"
@@ -262,6 +271,7 @@ const firstNode = nodes[0];
       const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
       const randomButton = lab.querySelector("[data-mega-random]");
       const audioButton = lab.querySelector("[data-audio-toggle]");
+      const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
       const scaleRange = lab.querySelector("[data-scale-range]");
       const scaleValue = lab.querySelector("[data-scale-value]");
       const modePhrase = lab.querySelector("[data-mode-phrase]");
@@ -271,12 +281,17 @@ const firstNode = nodes[0];
       const nodeSentence = lab.querySelector("[data-node-sentence]");
       const nodeSignal = lab.querySelector("[data-node-signal]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
+      const observerPanel = lab.querySelector(".mega-observer-panel");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       let activeModeId = modes[0].id;
       let activeNodeId = nodes[0].id;
+      let isPanelCollapsed = false;
       let pointerFrame = 0;
       let audioContext = null;
-      let oscillator = null;
+      let lowOscillator = null;
+      let overtoneOscillator = null;
+      let lowGain = null;
+      let presenceGain = null;
       let gain = null;
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
@@ -300,17 +315,30 @@ const firstNode = nodes[0];
           button.classList.toggle("is-muted", button.dataset.nodeMode !== mode.id);
         });
 
-        if (oscillator) {
-          oscillator.frequency.setTargetAtTime(
-            42 + modes.findIndex((item) => item.id === mode.id) * 9,
-            audioContext.currentTime,
-            0.08
-          );
+        if (lowOscillator && overtoneOscillator) {
+          const modeIndex = modes.findIndex((item) => item.id === mode.id);
+          const baseFrequency = 56 + modeIndex * 6;
+          lowOscillator.frequency.setTargetAtTime(baseFrequency, audioContext.currentTime, 0.08);
+          overtoneOscillator.frequency.setTargetAtTime(baseFrequency * 2.35, audioContext.currentTime, 0.08);
         }
       };
 
-      const applyNode = (nodeId) => {
+      const setPanelCollapsed = (collapsed) => {
+        isPanelCollapsed = collapsed;
+        lab.classList.toggle("is-panel-collapsed", collapsed);
+        if (observerPanel) {
+          observerPanel.setAttribute("aria-hidden", String(collapsed));
+        }
+
+        nodeButtons.forEach((button) => {
+          const isActive = button.dataset.nodeButton === activeNodeId;
+          button.setAttribute("aria-expanded", String(isActive && !collapsed));
+        });
+      };
+
+      const applyNode = (nodeId, options = {}) => {
         const node = findNode(nodeId);
+        const isSameNode = node.id === activeNodeId;
         activeNodeId = node.id;
         lab.style.setProperty("--focus-x", String(node.x) + "%");
         lab.style.setProperty("--focus-y", String(node.y) + "%");
@@ -332,6 +360,7 @@ const firstNode = nodes[0];
         }
 
         applyMode(node.mode);
+        setPanelCollapsed(options.toggleIfSame && isSameNode ? !isPanelCollapsed : false);
       };
 
       const setScale = (value) => {
@@ -350,24 +379,45 @@ const firstNode = nodes[0];
 
         if (!audioContext) {
           audioContext = new AudioCtor();
-          oscillator = audioContext.createOscillator();
+          lowOscillator = audioContext.createOscillator();
+          overtoneOscillator = audioContext.createOscillator();
+          lowGain = audioContext.createGain();
+          presenceGain = audioContext.createGain();
           gain = audioContext.createGain();
-          oscillator.type = "sine";
-          oscillator.frequency.value = 42;
+          const modeIndex = modes.findIndex((item) => item.id === activeModeId);
+          const baseFrequency = 56 + modeIndex * 6;
+          lowOscillator.type = "sine";
+          overtoneOscillator.type = "sine";
+          lowOscillator.frequency.value = baseFrequency;
+          overtoneOscillator.frequency.value = baseFrequency * 2.35;
+          lowGain.gain.value = 0.9;
+          presenceGain.gain.value = 0.32;
           gain.gain.value = 0.0001;
-          oscillator.connect(gain);
+          lowOscillator.connect(lowGain);
+          overtoneOscillator.connect(presenceGain);
+          lowGain.connect(gain);
+          presenceGain.connect(gain);
           gain.connect(audioContext.destination);
-          oscillator.start();
-        }
-
-        if (audioContext.state === "suspended") {
-          await audioContext.resume();
+          lowOscillator.start();
+          overtoneOscillator.start();
         }
 
         const isOn = audioButton.getAttribute("aria-pressed") !== "true";
         audioButton.setAttribute("aria-pressed", String(isOn));
-        audioButton.textContent = isOn ? "静音" : "声场";
-        gain.gain.setTargetAtTime(isOn ? 0.035 : 0.0001, audioContext.currentTime, 0.08);
+        audioButton.textContent = isOn ? "静音" : "低频";
+        gain.gain.setTargetAtTime(isOn ? 0.036 : 0.0001, audioContext.currentTime, 0.08);
+        lab.dataset.audioState = isOn ? "on" : "off";
+
+        if (audioContext.state === "suspended") {
+          await audioContext.resume().catch(() => {
+            lab.dataset.audioState = "blocked";
+          });
+        }
+
+        if (isOn && audioContext.state === "running") {
+          gain.gain.setTargetAtTime(0.036, audioContext.currentTime, 0.08);
+          lab.dataset.audioState = "running";
+        }
       };
 
       modeButtons.forEach((button) => {
@@ -380,7 +430,7 @@ const firstNode = nodes[0];
 
       nodeButtons.forEach((button) => {
         button.addEventListener("click", () => {
-          applyNode(button.dataset.nodeButton);
+          applyNode(button.dataset.nodeButton, { toggleIfSame: true });
         });
       });
 
@@ -391,6 +441,10 @@ const firstNode = nodes[0];
 
       audioButton?.addEventListener("click", () => {
         toggleAudio();
+      });
+
+      panelCollapseButton?.addEventListener("click", () => {
+        setPanelCollapsed(true);
       });
 
       scaleRange?.addEventListener("input", () => {
