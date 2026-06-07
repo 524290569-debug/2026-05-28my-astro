@@ -247,6 +247,10 @@ const firstNode = nodesWithQuality[0];
           ))
         }
       </div>
+      <div class="mega-drift-readout" aria-hidden="true">
+        <span>DRIFT / NO NODE</span>
+        <i></i>
+      </div>
 
       <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
         <div class="mega-panel-head">
@@ -481,6 +485,8 @@ const firstNode = nodesWithQuality[0];
 
       const clearNodeFocus = () => {
         activeNodeId = "";
+        lab.classList.add("is-node-unfocused");
+        lab.dataset.focusState = "none";
         lab.style.setProperty("--focus-x", "50%");
         lab.style.setProperty("--focus-y", "50%");
 
@@ -505,6 +511,8 @@ const firstNode = nodesWithQuality[0];
 
         activeNodeId = node.id;
         lastNodeId = node.id;
+        lab.classList.remove("is-node-unfocused");
+        lab.dataset.focusState = "node";
         lab.style.setProperty("--focus-x", String(node.x) + "%");
         lab.style.setProperty("--focus-y", String(node.y) + "%");
 
