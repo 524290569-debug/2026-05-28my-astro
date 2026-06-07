@@ -56,6 +56,9 @@ const nodes = [
     code: "A-01",
     x: 18,
     y: 54,
+    labelX: -0.3,
+    labelY: 2.5,
+    labelAlign: "center",
     thumbX: "0%",
     thumbY: "0%",
     sentence: "雾从柱脚升起，出口像一段被误删的记忆。",
@@ -68,6 +71,9 @@ const nodes = [
     code: "B-09",
     x: 58,
     y: 42,
+    labelX: 3.1,
+    labelY: 0.2,
+    labelAlign: "left",
     thumbX: "100%",
     thumbY: "0%",
     sentence: "水面没有波纹，只复制一盏过亮的天窗。",
@@ -80,6 +86,9 @@ const nodes = [
     code: "C-17",
     x: 50,
     y: 26,
+    labelX: 0,
+    labelY: -2.35,
+    labelAlign: "center",
     thumbX: "0%",
     thumbY: "100%",
     sentence: "向上看不到楼层，只能看到结构继续重复。",
@@ -92,6 +101,9 @@ const nodes = [
     code: "D-04",
     x: 60,
     y: 62,
+    labelX: 3.05,
+    labelY: 1.05,
+    labelAlign: "left",
     thumbX: "100%",
     thumbY: "100%",
     sentence: "每根柱子都像上一根柱子的回声。",
@@ -104,6 +116,9 @@ const nodes = [
     code: "E-12",
     x: 36,
     y: 72,
+    labelX: -3.1,
+    labelY: 0.95,
+    labelAlign: "right",
     thumbX: "100%",
     thumbY: "100%",
     sentence: "门开着，但空间没有真正允许你离开。",
@@ -116,6 +131,9 @@ const nodes = [
     code: "F-06",
     x: 51,
     y: 58,
+    labelX: -2.95,
+    labelY: -1.45,
+    labelAlign: "right",
     thumbX: "0%",
     thumbY: "0%",
     sentence: "结构背面没有功能，只剩一条低频电流。",
@@ -254,7 +272,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
               class={`mega-lab-node${index === 0 ? " is-active" : ""}`}
               data-node-button={node.id}
               data-node-mode={node.mode}
-              style={`--x: ${node.x}%; --y: ${node.y}%;`}
+              style={`--x: ${node.x}%; --y: ${node.y}%; --label-x: ${node.labelX}rem; --label-y: ${node.labelY}rem; --label-align: ${node.labelAlign};`}
+              aria-label={`观察节点 ${node.code} ${node.label}`}
               aria-controls="mega-observer-panel"
               aria-pressed={index === 0 ? "true" : "false"}
               aria-expanded={index === 0 ? "true" : "false"}
