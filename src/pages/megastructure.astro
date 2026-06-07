@@ -248,22 +248,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         </span>
       </section>
 
-      <nav class="mega-mode-rail" aria-label="空间模式">
-        {
-          modes.map((mode, index) => (
-            <button
-              type="button"
-              class={index === 0 ? "is-active" : ""}
-              data-mode-button={mode.id}
-              aria-pressed={index === 0 ? "true" : "false"}
-            >
-              <span>{mode.code}</span>
-              {mode.label}
-            </button>
-          ))
-        }
-      </nav>
-
       <div class="mega-node-plane" aria-label="空间节点">
         {
           nodesWithQuality.map((node, index) => (

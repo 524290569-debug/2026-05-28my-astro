@@ -3012,54 +3012,6 @@ img {
   letter-spacing: 0.14em;
 }
 
-.mega-mode-rail {
-  position: absolute;
-  z-index: 8;
-  bottom: clamp(1.25rem, 5vh, 3.4rem);
-  left: max(1.5rem, calc((100% - 78rem) / 2));
-  display: grid;
-  width: min(20rem, calc(100% - 3rem));
-  gap: 1px;
-  border: 1px solid var(--lab-border-soft);
-  background: rgba(224, 231, 228, 0.08);
-}
-
-.mega-mode-rail button {
-  display: grid;
-  min-height: 3.2rem;
-  grid-template-columns: 5.4rem minmax(0, 1fr);
-  align-items: center;
-  border: 0;
-  background:
-    linear-gradient(90deg, rgba(224, 231, 228, 0.04), transparent),
-    rgba(7, 8, 8, 0.72);
-  color: rgba(224, 231, 228, 0.68);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.82rem;
-  text-align: left;
-  transition:
-    background 180ms ease,
-    color 180ms ease;
-}
-
-.mega-mode-rail span {
-  color: var(--lab-dim);
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-align: center;
-}
-
-.mega-mode-rail button:hover,
-.mega-mode-rail button:focus-visible,
-.mega-mode-rail button.is-active {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 16%, transparent), transparent 74%),
-    rgba(12, 14, 14, 0.88);
-  color: rgba(248, 250, 249, 0.94);
-  outline: none;
-}
-
 .mega-node-plane {
   position: absolute;
   inset: 0;
@@ -3595,8 +3547,8 @@ img {
 .mega-panel-screen::before {
   inset: 0;
   background:
-    radial-gradient(ellipse at var(--viewport-x, 50%) var(--viewport-y, 50%), transparent 0 18%, rgba(9, 11, 11, 0.18) 38%, rgba(4, 5, 5, 0.38) 100%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 20%),
+    linear-gradient(90deg, rgba(4, 5, 5, 0.2), transparent 28%, transparent 72%, rgba(4, 5, 5, 0.22)),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 5px);
   opacity: 0.42;
   content: "";
@@ -3644,7 +3596,6 @@ img {
   overflow: hidden;
   border: 1px solid rgba(238, 242, 241, 0.16);
   background:
-    radial-gradient(circle at var(--map-x, 50%) var(--map-y, 50%), color-mix(in srgb, var(--mode-accent) 42%, transparent) 0 0.22rem, transparent 0.24rem),
     linear-gradient(180deg, rgba(238, 242, 241, 0.075), rgba(4, 5, 5, 0.34)),
     rgba(3, 4, 4, 0.52);
   box-shadow:
@@ -3687,10 +3638,10 @@ img {
   left: var(--map-x, 50%);
   width: 0.5rem;
   height: 0.5rem;
-  border: 1px solid color-mix(in srgb, var(--mode-accent) 68%, transparent);
+  border: 1px solid rgba(238, 242, 241, 0.42);
   box-shadow:
     0 0 0 0.18rem rgba(238, 242, 241, 0.045),
-    0 0 0.9rem color-mix(in srgb, var(--mode-accent) 26%, transparent);
+    0 0 0.65rem rgba(238, 242, 241, 0.12);
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
@@ -3762,7 +3713,7 @@ img {
   bottom: 13%;
   width: 28%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--mode-accent));
+  background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.36));
   opacity: 0.58;
 }
 
@@ -3771,7 +3722,7 @@ img {
   bottom: 0.65rem;
   width: 32%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--mode-accent));
+  background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.44));
 }
 
 .mega-panel-copy {
@@ -3955,10 +3906,6 @@ img {
     left: 1.25rem;
   }
 
-  .mega-mode-rail {
-    left: 1.25rem;
-  }
-
   .mega-observer-panel {
     right: 1.25rem;
   }
@@ -4018,27 +3965,6 @@ img {
 
   .mega-node-state {
     display: none;
-  }
-
-  .mega-mode-rail {
-    top: 11.8rem;
-    bottom: auto;
-    width: calc(100% - 1.5rem);
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    left: 0.75rem;
-  }
-
-  .mega-mode-rail button {
-    min-height: 2.75rem;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    padding: 0.42rem 0.2rem;
-    font-size: 0.66rem;
-    text-align: center;
-  }
-
-  .mega-mode-rail span {
-    font-size: 0.52rem;
   }
 
   .mega-lab-node {
