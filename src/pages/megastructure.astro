@@ -199,7 +199,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
-    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
+    style={`--mega-sheet: url("${nodeSheetImage}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
@@ -316,6 +316,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         >
           <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
           <span class="mega-panel-aperture" aria-hidden="true"></span>
+          <span class="mega-panel-locator" aria-hidden="true">
+            <span class="mega-locator-trace"></span>
+            <span class="mega-locator-mark"></span>
+            <b data-locator-code>{firstNode.code}</b>
+          </span>
           <span class="mega-panel-condensation" aria-hidden="true"></span>
           <span class="mega-panel-faults" aria-hidden="true"></span>
           <i></i>
@@ -422,6 +427,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
       const panelFrameCode = lab.querySelector("[data-panel-frame-code]");
+      const locatorCode = lab.querySelector("[data-locator-code]");
       const qualityIntegrity = lab.querySelector("[data-quality-integrity]");
       const qualityNoise = lab.querySelector("[data-quality-noise]");
       const qualityDrift = lab.querySelector("[data-quality-drift]");
@@ -584,6 +590,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         lab.dataset.focusState = "none";
         lab.style.setProperty("--focus-x", "50%");
         lab.style.setProperty("--focus-y", "50%");
+        lab.style.setProperty("--map-x", "50%");
+        lab.style.setProperty("--map-y", "50%");
 
         nodeButtons.forEach((button) => {
           button.classList.remove("is-active");
@@ -592,6 +600,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         });
 
         if (nodeState) nodeState.textContent = "NO NODE / OBSERVER COLLAPSED";
+        if (locatorCode) locatorCode.textContent = "NULL";
         setPanelCollapsed(true);
       };
 
@@ -610,6 +619,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         lab.dataset.focusState = "node";
         lab.style.setProperty("--focus-x", String(node.x) + "%");
         lab.style.setProperty("--focus-y", String(node.y) + "%");
+        lab.style.setProperty("--map-x", String(node.x) + "%");
+        lab.style.setProperty("--map-y", String(node.y) + "%");
 
         nodeButtons.forEach((button) => {
           const isActive = button.dataset.nodeButton === node.id;
@@ -623,6 +634,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         if (nodeSignal) nodeSignal.textContent = node.signal;
         if (nodeState) nodeState.textContent = `${node.code} / ${node.label} / ${node.signal}`;
         if (reopenCode) reopenCode.textContent = node.code;
+        if (locatorCode) locatorCode.textContent = node.code;
         setSignalQuality(node);
         setPanelViewport(node);
 

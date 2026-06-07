@@ -3613,6 +3613,13 @@ img {
   content: "";
 }
 
+.mega-panel-locator,
+.mega-locator-trace,
+.mega-locator-mark {
+  position: absolute;
+  pointer-events: none;
+}
+
 .mega-panel-frame-code {
   z-index: 2;
   top: 0.54rem;
@@ -3668,6 +3675,77 @@ img {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(238, 242, 241, 0.26), transparent);
   transform: translateY(-50%);
+}
+
+.mega-panel-locator {
+  z-index: 3;
+  bottom: 0.58rem;
+  left: 0.58rem;
+  display: block;
+  width: 5.9rem;
+  height: 3.45rem;
+  overflow: hidden;
+  border: 1px solid rgba(238, 242, 241, 0.16);
+  background:
+    radial-gradient(circle at var(--map-x, 50%) var(--map-y, 50%), color-mix(in srgb, var(--mode-accent) 42%, transparent) 0 0.22rem, transparent 0.24rem),
+    linear-gradient(180deg, rgba(238, 242, 241, 0.075), rgba(4, 5, 5, 0.34)),
+    rgba(3, 4, 4, 0.52);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.018),
+    0 0.7rem 1.6rem rgba(0, 0, 0, 0.32);
+  opacity: 0.82;
+}
+
+.mega-panel-locator::before,
+.mega-panel-locator::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.mega-panel-locator::before {
+  background:
+    linear-gradient(90deg, transparent calc(var(--map-x, 50%) - 0.5px), rgba(238, 242, 241, 0.2) calc(var(--map-x, 50%) - 0.5px) calc(var(--map-x, 50%) + 0.5px), transparent calc(var(--map-x, 50%) + 0.5px)),
+    linear-gradient(180deg, transparent calc(var(--map-y, 50%) - 0.5px), rgba(238, 242, 241, 0.16) calc(var(--map-y, 50%) - 0.5px) calc(var(--map-y, 50%) + 0.5px), transparent calc(var(--map-y, 50%) + 0.5px));
+  opacity: 0.62;
+}
+
+.mega-panel-locator::after {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 24%, rgba(238, 242, 241, 0.08) 24.5% 25%, transparent 25.5%),
+    repeating-linear-gradient(0deg, transparent 0 32%, rgba(238, 242, 241, 0.065) 32.5% 33%, transparent 33.5%);
+  opacity: 0.7;
+}
+
+.mega-locator-trace {
+  inset: 0.42rem;
+  border-top: 1px solid rgba(238, 242, 241, 0.13);
+  border-left: 1px solid rgba(238, 242, 241, 0.11);
+  opacity: 0.7;
+}
+
+.mega-locator-mark {
+  z-index: 2;
+  top: var(--map-y, 50%);
+  left: var(--map-x, 50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 68%, transparent);
+  box-shadow:
+    0 0 0 0.18rem rgba(238, 242, 241, 0.045),
+    0 0 0.9rem color-mix(in srgb, var(--mode-accent) 26%, transparent);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.mega-panel-locator b {
+  position: absolute;
+  right: 0.32rem;
+  bottom: 0.22rem;
+  z-index: 2;
+  color: rgba(238, 242, 241, 0.66);
+  font-size: 0.46rem;
+  font-weight: 520;
+  letter-spacing: 0.12em;
 }
 
 .mega-panel-condensation {
@@ -4204,6 +4282,19 @@ img {
     width: clamp(3.2rem, var(--viewport-slit, 28%), 6.2rem);
   }
 
+  .mega-panel-locator {
+    bottom: 0.42rem;
+    left: 0.45rem;
+    width: 4.65rem;
+    height: 2.62rem;
+  }
+
+  .mega-panel-locator b {
+    right: 0.24rem;
+    bottom: 0.18rem;
+    font-size: 0.4rem;
+  }
+
   .mega-panel-copy {
     gap: 0.34rem;
     padding-top: 0.58rem;
@@ -4254,6 +4345,55 @@ img {
   .mega-scale-control span,
   .mega-scale-control b {
     font-size: 0.56rem;
+  }
+
+  @media (max-height: 760px) {
+    .mega-observer-panel {
+      padding: 0.62rem;
+    }
+
+    .mega-panel-head {
+      margin-bottom: 0.52rem;
+    }
+
+    .mega-panel-screen {
+      aspect-ratio: 2.85 / 1;
+    }
+
+    .mega-panel-copy {
+      padding-top: 0.44rem;
+    }
+
+    .mega-panel-copy p {
+      -webkit-line-clamp: 1;
+    }
+
+    .mega-signal-readout {
+      margin-top: 0.44rem;
+    }
+
+    .mega-signal-readout span {
+      padding: 0.36rem 0.42rem 0.4rem;
+    }
+
+    .mega-scale-control {
+      margin-top: 0.5rem;
+      padding-top: 0.48rem;
+    }
+  }
+
+  @media (max-height: 640px) {
+    .mega-signal-readout {
+      display: none;
+    }
+
+    .mega-panel-screen {
+      aspect-ratio: 3.35 / 1;
+    }
+
+    .mega-scale-control {
+      grid-template-columns: 3.9rem minmax(0, 1fr) 1.6rem;
+    }
   }
 
   .mega-design-strip {
