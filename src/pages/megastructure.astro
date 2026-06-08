@@ -177,8 +177,8 @@ const nodesWithQuality = nodes.map((node) => ({
   imagePath: nodeImagePathFor(node.id as keyof typeof nodeImagePaths),
   image: nodeImageFor(node.id as keyof typeof nodeImagePaths)
 }));
-const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
+const firstMode = modes.find((mode) => mode.id === firstNode.mode) ?? modes[0];
 const firstPanelSignal = panelSignalFor(firstNode.quality);
 ---
 
@@ -203,6 +203,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
+    data-mode={firstMode.id}
     style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
@@ -250,6 +251,22 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <span class="mega-node-state" data-node-state role="status" aria-live="polite">
           {firstNode.code} / {firstNode.label} / {firstNode.signal}
         </span>
+        <div class="mega-mode-rail" role="toolbar" aria-label="观察模式">
+          {
+            modes.map((mode) => (
+              <button
+                type="button"
+                class={`mega-mode-button${mode.id === firstMode.id ? " is-active" : ""}`}
+                data-mode-button={mode.id}
+                aria-pressed={mode.id === firstMode.id ? "true" : "false"}
+              >
+                <span>{mode.code}</span>
+                <strong>{mode.label}</strong>
+                <small>{mode.status}</small>
+              </button>
+            ))
+          }
+        </div>
       </section>
 
       <div class="mega-node-plane" aria-label="空间节点">
@@ -526,6 +543,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const applyMode = (modeId) => {
         const mode = findMode(modeId);
         activeModeId = mode.id;
+        lab.dataset.mode = mode.id;
         lab.style.setProperty("--mode-accent", mode.accent);
         lab.style.setProperty("--mode-haze", mode.haze);
         if (modePhrase) modePhrase.textContent = mode.phrase;
