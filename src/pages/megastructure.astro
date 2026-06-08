@@ -224,17 +224,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <span class="mega-depth-slab mega-depth-slab-2"></span>
         <span class="mega-depth-slab mega-depth-slab-3"></span>
       </div>
-      <div class="mega-scale-field" aria-hidden="true">
-        <span class="mega-scale-mark mega-scale-mark-1" data-scale="120M"></span>
-        <span class="mega-scale-mark mega-scale-mark-2" data-scale="044M"></span>
-        <span class="mega-scale-mark mega-scale-mark-3" data-scale="009M"></span>
-      </div>
-      <div class="mega-maintenance-field" aria-hidden="true">
-        <span class="mega-maintenance-seam mega-maintenance-seam-1" data-mark="SEAM 021"></span>
-        <span class="mega-maintenance-seam mega-maintenance-seam-2" data-mark="PATCH 04"></span>
-        <span class="mega-maintenance-seam mega-maintenance-seam-3" data-mark="LOCK 17"></span>
-        <span class="mega-maintenance-seam mega-maintenance-seam-4" data-mark="WET 06"></span>
-      </div>
       <div class="mega-ground-sheen" aria-hidden="true"></div>
 
       <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
@@ -445,6 +434,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let panelGesture = null;
       let panelFrame = 0;
       let pendingPanelBox = null;
+      let pendingPanelMode = "floating";
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
@@ -564,6 +554,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const setPanelCollapsed = (collapsed) => {
         isPanelCollapsed = collapsed;
         lab.classList.toggle("is-panel-collapsed", collapsed);
+        if (collapsed) {
+          resetPanelPlacement();
+        }
+
         if (observerPanel) {
           observerPanel.setAttribute("aria-hidden", String(collapsed));
         }
@@ -584,6 +578,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         });
       };
 
+      const resetPanelPlacement = () => {
+        if (!observerPanel) {
+          return;
+        }
+
+        observerPanel.style.left = "";
+        observerPanel.style.top = "";
+        observerPanel.style.right = "";
+        observerPanel.style.bottom = "";
+        observerPanel.style.width = "";
+        observerPanel.style.height = "";
+        lab.classList.remove("is-panel-floating");
+      };
+
       const getPanelBounds = () => {
         const stage = lab.querySelector(".mega-lab-stage");
 
@@ -594,14 +602,47 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const stageRect = stage.getBoundingClientRect();
         const panelRect = observerPanel.getBoundingClientRect();
         const gutter = stageRect.width <= 720 ? 14 : 24;
-        const minWidth = Math.min(280, Math.max(220, stageRect.width - gutter * 2));
-        const minHeight = Math.min(260, Math.max(220, stageRect.height - gutter * 2));
-        const maxWidth = Math.max(minWidth, stageRect.width - gutter * 2);
-        const maxHeight = Math.max(minHeight, stageRect.height - gutter * 2);
+        const viewportLeft = Math.max(stageRect.left, 0);
+        const viewportTop = Math.max(stageRect.top, 0);
+        const viewportRight = Math.min(stageRect.right, window.innerWidth);
+        let viewportBottom = Math.min(stageRect.bottom, window.innerHeight);
+        const designStrip = lab.querySelector(".mega-design-strip");
+        const designStripRect = designStrip?.getBoundingClientRect();
+
+        if (
+          designStripRect &&
+          designStripRect.top < window.innerHeight &&
+          designStripRect.bottom > 0
+        ) {
+          viewportBottom = Math.min(viewportBottom, designStripRect.top);
+        }
+
+        const safeLeft = Math.max(gutter, viewportLeft - stageRect.left + gutter);
+        const safeTop = Math.max(gutter, viewportTop - stageRect.top + gutter);
+        const safeRight = Math.max(
+          safeLeft + 1,
+          Math.min(stageRect.width - gutter, viewportRight - stageRect.left - gutter)
+        );
+        const safeBottom = Math.max(
+          safeTop + 1,
+          Math.min(stageRect.height - gutter, viewportBottom - stageRect.top - gutter)
+        );
+        const preferredMinWidth = stageRect.width <= 720 ? 220 : 260;
+        const preferredMinHeight = stageRect.width <= 720 ? 220 : 240;
+        const availableWidth = Math.max(1, safeRight - safeLeft);
+        const availableHeight = Math.max(1, safeBottom - safeTop);
+        const minWidth = Math.min(preferredMinWidth, availableWidth);
+        const minHeight = Math.min(preferredMinHeight, availableHeight);
+        const maxWidth = Math.max(minWidth, availableWidth);
+        const maxHeight = Math.max(minHeight, availableHeight);
 
         return {
           stageRect,
           gutter,
+          safeLeft,
+          safeTop,
+          safeRight,
+          safeBottom,
           minWidth,
           minHeight,
           maxWidth,
@@ -613,7 +654,34 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         };
       };
 
-      const applyPanelBox = (box) => {
+      const isPanelManuallyFloating = () => lab.classList.contains("is-panel-floating");
+
+      const getPanelContentHeight = (width) => {
+        if (!observerPanel) {
+          return 0;
+        }
+
+        const previousWidth = observerPanel.style.width;
+        const previousHeight = observerPanel.style.height;
+        const previousMaxHeight = observerPanel.style.maxHeight;
+        observerPanel.style.width = `${width}px`;
+        observerPanel.style.height = "auto";
+        observerPanel.style.maxHeight = "none";
+
+        const panelStyle = getComputedStyle(observerPanel);
+        const borderHeight =
+          Number.parseFloat(panelStyle.borderTopWidth || "0") +
+          Number.parseFloat(panelStyle.borderBottomWidth || "0");
+        const contentHeight = Math.ceil(observerPanel.scrollHeight + borderHeight);
+
+        observerPanel.style.width = previousWidth;
+        observerPanel.style.height = previousHeight;
+        observerPanel.style.maxHeight = previousMaxHeight;
+
+        return contentHeight;
+      };
+
+      const applyFloatingPanelBox = (box) => {
         if (!observerPanel) {
           return;
         }
@@ -625,9 +693,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         const width = clamp(box.width, bounds.minWidth, bounds.maxWidth);
-        const height = clamp(box.height, bounds.minHeight, bounds.maxHeight);
-        const left = clamp(box.left, bounds.gutter, bounds.stageRect.width - width - bounds.gutter);
-        const top = clamp(box.top, bounds.gutter, bounds.stageRect.height - height - bounds.gutter);
+        const contentHeight = getPanelContentHeight(width);
+        const height = Math.max(clamp(box.height, bounds.minHeight, bounds.maxHeight), contentHeight);
+        const left = clamp(box.left, bounds.safeLeft, Math.max(bounds.safeLeft, bounds.safeRight - width));
+        const top = clamp(box.top, bounds.safeTop, Math.max(bounds.safeTop, bounds.safeBottom - height));
 
         observerPanel.style.left = `${left}px`;
         observerPanel.style.top = `${top}px`;
@@ -638,8 +707,35 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         lab.classList.add("is-panel-floating");
       };
 
-      const schedulePanelBox = (box) => {
+      const applyDockedPanelBox = (box) => {
+        if (!observerPanel) {
+          return;
+        }
+
+        const bounds = getPanelBounds();
+
+        if (!bounds) {
+          return;
+        }
+
+        const width = clamp(box.width, bounds.minWidth, bounds.maxWidth);
+        const contentHeight = getPanelContentHeight(width);
+        const height = Math.max(clamp(box.height, bounds.minHeight, bounds.maxHeight), contentHeight);
+        const right = Math.max(bounds.gutter, bounds.stageRect.width - bounds.safeRight);
+        const bottom = Math.max(bounds.gutter, bounds.stageRect.height - bounds.safeBottom);
+
+        observerPanel.style.left = "auto";
+        observerPanel.style.top = "auto";
+        observerPanel.style.right = `${right}px`;
+        observerPanel.style.bottom = `${bottom}px`;
+        observerPanel.style.width = `${width}px`;
+        observerPanel.style.height = `${height}px`;
+        lab.classList.remove("is-panel-floating");
+      };
+
+      const schedulePanelBox = (box, mode = "floating") => {
         pendingPanelBox = box;
+        pendingPanelMode = mode;
 
         if (panelFrame) {
           return;
@@ -647,8 +743,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         panelFrame = window.requestAnimationFrame(() => {
           panelFrame = 0;
-          applyPanelBox(pendingPanelBox);
+          if (pendingPanelMode === "docked") {
+            applyDockedPanelBox(pendingPanelBox);
+          } else {
+            applyFloatingPanelBox(pendingPanelBox);
+          }
           pendingPanelBox = null;
+          pendingPanelMode = "floating";
         });
       };
 
@@ -677,6 +778,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         panelGesture = {
           type,
+          mode: type === "resize" && !isPanelManuallyFloating() ? "docked" : "floating",
           pointerId: event.pointerId,
           startX: event.clientX,
           startY: event.clientY,
@@ -700,12 +802,24 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const dy = event.clientY - panelGesture.startY;
 
         if (panelGesture.type === "resize") {
-          schedulePanelBox({
-            left: panelGesture.left,
-            top: panelGesture.top,
-            width: panelGesture.width + dx,
-            height: panelGesture.height + dy
-          });
+          if (panelGesture.mode === "docked") {
+            schedulePanelBox(
+              {
+                left: panelGesture.left,
+                top: panelGesture.top,
+                width: panelGesture.width - dx,
+                height: panelGesture.height - dy
+              },
+              "docked"
+            );
+          } else {
+            schedulePanelBox({
+              left: panelGesture.left + dx,
+              top: panelGesture.top + dy,
+              width: panelGesture.width - dx,
+              height: panelGesture.height - dy
+            });
+          }
         } else {
           schedulePanelBox({
             left: panelGesture.left + dx,
@@ -732,16 +846,26 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           return;
         }
 
-        applyPanelBox({
+        const box = {
           left: bounds.left,
           top: bounds.top,
           width: bounds.width + widthDelta,
           height: bounds.height + heightDelta
-        });
+        };
+
+        if (isPanelManuallyFloating()) {
+          applyFloatingPanelBox(box);
+        } else {
+          applyDockedPanelBox(box);
+        }
       };
 
-      const clampFloatingPanel = () => {
-        if (!observerPanel || !lab.classList.contains("is-panel-floating")) {
+      const clampPanelPlacement = () => {
+        if (
+          !observerPanel ||
+          lab.classList.contains("is-panel-collapsed") ||
+          !isPanelFreeformEnabled()
+        ) {
           return;
         }
 
@@ -751,7 +875,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           return;
         }
 
-        applyPanelBox(bounds);
+        if (isPanelManuallyFloating()) {
+          applyFloatingPanelBox(bounds);
+        } else {
+          applyDockedPanelBox(bounds);
+        }
       };
 
       const clearNodeFocus = () => {
@@ -810,6 +938,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         applyMode(node.mode);
         setPanelCollapsed(false);
+        window.requestAnimationFrame(clampPanelPlacement);
       };
 
       const setScale = (value) => {
@@ -904,6 +1033,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       panelReopenButton?.addEventListener("click", () => {
         if (activeNodeId) {
+          resetPanelPlacement();
           setPanelCollapsed(false);
           return;
         }
@@ -953,7 +1083,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         event.preventDefault();
       });
 
-      window.addEventListener("resize", clampFloatingPanel);
+      window.addEventListener("resize", clampPanelPlacement);
+      window.addEventListener("scroll", clampPanelPlacement, { passive: true });
 
       lab.addEventListener(
         "pointermove",

@@ -2659,8 +2659,6 @@ img {
 }
 
 .mega-depth-field,
-.mega-scale-field,
-.mega-maintenance-field,
 .mega-ground-sheen {
   position: absolute;
   pointer-events: none;
@@ -2710,173 +2708,6 @@ img {
   width: 24rem;
   height: 10rem;
   opacity: 0.52;
-}
-
-.mega-scale-field {
-  inset: 0;
-  z-index: 6;
-  opacity: 0.72;
-}
-
-.mega-scale-mark {
-  position: absolute;
-  display: block;
-  width: 3.2rem;
-  height: var(--scale-height, 10rem);
-  color: rgba(226, 232, 229, 0.48);
-  font-size: 0.56rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-}
-
-.mega-scale-mark::before,
-.mega-scale-mark::after {
-  position: absolute;
-  content: "";
-}
-
-.mega-scale-mark::before {
-  top: 0;
-  bottom: 1.45rem;
-  left: 50%;
-  width: 1px;
-  background:
-    linear-gradient(180deg, rgba(226, 232, 229, 0.58), rgba(226, 232, 229, 0.06)),
-    rgba(226, 232, 229, 0.12);
-  box-shadow:
-    -0.42rem 0 0 -0.4rem rgba(226, 232, 229, 0.32),
-    0.42rem 0 0 -0.4rem rgba(226, 232, 229, 0.32);
-}
-
-.mega-scale-mark::after {
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border-top: 1px solid rgba(226, 232, 229, 0.18);
-  padding-top: 0.32rem;
-  text-align: center;
-  content: attr(data-scale);
-}
-
-.mega-scale-mark-1 {
-  --scale-height: 13rem;
-  top: 20%;
-  left: 72%;
-}
-
-.mega-scale-mark-2 {
-  --scale-height: 8rem;
-  top: 54%;
-  left: 27%;
-}
-
-.mega-scale-mark-3 {
-  --scale-height: 6.4rem;
-  top: 38%;
-  left: 43%;
-}
-
-.mega-maintenance-field {
-  inset: 0;
-  z-index: 6;
-  overflow: hidden;
-  color: rgba(226, 232, 229, 0.5);
-  mix-blend-mode: screen;
-  opacity: 0.42;
-}
-
-.mega-maintenance-field::before {
-  position: absolute;
-  inset: 17% 8% 8%;
-  border-top: 1px solid rgba(226, 232, 229, 0.052);
-  border-left: 1px solid rgba(226, 232, 229, 0.042);
-  background:
-    linear-gradient(90deg, transparent 0 47%, rgba(226, 232, 229, 0.038) 47.08% 47.18%, transparent 47.28%),
-    repeating-linear-gradient(0deg, transparent 0 5.8rem, rgba(226, 232, 229, 0.03) 5.84rem 5.88rem);
-  content: "";
-  clip-path: polygon(0 0, 78% 0, 100% 26%, 100% 100%, 10% 100%, 0 84%);
-}
-
-.mega-maintenance-seam {
-  position: absolute;
-  display: block;
-  width: clamp(7rem, 16vw, 15rem);
-  height: 1px;
-  background:
-    linear-gradient(90deg, transparent, rgba(226, 232, 229, 0.24), rgba(226, 232, 229, 0.08), transparent);
-  box-shadow:
-    0 0.6rem 0 rgba(226, 232, 229, 0.026),
-    0 -0.55rem 0 rgba(226, 232, 229, 0.018);
-  transform: rotate(var(--seam-angle, 0deg));
-  transform-origin: left center;
-}
-
-.mega-maintenance-seam::before,
-.mega-maintenance-seam::after {
-  position: absolute;
-  content: "";
-}
-
-.mega-maintenance-seam::before {
-  top: -0.42rem;
-  left: 12%;
-  width: 0.62rem;
-  height: 0.62rem;
-  border-top: 1px solid rgba(226, 232, 229, 0.18);
-  border-left: 1px solid rgba(226, 232, 229, 0.14);
-  transform: rotate(45deg);
-}
-
-.mega-maintenance-seam::after {
-  right: 0.15rem;
-  bottom: 0.32rem;
-  max-width: 5.8rem;
-  overflow: hidden;
-  border-left: 1px solid rgba(226, 232, 229, 0.16);
-  padding-left: 0.38rem;
-  color: rgba(226, 232, 229, 0.4);
-  font-size: 0.48rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-overflow: ellipsis;
-  text-shadow: 0 0.75rem 1.4rem rgba(0, 0, 0, 0.78);
-  white-space: nowrap;
-  content: attr(data-mark);
-}
-
-.mega-maintenance-seam-1 {
-  --seam-angle: -12deg;
-  top: 31%;
-  left: 34%;
-  width: clamp(6.4rem, 10vw, 10rem);
-}
-
-.mega-maintenance-seam-2 {
-  --seam-angle: 6deg;
-  top: 51%;
-  left: 44%;
-  width: clamp(6rem, 11vw, 10rem);
-  opacity: 0.78;
-}
-
-.mega-maintenance-seam-3 {
-  --seam-angle: 88deg;
-  top: 25%;
-  left: 74%;
-  width: clamp(4.8rem, 12vw, 9.5rem);
-  opacity: 0.74;
-}
-
-.mega-maintenance-seam-4 {
-  --seam-angle: -4deg;
-  right: 12%;
-  bottom: 20%;
-  width: clamp(7rem, 15vw, 13rem);
-  opacity: 0.62;
-}
-
-.mega-lab.is-node-unfocused .mega-maintenance-field {
-  opacity: 0.5;
 }
 
 .mega-ground-sheen {
@@ -3369,13 +3200,13 @@ img {
 .mega-observer-panel {
   position: absolute;
   z-index: 10;
-  right: max(1.5rem, calc((100% - 78rem) / 2));
+  right: clamp(1rem, 2vw, 1.5rem);
   bottom: clamp(1.25rem, 5vh, 3.4rem);
   width: min(27rem, calc(100% - 3rem));
   min-width: min(20rem, calc(100% - 3rem));
   min-height: min(26rem, calc(100svh - 2rem));
   max-width: calc(100% - 3rem);
-  max-height: calc(100svh - 2rem);
+  max-height: none;
   overflow: hidden;
   border: 1px solid var(--lab-border);
   background:
@@ -3418,7 +3249,7 @@ img {
 .mega-panel-reopen {
   position: absolute;
   z-index: 11;
-  right: max(1.5rem, calc((100% - 78rem) / 2));
+  right: clamp(1rem, 2vw, 1.5rem);
   bottom: clamp(1.25rem, 5vh, 3.4rem);
   display: grid;
   width: 5.4rem;
@@ -3433,7 +3264,7 @@ img {
   font: inherit;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(0.9rem);
+  transform: translateX(0);
   transition:
     border-color 180ms ease,
     opacity 180ms ease,
@@ -3537,8 +3368,8 @@ img {
 
 .mega-panel-resize {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  top: 0;
+  left: 0;
   z-index: 4;
   width: 1.55rem;
   height: 1.55rem;
@@ -3551,8 +3382,8 @@ img {
 .mega-panel-resize::before,
 .mega-panel-resize::after {
   position: absolute;
-  right: 0.32rem;
-  bottom: 0.36rem;
+  top: 0.36rem;
+  left: 0.32rem;
   height: 1px;
   background: color-mix(in srgb, var(--mode-accent) 58%, transparent);
   content: "";
@@ -3560,7 +3391,7 @@ img {
 
 .mega-panel-resize::before {
   width: 0.9rem;
-  transform: translateY(-0.3rem);
+  transform: translateY(0.3rem);
 }
 
 .mega-panel-resize::after {
@@ -4091,60 +3922,6 @@ img {
     bottom: 16%;
     width: 15rem;
     height: 7rem;
-  }
-
-  .mega-scale-field {
-    opacity: 0.54;
-  }
-
-  .mega-scale-mark {
-    width: 2.7rem;
-    font-size: 0.48rem;
-  }
-
-  .mega-scale-mark-1 {
-    --scale-height: 9rem;
-    top: 24%;
-    left: 77%;
-  }
-
-  .mega-scale-mark-2,
-  .mega-scale-mark-3 {
-    display: none;
-  }
-
-  .mega-maintenance-field {
-    opacity: 0.25;
-  }
-
-  .mega-maintenance-field::before {
-    inset: 20% 6% 28%;
-  }
-
-  .mega-maintenance-seam {
-    width: 6.6rem;
-  }
-
-  .mega-maintenance-seam::after {
-    max-width: 4.4rem;
-    font-size: 0.42rem;
-    letter-spacing: 0.1em;
-  }
-
-  .mega-maintenance-seam-1 {
-    top: 34%;
-    left: 13%;
-  }
-
-  .mega-maintenance-seam-2 {
-    top: 49%;
-    left: 50%;
-    width: 5.8rem;
-  }
-
-  .mega-maintenance-seam-3,
-  .mega-maintenance-seam-4 {
-    display: none;
   }
 
   .mega-ground-sheen {
