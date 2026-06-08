@@ -2780,6 +2780,37 @@ img {
   padding: 0 0.85rem;
 }
 
+.mega-topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.mega-admin-comment-button {
+  position: relative;
+  gap: 0.42rem;
+}
+
+.mega-admin-comment-button[hidden] {
+  display: none;
+}
+
+.mega-admin-comment-button b {
+  display: inline-grid;
+  min-width: 1.18rem;
+  height: 1.18rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 48%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mode-accent) 18%, rgba(8, 10, 10, 0.92));
+  color: rgba(247, 250, 249, 0.96);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
 .mega-lab-topbar a:hover,
 .mega-lab-topbar a:focus-visible,
 .mega-lab-topbar button:hover,
@@ -3204,6 +3235,43 @@ img {
   pointer-events: none;
 }
 
+.mega-lab.is-comments-hidden .mega-comment-layer {
+  display: none;
+}
+
+.mega-comment-toggle {
+  position: absolute;
+  left: clamp(1rem, 2.6vw, 1.7rem);
+  bottom: clamp(1rem, 4vh, 2rem);
+  z-index: 13;
+  display: inline-grid;
+  width: 5.8rem;
+  min-height: 2.15rem;
+  place-items: center;
+  border: 1px solid rgba(224, 231, 228, 0.24);
+  background:
+    linear-gradient(180deg, rgba(42, 47, 47, 0.74), rgba(10, 13, 13, 0.86)),
+    var(--lab-panel);
+  color: rgba(247, 250, 249, 0.92);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  padding: 0 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.mega-comment-toggle:hover,
+.mega-comment-toggle:focus-visible {
+  border-color: color-mix(in srgb, var(--mode-accent) 48%, transparent);
+  outline: none;
+}
+
+.mega-lab.is-comments-hidden .mega-comment-toggle {
+  border-color: color-mix(in srgb, var(--mode-accent) 42%, transparent);
+  color: var(--mode-accent);
+}
+
 .mega-comment-pin {
   position: absolute;
   display: inline-grid;
@@ -3271,6 +3339,105 @@ img {
 
 .mega-comment-popover[hidden] {
   display: none;
+}
+
+.mega-comment-admin-dialog {
+  position: absolute;
+  top: clamp(5.4rem, 9vh, 6.8rem);
+  right: clamp(1rem, 2vw, 1.5rem);
+  z-index: 16;
+  display: grid;
+  width: min(34rem, calc(100% - 2rem));
+  max-height: min(76vh, calc(100svh - 7rem), 46rem);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 0.75rem;
+  border: 1px solid var(--lab-border);
+  background:
+    linear-gradient(180deg, rgba(35, 40, 40, 0.9), rgba(8, 10, 10, 0.96)),
+    var(--lab-panel);
+  box-shadow: 0 2.5rem 6rem rgba(0, 0, 0, 0.46);
+  padding: 0.85rem;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+}
+
+.mega-comment-admin-dialog[hidden] {
+  display: none;
+}
+
+.mega-comment-admin-summary,
+.mega-comment-admin-empty {
+  margin: 0;
+  color: var(--lab-dim);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+}
+
+.mega-comment-admin-list {
+  display: grid;
+  gap: 0.62rem;
+  min-height: 0;
+  max-height: min(58vh, 35rem);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scrollbar-color: color-mix(in srgb, var(--mode-accent) 42%, transparent) rgba(224, 231, 228, 0.08);
+  scrollbar-width: thin;
+}
+
+.mega-comment-admin-list::-webkit-scrollbar {
+  width: 0.45rem;
+}
+
+.mega-comment-admin-list::-webkit-scrollbar-track {
+  background: rgba(224, 231, 228, 0.08);
+}
+
+.mega-comment-admin-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--mode-accent) 42%, transparent);
+}
+
+.mega-comment-admin-row {
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid rgba(224, 231, 228, 0.18);
+  background: rgba(7, 9, 9, 0.52);
+  padding: 0.68rem;
+}
+
+.mega-comment-admin-row.is-pending {
+  border-color: color-mix(in srgb, var(--mode-accent) 34%, rgba(224, 231, 228, 0.14));
+}
+
+.mega-comment-admin-row p {
+  margin: 0;
+  color: rgba(247, 250, 249, 0.9);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.mega-comment-admin-row dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.28rem 0.7rem;
+  margin: 0;
+}
+
+.mega-comment-admin-row dt,
+.mega-comment-admin-row dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  line-height: 1.45;
+}
+
+.mega-comment-admin-row dt {
+  color: var(--lab-dim);
+}
+
+.mega-comment-admin-row dd {
+  color: var(--mode-accent);
+  overflow-wrap: anywhere;
 }
 
 .mega-comment-head,

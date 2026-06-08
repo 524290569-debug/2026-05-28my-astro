@@ -239,7 +239,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
         <a href={basePath}>灰雨电台</a>
         <span>MEGASTRUCTURE OBSERVER</span>
-        <button type="button" data-mega-random aria-label="随机漂移到另一个空间节点">No-clip</button>
+        <div class="mega-topbar-actions">
+          <button class="mega-admin-comment-button" type="button" data-comment-admin-open hidden>
+            评论
+            <b data-comment-pending-count>0</b>
+          </button>
+          <button type="button" data-mega-random aria-label="随机漂移到另一个空间节点">No-clip</button>
+        </div>
       </header>
 
       <section class="mega-lab-title" aria-label="页面标题">
@@ -281,6 +287,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       </div>
 
       <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
+      <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">关闭评论</button>
       <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
         <div class="mega-comment-head">
           <span data-comment-title>评论</span>
@@ -316,6 +323,14 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           <span>待审核</span>
           <div data-comment-review-list></div>
         </div>
+      </aside>
+      <aside class="mega-comment-admin-dialog" data-comment-admin-dialog hidden aria-live="polite" aria-label="评论审核面板">
+        <div class="mega-comment-head">
+          <span>评论审核</span>
+          <button type="button" data-comment-admin-close aria-label="Close comment review panel">x</button>
+        </div>
+        <p class="mega-comment-admin-summary" data-comment-admin-summary>全部评论 / 0</p>
+        <div class="mega-comment-admin-list" data-comment-admin-list></div>
       </aside>
 
       <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
@@ -468,6 +483,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const observerPanel = lab.querySelector(".mega-observer-panel");
       const labStage = lab.querySelector(".mega-lab-stage");
       const commentLayer = lab.querySelector("[data-comment-layer]");
+      const commentToggleButton = lab.querySelector("[data-comment-toggle]");
+      const commentAdminOpenButton = lab.querySelector("[data-comment-admin-open]");
+      const commentPendingCount = lab.querySelector("[data-comment-pending-count]");
+      const commentAdminDialog = lab.querySelector("[data-comment-admin-dialog]");
+      const commentAdminCloseButton = lab.querySelector("[data-comment-admin-close]");
+      const commentAdminSummary = lab.querySelector("[data-comment-admin-summary]");
+      const commentAdminList = lab.querySelector("[data-comment-admin-list]");
       const commentPopover = lab.querySelector("[data-comment-popover]");
       const commentTitle = lab.querySelector("[data-comment-title]");
       const commentPosition = lab.querySelector("[data-comment-position]");
@@ -516,8 +538,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let commentOpenedAt = 0;
       let commentReleaseClickPoint = null;
       let selectedCommentId = "";
+      let areCommentsVisible = true;
       const commentKeys = {
-        remoteSession: "mega-comment-supabase-session-v1"
+        remoteSession: "mega-comment-supabase-session-v1",
+        visibility: "mega-comment-visibility-v1"
       };
       const commentHoldMs = 620;
       const commentSupabaseUrl = String(supabaseConfig?.url || "").replace(/\/$/, "");
@@ -692,6 +716,43 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         } catch {}
       };
 
+      const loadCommentVisibilityPreference = () => {
+        try {
+          areCommentsVisible = window.localStorage.getItem(commentKeys.visibility) !== "hidden";
+        } catch {
+          areCommentsVisible = true;
+        }
+      };
+
+      const saveCommentVisibilityPreference = () => {
+        try {
+          window.localStorage.setItem(commentKeys.visibility, areCommentsVisible ? "visible" : "hidden");
+        } catch {}
+      };
+
+      const updateCommentVisibilityControl = () => {
+        lab.classList.toggle("is-comments-hidden", !areCommentsVisible);
+
+        if (!commentToggleButton) {
+          return;
+        }
+
+        commentToggleButton.textContent = areCommentsVisible ? "关闭评论" : "显示评论";
+        commentToggleButton.setAttribute("aria-pressed", String(areCommentsVisible));
+        commentToggleButton.setAttribute("aria-label", areCommentsVisible ? "关闭所有评论标记" : "显示评论标记");
+      };
+
+      const setCommentsVisible = (visible) => {
+        areCommentsVisible = Boolean(visible);
+        saveCommentVisibilityPreference();
+
+        if (!areCommentsVisible) {
+          closeCommentPanel();
+        }
+
+        renderCommentUi();
+      };
+
       const profileNameFromSession = () =>
         normalizeCommentName(
           commentSession?.user?.user_metadata?.display_name ||
@@ -792,6 +853,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         return {
           id: row.id,
           author: normalizeCommentName(profile?.display_name || "用户"),
+          authorEmail: normalizeCommentEmail(profile?.email || ""),
           userId: row.user_id,
           role: profile?.role || "user",
           text: String(row.body || ""),
@@ -804,8 +866,9 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       };
 
       const loadRemoteComments = async () => {
+        const profileSelect = isCommentAdmin() ? "display_name,email,role" : "display_name,role";
         const rows = await requestCommentApi(
-          "/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(display_name,role)&page=eq.megastructure&order=created_at.desc"
+          `/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(${profileSelect})&page=eq.megastructure&order=created_at.desc`
         );
         comments = Array.isArray(rows) ? rows.map(mapRemoteComment) : [];
       };
@@ -832,6 +895,16 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         `X ${Number(point?.x || 0).toFixed(1)} / Y ${Number(point?.y || 0).toFixed(1)}`;
 
       const isCommentAdmin = () => currentCommentRole === "admin";
+
+      const commentStatusLabel = (status) => {
+        if (status === "approved") {
+          return "已通过";
+        }
+        if (status === "rejected") {
+          return "已拒绝";
+        }
+        return "待审核";
+      };
 
       const canManageComment = (comment) =>
         Boolean(comment && currentCommentUserId && (isCommentAdmin() || (!currentCommentLocked && comment.userId === currentCommentUserId)));
@@ -896,6 +969,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       };
 
       const openCommentPanel = (point, selectedComment = null) => {
+        if (!areCommentsVisible) {
+          return;
+        }
+
         commentDraftPoint = point;
         selectedCommentId = selectedComment?.id || "";
         commentOpenedAt = Date.now();
@@ -928,13 +1005,150 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         setCommentDetail(null);
       };
 
+      const closeCommentAdminDialog = () => {
+        if (commentAdminDialog) {
+          commentAdminDialog.hidden = true;
+        }
+      };
+
+      const createCommentAdminRow = (comment) => {
+        const row = document.createElement("article");
+        row.className = `mega-comment-admin-row is-${comment.status}`;
+        row.dataset.commentId = comment.id;
+
+        const text = document.createElement("p");
+        text.textContent = comment.text;
+
+        const meta = document.createElement("dl");
+        const metaItems = [
+          ["状态", commentStatusLabel(comment.status)],
+          ["时间", formatCommentTime(comment.createdAt)],
+          ["评论人", comment.author || "-"],
+          ["邮箱", comment.authorEmail || "-"]
+        ];
+
+        metaItems.forEach(([label, value]) => {
+          const term = document.createElement("dt");
+          term.textContent = label;
+          const detail = document.createElement("dd");
+          detail.textContent = value;
+          meta.append(term, detail);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "mega-comment-review-actions";
+
+        if (comment.status !== "approved") {
+          const approve = document.createElement("button");
+          approve.type = "button";
+          approve.dataset.commentAction = "approve";
+          approve.dataset.commentId = comment.id;
+          approve.textContent = "通过";
+          actions.append(approve);
+        }
+
+        if (comment.status !== "rejected") {
+          const reject = document.createElement("button");
+          reject.type = "button";
+          reject.dataset.commentAction = "reject";
+          reject.dataset.commentId = comment.id;
+          reject.textContent = "拒绝";
+          actions.append(reject);
+        }
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.dataset.commentAction = "delete";
+        remove.dataset.commentId = comment.id;
+        remove.textContent = "删除";
+        actions.append(remove);
+
+        row.append(text, meta, actions);
+        return row;
+      };
+
+      const renderCommentAdminDialog = () => {
+        const adminMode = isCommentAdmin();
+        const pendingCount = comments.filter((comment) => comment.status === "pending").length;
+
+        if (commentAdminOpenButton) {
+          commentAdminOpenButton.hidden = !adminMode;
+          commentAdminOpenButton.disabled = !adminMode;
+        }
+        if (commentPendingCount) {
+          commentPendingCount.textContent = String(pendingCount);
+          commentPendingCount.setAttribute("aria-label", `${pendingCount} 条待审核评论`);
+        }
+
+        if (!adminMode) {
+          closeCommentAdminDialog();
+          return;
+        }
+
+        if (commentAdminSummary) {
+          commentAdminSummary.textContent = `全部评论 / ${comments.length} · 待审核 / ${pendingCount}`;
+        }
+
+        if (!commentAdminList || commentAdminDialog?.hidden) {
+          return;
+        }
+
+        commentAdminList.textContent = "";
+
+        if (!comments.length) {
+          const empty = document.createElement("p");
+          empty.className = "mega-comment-admin-empty";
+          empty.textContent = "暂无评论";
+          commentAdminList.append(empty);
+          return;
+        }
+
+        const sortedComments = comments.slice().sort((left, right) => {
+          const leftPending = left.status === "pending" ? 0 : 1;
+          const rightPending = right.status === "pending" ? 0 : 1;
+
+          if (leftPending !== rightPending) {
+            return leftPending - rightPending;
+          }
+
+          return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+        });
+
+        sortedComments.forEach((comment) => {
+          commentAdminList.append(createCommentAdminRow(comment));
+        });
+      };
+
+      const openCommentAdminDialog = () => {
+        if (!isCommentAdmin() || !commentAdminDialog) {
+          return;
+        }
+
+        closeCommentPanel();
+        commentAdminDialog.hidden = false;
+        renderCommentAdminDialog();
+      };
+
+      const toggleCommentAdminDialog = () => {
+        if (!isCommentAdmin() || !commentAdminDialog) {
+          return;
+        }
+
+        if (!commentAdminDialog.hidden) {
+          closeCommentAdminDialog();
+          return;
+        }
+
+        openCommentAdminDialog();
+      };
+
       const isCommentPressTarget = (target) => {
         if (!(target instanceof HTMLElement)) {
           return false;
         }
 
         return !target.closest(
-          "a, button, input, textarea, label, .mega-observer-panel, .mega-panel-reopen, .mega-comment-popover, .mega-comment-pin"
+          "a, button, input, textarea, label, .mega-observer-panel, .mega-panel-reopen, .mega-comment-popover, .mega-comment-admin-dialog, .mega-comment-pin"
         );
       };
 
@@ -976,6 +1190,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         commentLayer.textContent = "";
+
+        if (!areCommentsVisible) {
+          return;
+        }
+
         const visibleComments = comments.filter(
           (comment) => isCommentAdmin() || comment.status === "approved" || comment.userId === currentCommentUserId
         );
@@ -998,6 +1217,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const adminMode = isCommentAdmin();
         const isViewingComment = Boolean(selectedCommentId);
 
+        updateCommentVisibilityControl();
         if (commentAuth) commentAuth.hidden = isLoggedIn || isViewingComment;
         if (commentSessionPanel) commentSessionPanel.hidden = !isLoggedIn || isViewingComment;
         if (commentForm) commentForm.hidden = !isLoggedIn || isViewingComment;
@@ -1011,7 +1231,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           commentList.textContent = "";
           commentList.hidden = isViewingComment;
           const visibleLog = currentCommentUserId
-            ? (adminMode ? comments.slice(0, 8) : comments.filter((comment) => comment.userId === currentCommentUserId).slice(0, 4))
+            ? (adminMode ? [] : comments.filter((comment) => comment.userId === currentCommentUserId).slice(0, 4))
             : [];
 
           if (!isViewingComment && visibleLog.length) {
@@ -1025,46 +1245,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         if (commentReview && commentReviewList) {
-          const pendingComments = adminMode
-            ? comments.filter((comment) => comment.status === "pending").slice().reverse().slice(0, 8)
-            : [];
-          commentReview.hidden = isViewingComment || !pendingComments.length;
+          commentReview.hidden = true;
           commentReviewList.textContent = "";
-
-          if (isViewingComment) {
-            renderCommentMarkers();
-            return;
-          }
-
-          pendingComments.forEach((comment) => {
-            const row = createCommentRow(comment);
-            const actions = document.createElement("div");
-            actions.className = "mega-comment-review-actions";
-
-            const approve = document.createElement("button");
-            approve.type = "button";
-            approve.dataset.commentAction = "approve";
-            approve.dataset.commentId = comment.id;
-            approve.textContent = "通过";
-
-            const reject = document.createElement("button");
-            reject.type = "button";
-            reject.dataset.commentAction = "reject";
-            reject.dataset.commentId = comment.id;
-            reject.textContent = "拒绝";
-
-            const remove = document.createElement("button");
-            remove.type = "button";
-            remove.dataset.commentAction = "delete";
-            remove.dataset.commentId = comment.id;
-            remove.textContent = "删除";
-
-            actions.append(approve, reject, remove);
-            row.append(actions);
-            commentReviewList.append(row);
-          });
         }
 
+        renderCommentAdminDialog();
         renderCommentMarkers();
       };
 
@@ -1937,12 +2122,28 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         closeCommentPanel();
       });
 
+      commentAdminOpenButton?.addEventListener("click", () => {
+        toggleCommentAdminDialog();
+      });
+
+      commentAdminCloseButton?.addEventListener("click", () => {
+        closeCommentAdminDialog();
+      });
+
+      commentToggleButton?.addEventListener("click", () => {
+        setCommentsVisible(!areCommentsVisible);
+      });
+
       commentForm?.addEventListener("submit", (event) => {
         event.preventDefault();
         submitComment();
       });
 
       commentLayer?.addEventListener("click", (event) => {
+        if (!areCommentsVisible) {
+          return;
+        }
+
         const target = event.target;
 
         if (!(target instanceof HTMLElement)) {
@@ -1975,7 +2176,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       commentDetail?.addEventListener("click", handleCommentDeleteClick);
       commentList?.addEventListener("click", handleCommentDeleteClick);
 
-      commentReviewList?.addEventListener("click", (event) => {
+      const handleCommentReviewActionClick = (event) => {
         const target = event.target;
 
         if (!(target instanceof HTMLElement)) {
@@ -1993,7 +2194,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         } else if (id && action === "delete") {
           deleteComment(id);
         }
-      });
+      };
+
+      commentReviewList?.addEventListener("click", handleCommentReviewActionClick);
+      commentAdminList?.addEventListener("click", handleCommentReviewActionClick);
 
       document.addEventListener("click", (event) => {
         if (!commentPopover || commentPopover.hidden || Date.now() - commentOpenedAt < 180) {
@@ -2028,7 +2232,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       labStage?.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0 || panelGesture || !isCommentPressTarget(event.target)) {
+        if (!areCommentsVisible || event.button !== 0 || panelGesture || !isCommentPressTarget(event.target)) {
           return;
         }
 
@@ -2072,8 +2276,15 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && commentPopover && !commentPopover.hidden) {
+        if (event.key !== "Escape") {
+          return;
+        }
+
+        if (commentPopover && !commentPopover.hidden) {
           closeCommentPanel();
+        }
+        if (commentAdminDialog && !commentAdminDialog.hidden) {
+          closeCommentAdminDialog();
         }
       });
 
@@ -2118,6 +2329,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         clearCommentPress();
       });
 
+      loadCommentVisibilityPreference();
       loadCommentState();
       setScale(scaleRange?.value || "62");
       applyNode(activeNodeId);
