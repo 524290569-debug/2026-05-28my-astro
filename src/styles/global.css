@@ -3372,6 +3372,10 @@ img {
   right: max(1.5rem, calc((100% - 78rem) / 2));
   bottom: clamp(1.25rem, 5vh, 3.4rem);
   width: min(27rem, calc(100% - 3rem));
+  min-width: min(20rem, calc(100% - 3rem));
+  min-height: min(26rem, calc(100svh - 2rem));
+  max-width: calc(100% - 3rem);
+  max-height: calc(100svh - 2rem);
   overflow: hidden;
   border: 1px solid var(--lab-border);
   background:
@@ -3386,6 +3390,16 @@ img {
     opacity 220ms ease,
     transform 260ms ease,
     visibility 220ms ease;
+}
+
+.mega-lab.is-panel-floating .mega-observer-panel {
+  right: auto;
+  bottom: auto;
+}
+
+.mega-lab.is-panel-adjusting .mega-observer-panel {
+  transition: none;
+  user-select: none;
 }
 
 .mega-lab.is-panel-collapsed .mega-observer-panel {
@@ -3461,6 +3475,13 @@ img {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.72rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.mega-lab.is-panel-adjusting .mega-panel-head {
+  cursor: grabbing;
 }
 
 .mega-panel-actions {
@@ -3512,6 +3533,50 @@ img {
 .mega-panel-head button[aria-pressed="true"] {
   border-color: color-mix(in srgb, var(--mode-accent) 44%, transparent);
   outline: none;
+}
+
+.mega-panel-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 0;
+  background: transparent;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.mega-panel-resize::before,
+.mega-panel-resize::after {
+  position: absolute;
+  right: 0.32rem;
+  bottom: 0.36rem;
+  height: 1px;
+  background: color-mix(in srgb, var(--mode-accent) 58%, transparent);
+  content: "";
+}
+
+.mega-panel-resize::before {
+  width: 0.9rem;
+  transform: translateY(-0.3rem);
+}
+
+.mega-panel-resize::after {
+  width: 0.58rem;
+}
+
+.mega-panel-resize:hover::before,
+.mega-panel-resize:hover::after,
+.mega-panel-resize:focus-visible::before,
+.mega-panel-resize:focus-visible::after {
+  background: color-mix(in srgb, var(--mode-accent) 82%, transparent);
+}
+
+.mega-panel-resize:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--mode-accent) 52%, transparent);
+  outline-offset: -0.25rem;
 }
 
 .mega-panel-screen {
@@ -4115,11 +4180,24 @@ img {
   }
 
   .mega-observer-panel {
+    top: auto !important;
     right: 0.85rem;
     bottom: 0.85rem;
     left: 0.85rem;
-    width: auto;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0;
+    min-height: 0;
     padding: 0.76rem;
+  }
+
+  .mega-panel-head {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .mega-panel-resize {
+    display: none;
   }
 
   .mega-lab.is-panel-collapsed .mega-observer-panel {

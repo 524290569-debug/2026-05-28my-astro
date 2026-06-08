@@ -282,7 +282,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       </div>
 
       <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
-        <div class="mega-panel-head">
+        <div class="mega-panel-head" data-panel-drag aria-label="拖动移动观察窗口">
           <span data-node-code>{firstNode.code}</span>
           <div class="mega-panel-actions">
             <button type="button" data-audio-toggle aria-pressed="false">低频</button>
@@ -354,6 +354,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           <input type="range" min="0" max="100" value="62" data-scale-range />
           <b data-scale-value>62</b>
         </label>
+        <button
+          class="mega-panel-resize"
+          type="button"
+          data-panel-resize
+          aria-label="拖动调整观察窗口大小"
+        ></button>
       </aside>
 
       <button
@@ -400,6 +406,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const audioButton = lab.querySelector("[data-audio-toggle]");
       const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
       const panelReopenButton = lab.querySelector("[data-panel-reopen]");
+      const panelDragHandle = lab.querySelector("[data-panel-drag]");
+      const panelResizeHandle = lab.querySelector("[data-panel-resize]");
       const noClipTrace = lab.querySelector("[data-noclip-trace]");
       const noClipCode = lab.querySelector("[data-noclip-code]");
       const scaleRange = lab.querySelector("[data-scale-range]");
@@ -434,9 +442,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let presenceGain = null;
       let gain = null;
       let noClipTimer = 0;
+      let panelGesture = null;
+      let panelFrame = 0;
+      let pendingPanelBox = null;
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
       const setMeter = (meter, value) => {
         if (!meter) {
@@ -570,6 +582,176 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           const isActive = button.dataset.nodeButton === activeNodeId;
           button.setAttribute("aria-expanded", String(isActive && !collapsed));
         });
+      };
+
+      const getPanelBounds = () => {
+        const stage = lab.querySelector(".mega-lab-stage");
+
+        if (!observerPanel || !stage) {
+          return null;
+        }
+
+        const stageRect = stage.getBoundingClientRect();
+        const panelRect = observerPanel.getBoundingClientRect();
+        const gutter = stageRect.width <= 720 ? 14 : 24;
+        const minWidth = Math.min(280, Math.max(220, stageRect.width - gutter * 2));
+        const minHeight = Math.min(260, Math.max(220, stageRect.height - gutter * 2));
+        const maxWidth = Math.max(minWidth, stageRect.width - gutter * 2);
+        const maxHeight = Math.max(minHeight, stageRect.height - gutter * 2);
+
+        return {
+          stageRect,
+          gutter,
+          minWidth,
+          minHeight,
+          maxWidth,
+          maxHeight,
+          left: panelRect.left - stageRect.left,
+          top: panelRect.top - stageRect.top,
+          width: panelRect.width,
+          height: panelRect.height
+        };
+      };
+
+      const applyPanelBox = (box) => {
+        if (!observerPanel) {
+          return;
+        }
+
+        const bounds = getPanelBounds();
+
+        if (!bounds) {
+          return;
+        }
+
+        const width = clamp(box.width, bounds.minWidth, bounds.maxWidth);
+        const height = clamp(box.height, bounds.minHeight, bounds.maxHeight);
+        const left = clamp(box.left, bounds.gutter, bounds.stageRect.width - width - bounds.gutter);
+        const top = clamp(box.top, bounds.gutter, bounds.stageRect.height - height - bounds.gutter);
+
+        observerPanel.style.left = `${left}px`;
+        observerPanel.style.top = `${top}px`;
+        observerPanel.style.right = "auto";
+        observerPanel.style.bottom = "auto";
+        observerPanel.style.width = `${width}px`;
+        observerPanel.style.height = `${height}px`;
+        lab.classList.add("is-panel-floating");
+      };
+
+      const schedulePanelBox = (box) => {
+        pendingPanelBox = box;
+
+        if (panelFrame) {
+          return;
+        }
+
+        panelFrame = window.requestAnimationFrame(() => {
+          panelFrame = 0;
+          applyPanelBox(pendingPanelBox);
+          pendingPanelBox = null;
+        });
+      };
+
+      const isPanelFreeformEnabled = () => window.matchMedia("(min-width: 721px)").matches;
+
+      const startPanelGesture = (event, type) => {
+        if (!observerPanel || !isPanelFreeformEnabled()) {
+          return;
+        }
+
+        const target = event.target;
+
+        if (
+          type === "move" &&
+          target instanceof HTMLElement &&
+          target.closest("button, input, a, label")
+        ) {
+          return;
+        }
+
+        const bounds = getPanelBounds();
+
+        if (!bounds) {
+          return;
+        }
+
+        panelGesture = {
+          type,
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          left: bounds.left,
+          top: bounds.top,
+          width: bounds.width,
+          height: bounds.height
+        };
+
+        observerPanel.setPointerCapture?.(event.pointerId);
+        lab.classList.add("is-panel-adjusting");
+        event.preventDefault();
+      };
+
+      const updatePanelGesture = (event) => {
+        if (!panelGesture || event.pointerId !== panelGesture.pointerId) {
+          return;
+        }
+
+        const dx = event.clientX - panelGesture.startX;
+        const dy = event.clientY - panelGesture.startY;
+
+        if (panelGesture.type === "resize") {
+          schedulePanelBox({
+            left: panelGesture.left,
+            top: panelGesture.top,
+            width: panelGesture.width + dx,
+            height: panelGesture.height + dy
+          });
+        } else {
+          schedulePanelBox({
+            left: panelGesture.left + dx,
+            top: panelGesture.top + dy,
+            width: panelGesture.width,
+            height: panelGesture.height
+          });
+        }
+      };
+
+      const endPanelGesture = (event) => {
+        if (!panelGesture || event.pointerId !== panelGesture.pointerId) {
+          return;
+        }
+
+        panelGesture = null;
+        lab.classList.remove("is-panel-adjusting");
+      };
+
+      const adjustPanelSize = (widthDelta, heightDelta) => {
+        const bounds = getPanelBounds();
+
+        if (!bounds || !isPanelFreeformEnabled()) {
+          return;
+        }
+
+        applyPanelBox({
+          left: bounds.left,
+          top: bounds.top,
+          width: bounds.width + widthDelta,
+          height: bounds.height + heightDelta
+        });
+      };
+
+      const clampFloatingPanel = () => {
+        if (!observerPanel || !lab.classList.contains("is-panel-floating")) {
+          return;
+        }
+
+        const bounds = getPanelBounds();
+
+        if (!bounds) {
+          return;
+        }
+
+        applyPanelBox(bounds);
       };
 
       const clearNodeFocus = () => {
@@ -733,10 +915,50 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         setScale(scaleRange.value);
       });
 
+      panelDragHandle?.addEventListener("pointerdown", (event) => {
+        startPanelGesture(event, "move");
+      });
+
+      panelResizeHandle?.addEventListener("pointerdown", (event) => {
+        startPanelGesture(event, "resize");
+      });
+
+      observerPanel?.addEventListener("pointermove", (event) => {
+        updatePanelGesture(event);
+      });
+
+      observerPanel?.addEventListener("pointerup", (event) => {
+        endPanelGesture(event);
+      });
+
+      observerPanel?.addEventListener("lostpointercapture", (event) => {
+        endPanelGesture(event);
+      });
+
+      panelResizeHandle?.addEventListener("keydown", (event) => {
+        const step = event.shiftKey ? 48 : 16;
+
+        if (event.key === "ArrowRight") {
+          adjustPanelSize(step, 0);
+        } else if (event.key === "ArrowLeft") {
+          adjustPanelSize(-step, 0);
+        } else if (event.key === "ArrowDown") {
+          adjustPanelSize(0, step);
+        } else if (event.key === "ArrowUp") {
+          adjustPanelSize(0, -step);
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+      });
+
+      window.addEventListener("resize", clampFloatingPanel);
+
       lab.addEventListener(
         "pointermove",
         (event) => {
-          if (reduceMotion.matches || pointerFrame) {
+          if (panelGesture || reduceMotion.matches || pointerFrame) {
             return;
           }
 
@@ -762,6 +984,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         if (noClipTimer) {
           window.clearTimeout(noClipTimer);
+        }
+
+        if (panelFrame) {
+          window.cancelAnimationFrame(panelFrame);
         }
       });
 
