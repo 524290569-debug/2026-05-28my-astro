@@ -5,6 +5,16 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const assetPath = (path: string) => `${basePath}${path}`;
+const supabaseConfig = {
+  url:
+    import.meta.env.PUBLIC_SUPABASE_URL ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
+    "https://eaoxzkdowmaibjnphnmu.supabase.co",
+  key:
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    "sb_publishable_3XfkcJuOqqFKjLcWIyaB_g_5B5mmZGR"
+};
 
 const atriumImage = assetPath("assets/megastructure/atrium-cold-concrete.webp");
 const nodeImagePaths = {
@@ -279,6 +289,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <p class="mega-comment-position" data-comment-position>X 00.0 / Y 00.0</p>
         <div class="mega-comment-auth" data-comment-auth>
           <input type="text" data-comment-name autocomplete="username" maxlength="24" placeholder="NAME" />
+          <input type="email" data-comment-email autocomplete="email" maxlength="80" placeholder="EMAIL" />
           <input
             type="password"
             data-comment-password
@@ -422,7 +433,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     </section>
   </main>
 
-  <script define:vars={{ modes, nodes: nodesWithQuality }}>
+  <script define:vars={{ modes, nodes: nodesWithQuality, supabaseConfig }}>
     const lab = document.querySelector("[data-mega-lab]");
 
     if (lab) {
@@ -463,6 +474,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentCloseButton = lab.querySelector("[data-comment-close]");
       const commentAuth = lab.querySelector("[data-comment-auth]");
       const commentName = lab.querySelector("[data-comment-name]");
+      const commentEmail = lab.querySelector("[data-comment-email]");
       const commentPassword = lab.querySelector("[data-comment-password]");
       const commentLoginButton = lab.querySelector("[data-comment-login]");
       const commentRegisterButton = lab.querySelector("[data-comment-register]");
@@ -493,19 +505,23 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let pendingPanelBox = null;
       let pendingPanelMode = "floating";
       let comments = [];
-      let commentUsers = [];
       let currentCommentUser = "";
+      let currentCommentUserId = "";
+      let currentCommentRole = "user";
+      let commentSession = null;
       let commentDraftPoint = null;
       let commentPressTimer = 0;
       let commentPressStart = null;
       let commentOpenedAt = 0;
       let commentReleaseClickPoint = null;
+      let selectedCommentId = "";
       const commentKeys = {
-        users: "mega-comment-users-v1",
-        comments: "mega-comments-v1",
-        session: "mega-comment-session-v1"
+        remoteSession: "mega-comment-supabase-session-v1"
       };
       const commentHoldMs = 620;
+      const commentSupabaseUrl = String(supabaseConfig?.url || "").replace(/\/$/, "");
+      const commentSupabaseKey = String(supabaseConfig?.key || "");
+      const hasRemoteComments = Boolean(commentSupabaseUrl && commentSupabaseKey);
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
@@ -553,43 +569,159 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
       };
 
-      const readCommentJson = (key, fallback) => {
-        try {
-          const value = window.localStorage.getItem(key);
-          return value ? JSON.parse(value) : fallback;
-        } catch {
-          return fallback;
-        }
+      const normalizeCommentName = (value) => String(value || "").trim().replace(/\s+/g, " ").slice(0, 24);
+
+      const normalizeCommentEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 80);
+
+      const commentAuthHeaders = (useSession = true) => {
+        const token = useSession && commentSession?.access_token ? commentSession.access_token : commentSupabaseKey;
+        return {
+          apikey: commentSupabaseKey,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        };
       };
 
-      const writeCommentJson = (key, value) => {
+      const requestCommentApi = async (path, options = {}, useSession = true) => {
+        if (!hasRemoteComments) {
+          throw new Error("Supabase config missing");
+        }
+
+        const response = await fetch(`${commentSupabaseUrl}${path}`, {
+          ...options,
+          headers: {
+            ...commentAuthHeaders(useSession),
+            ...(options.headers || {})
+          }
+        });
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
+
+        if (!response.ok) {
+          throw new Error(data?.msg || data?.message || `Supabase request failed: ${response.status}`);
+        }
+
+        return data;
+      };
+
+      const saveCommentSession = () => {
         try {
-          window.localStorage.setItem(key, JSON.stringify(value));
+          if (commentSession) {
+            window.localStorage.setItem(commentKeys.remoteSession, JSON.stringify(commentSession));
+          } else {
+            window.localStorage.removeItem(commentKeys.remoteSession);
+          }
         } catch {}
       };
 
-      const normalizeCommentName = (value) => String(value || "").trim().replace(/\s+/g, " ").slice(0, 24);
+      const profileNameFromSession = () =>
+        normalizeCommentName(
+          commentSession?.user?.user_metadata?.display_name ||
+            commentSession?.user?.email?.split("@")[0] ||
+            "USER"
+        );
 
-      const hashCommentPassword = async (password) => {
-        const value = String(password || "");
+      const loadCurrentCommentProfile = async () => {
+        currentCommentUserId = commentSession?.user?.id || "";
+        currentCommentRole = "user";
+        currentCommentUser = currentCommentUserId ? profileNameFromSession() : "";
 
-        if (window.crypto?.subtle && window.TextEncoder) {
-          const bytes = new TextEncoder().encode(value);
-          const digest = await window.crypto.subtle.digest("SHA-256", bytes);
-          return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        if (!currentCommentUserId) {
+          return;
         }
 
-        let hash = 0;
-        for (let index = 0; index < value.length; index += 1) {
-          hash = (hash << 5) - hash + value.charCodeAt(index);
-          hash |= 0;
+        const rows = await requestCommentApi(
+          `/rest/v1/comment_profiles?id=eq.${encodeURIComponent(currentCommentUserId)}&select=display_name,role&limit=1`
+        );
+        const profile = Array.isArray(rows) ? rows[0] : null;
+
+        if (profile?.display_name) {
+          currentCommentUser = normalizeCommentName(profile.display_name);
         }
-        return `fallback-${Math.abs(hash)}`;
+        if (profile?.role) {
+          currentCommentRole = profile.role;
+        }
+      };
+
+      const applyCommentSession = async (session) => {
+        commentSession = session || null;
+        await loadCurrentCommentProfile();
+        saveCommentSession();
+      };
+
+      const refreshCommentSession = async () => {
+        if (!commentSession?.refresh_token) {
+          return false;
+        }
+
+        const refreshed = await requestCommentApi(
+          "/auth/v1/token?grant_type=refresh_token",
+          {
+            method: "POST",
+            body: JSON.stringify({ refresh_token: commentSession.refresh_token })
+          },
+          false
+        );
+        await applyCommentSession(refreshed);
+        return true;
+      };
+
+      const restoreCommentSession = async () => {
+        try {
+          const stored = window.localStorage.getItem(commentKeys.remoteSession);
+          commentSession = stored ? JSON.parse(stored) : null;
+        } catch {
+          commentSession = null;
+        }
+
+        if (!commentSession?.access_token) {
+          currentCommentUser = "";
+          currentCommentUserId = "";
+          currentCommentRole = "user";
+          return;
+        }
+
+        try {
+          await loadCurrentCommentProfile();
+        } catch (error) {
+          try {
+            await refreshCommentSession();
+          } catch {
+            commentSession = null;
+            currentCommentUser = "";
+            currentCommentUserId = "";
+            currentCommentRole = "user";
+            saveCommentSession();
+            console.warn("Comment session restore failed", error);
+          }
+        }
+      };
+
+      const mapRemoteComment = (row) => {
+        const profile = Array.isArray(row.comment_profiles) ? row.comment_profiles[0] : row.comment_profiles;
+        return {
+          id: row.id,
+          author: normalizeCommentName(profile?.display_name || "USER"),
+          userId: row.user_id,
+          role: profile?.role || "user",
+          text: String(row.body || ""),
+          x: Number(row.x),
+          y: Number(row.y),
+          status: row.status || "pending",
+          createdAt: row.created_at,
+          reviewedAt: row.reviewed_at || ""
+        };
+      };
+
+      const loadRemoteComments = async () => {
+        const rows = await requestCommentApi(
+          "/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(display_name,role)&page=eq.megastructure&order=created_at.desc"
+        );
+        comments = Array.isArray(rows) ? rows.map(mapRemoteComment) : [];
       };
 
       const saveCommentState = () => {
-        writeCommentJson(commentKeys.users, commentUsers);
-        writeCommentJson(commentKeys.comments, comments);
+        saveCommentSession();
       };
 
       const formatCommentTime = (value) => {
@@ -609,10 +741,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const formatCommentPosition = (point) =>
         `X ${Number(point?.x || 0).toFixed(1)} / Y ${Number(point?.y || 0).toFixed(1)}`;
 
-      const isCommentAdmin = () => currentCommentUser.toLowerCase() === "admin";
+      const isCommentAdmin = () => currentCommentRole === "admin";
 
       const canManageComment = (comment) =>
-        Boolean(comment && currentCommentUser && (isCommentAdmin() || comment.author === currentCommentUser));
+        Boolean(comment && currentCommentUserId && (isCommentAdmin() || comment.userId === currentCommentUserId));
 
       const getCommentPoint = (event) => {
         if (!labStage) {
@@ -666,33 +798,23 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           return;
         }
 
-        const meta = document.createElement("span");
-        meta.textContent = `${comment.author} / ${comment.status.toUpperCase()} / ${formatCommentTime(comment.createdAt)}`;
         const text = document.createElement("p");
         text.textContent = comment.text;
-        commentDetail.append(meta, text);
-
-        if (canManageComment(comment)) {
-          const actions = document.createElement("div");
-          actions.className = "mega-comment-row-actions";
-
-          const remove = document.createElement("button");
-          remove.type = "button";
-          remove.dataset.commentAction = "delete";
-          remove.dataset.commentId = comment.id;
-          remove.textContent = "DELETE";
-
-          actions.append(remove);
-          commentDetail.append(actions);
-        }
+        const meta = document.createElement("span");
+        meta.textContent = `${comment.author} / ${formatCommentTime(comment.createdAt)}`;
+        commentDetail.append(text, meta);
       };
 
       const openCommentPanel = (point, selectedComment = null) => {
         commentDraftPoint = point;
+        selectedCommentId = selectedComment?.id || "";
         commentOpenedAt = Date.now();
 
         if (commentTitle) commentTitle.textContent = selectedComment ? "COMMENT LOG" : "COMMENT";
-        if (commentPosition) commentPosition.textContent = formatCommentPosition(point);
+        if (commentPosition) {
+          commentPosition.hidden = Boolean(selectedComment);
+          commentPosition.textContent = formatCommentPosition(point);
+        }
         if (commentText) commentText.value = "";
         setCommentDetail(selectedComment);
         renderCommentUi();
@@ -712,6 +834,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           commentPopover.hidden = true;
         }
         commentDraftPoint = null;
+        selectedCommentId = "";
         setCommentDetail(null);
       };
 
@@ -731,12 +854,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         row.dataset.commentId = comment.id;
 
         const meta = document.createElement("span");
-        meta.textContent = compact
-          ? `${comment.author} / ${comment.status.toUpperCase()}`
-          : `${comment.author} / ${comment.status.toUpperCase()} / ${formatCommentPosition(comment)} / ${formatCommentTime(comment.createdAt)}`;
+        meta.textContent = `${comment.author} / ${formatCommentTime(comment.createdAt)}`;
         const text = document.createElement("p");
         text.textContent = comment.text;
-        row.append(meta, text);
+        row.append(text, meta);
         return row;
       };
 
@@ -766,7 +887,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         commentLayer.textContent = "";
         const visibleComments = comments.filter(
-          (comment) => isCommentAdmin() || comment.status === "approved" || comment.author === currentCommentUser
+          (comment) => isCommentAdmin() || comment.status === "approved" || comment.userId === currentCommentUserId
         );
 
         visibleComments.forEach((comment, index) => {
@@ -785,10 +906,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const renderCommentUi = () => {
         const isLoggedIn = Boolean(currentCommentUser);
         const adminMode = isCommentAdmin();
+        const isViewingComment = Boolean(selectedCommentId);
 
-        if (commentAuth) commentAuth.hidden = isLoggedIn;
-        if (commentSession) commentSession.hidden = !isLoggedIn;
-        if (commentForm) commentForm.hidden = !isLoggedIn;
+        if (commentAuth) commentAuth.hidden = isLoggedIn || isViewingComment;
+        if (commentSession) commentSession.hidden = !isLoggedIn || isViewingComment;
+        if (commentForm) commentForm.hidden = !isLoggedIn || isViewingComment;
         if (commentUser) {
           commentUser.textContent = isLoggedIn
             ? `${adminMode ? "ADMIN" : "USER"} / ${currentCommentUser}`
@@ -797,11 +919,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         if (commentList) {
           commentList.textContent = "";
-          const visibleLog = currentCommentUser
-            ? (adminMode ? comments.slice().reverse().slice(0, 8) : comments.filter((comment) => comment.author === currentCommentUser).slice().reverse().slice(0, 4))
+          commentList.hidden = isViewingComment;
+          const visibleLog = currentCommentUserId
+            ? (adminMode ? comments.slice(0, 8) : comments.filter((comment) => comment.userId === currentCommentUserId).slice(0, 4))
             : [];
 
-          if (visibleLog.length) {
+          if (!isViewingComment && visibleLog.length) {
             const label = document.createElement("span");
             label.textContent = adminMode ? "ALL LOG" : "MY LOG";
             commentList.append(
@@ -815,8 +938,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           const pendingComments = adminMode
             ? comments.filter((comment) => comment.status === "pending").slice().reverse().slice(0, 8)
             : [];
-          commentReview.hidden = !pendingComments.length;
+          commentReview.hidden = isViewingComment || !pendingComments.length;
           commentReviewList.textContent = "";
+
+          if (isViewingComment) {
+            renderCommentMarkers();
+            return;
+          }
 
           pendingComments.forEach((comment) => {
             const row = createCommentRow(comment);
@@ -850,25 +978,19 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         renderCommentMarkers();
       };
 
-      const loadCommentState = () => {
-        commentUsers = readCommentJson(commentKeys.users, []);
-        comments = readCommentJson(commentKeys.comments, []);
-
-        if (!Array.isArray(commentUsers)) commentUsers = [];
-        if (!Array.isArray(comments)) comments = [];
+      const loadCommentState = async () => {
+        if (!hasRemoteComments) {
+          if (commentTitle) commentTitle.textContent = "REMOTE CONFIG MISSING";
+          renderCommentUi();
+          return;
+        }
 
         try {
-          currentCommentUser = window.localStorage.getItem(commentKeys.session) || "";
-        } catch {
-          currentCommentUser = "";
-        }
-
-        if (currentCommentUser.toLowerCase() === "admin") {
-          currentCommentUser = "admin";
-        }
-
-        if (!isCommentAdmin() && !commentUsers.some((user) => user.name === currentCommentUser)) {
-          currentCommentUser = "";
+          await restoreCommentSession();
+          await loadRemoteComments();
+        } catch (error) {
+          console.warn("Comment load failed", error);
+          if (commentTitle) commentTitle.textContent = "REMOTE LOAD FAILED";
         }
 
         renderCommentUi();
@@ -876,119 +998,143 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       const authenticateCommentUser = async (mode) => {
         const name = normalizeCommentName(commentName?.value);
+        const rawName = String(commentName?.value || "");
+        const email = normalizeCommentEmail(commentEmail?.value || (rawName.includes("@") ? rawName : ""));
         const password = String(commentPassword?.value || "");
 
-        if (!name || password.length < 3) {
-          if (commentTitle) commentTitle.textContent = "NAME / PASSWORD REQUIRED";
+        if (!hasRemoteComments) {
+          if (commentTitle) commentTitle.textContent = "REMOTE CONFIG MISSING";
           return;
         }
 
-        if (name.toLowerCase() === "admin") {
-          if (mode === "register") {
-            if (commentTitle) commentTitle.textContent = "ADMIN RESERVED";
+        if (!email || password.length < 6 || (mode === "register" && !name)) {
+          if (commentTitle) {
+            commentTitle.textContent = mode === "register" ? "NAME / EMAIL / PASSWORD REQUIRED" : "EMAIL / PASSWORD REQUIRED";
+          }
+          return;
+        }
+
+        try {
+          const data = await requestCommentApi(
+            mode === "register" ? "/auth/v1/signup" : "/auth/v1/token?grant_type=password",
+            {
+              method: "POST",
+              body: JSON.stringify(
+                mode === "register"
+                  ? { email, password, data: { display_name: name } }
+                  : { email, password }
+              )
+            },
+            false
+          );
+          const session = data.session || (data.access_token ? data : null);
+
+          if (!session) {
+            if (commentTitle) commentTitle.textContent = "CHECK EMAIL";
             return;
           }
 
-          if (password !== "admin") {
-            if (commentTitle) commentTitle.textContent = "LOGIN FAILED";
-            return;
-          }
-
-          currentCommentUser = "admin";
-          try {
-            window.localStorage.setItem(commentKeys.session, currentCommentUser);
-          } catch {}
+          await applyCommentSession(session);
+          await loadRemoteComments();
           if (commentPassword) commentPassword.value = "";
           renderCommentUi();
-          if (commentTitle) commentTitle.textContent = "ADMIN";
+          if (commentTitle) commentTitle.textContent = isCommentAdmin() ? "ADMIN" : "COMMENT";
           commentText?.focus({ preventScroll: true });
-          return;
+        } catch (error) {
+          console.warn("Comment auth failed", error);
+          if (commentTitle) commentTitle.textContent = mode === "register" ? "REGISTER FAILED" : "LOGIN FAILED";
         }
-
-        const passwordHash = await hashCommentPassword(password);
-        const existingUser = commentUsers.find((user) => user.name.toLowerCase() === name.toLowerCase());
-
-        if (mode === "register") {
-          if (existingUser) {
-            if (commentTitle) commentTitle.textContent = "NAME EXISTS";
-            return;
-          }
-
-          commentUsers.push({ name, passwordHash, createdAt: new Date().toISOString() });
-        } else if (!existingUser || existingUser.passwordHash !== passwordHash) {
-          if (commentTitle) commentTitle.textContent = "LOGIN FAILED";
-          return;
-        }
-
-        currentCommentUser = mode === "register" ? name : existingUser.name;
-        try {
-          window.localStorage.setItem(commentKeys.session, currentCommentUser);
-        } catch {}
-        if (commentPassword) commentPassword.value = "";
-        saveCommentState();
-        renderCommentUi();
-        if (commentTitle) commentTitle.textContent = "COMMENT";
-        commentText?.focus({ preventScroll: true });
       };
 
-      const submitComment = () => {
+      const submitComment = async () => {
         const text = String(commentText?.value || "").trim();
 
-        if (!currentCommentUser || !commentDraftPoint || !text) {
+        if (!currentCommentUserId || !commentDraftPoint || !text) {
+          if (commentTitle) commentTitle.textContent = "LOGIN REQUIRED";
           return;
         }
 
-        comments.push({
-          id: `comment-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
-          author: currentCommentUser,
-          text: text.slice(0, 180),
-          x: Number(commentDraftPoint.x.toFixed(2)),
-          y: Number(commentDraftPoint.y.toFixed(2)),
-          status: "pending",
-          createdAt: new Date().toISOString()
-        });
+        try {
+          await requestCommentApi(
+            "/rest/v1/megastructure_comments",
+            {
+              method: "POST",
+              headers: { Prefer: "return=representation" },
+              body: JSON.stringify({
+                page: "megastructure",
+                user_id: currentCommentUserId,
+                body: text.slice(0, 180),
+                x: Number(commentDraftPoint.x.toFixed(2)),
+                y: Number(commentDraftPoint.y.toFixed(2)),
+                status: "pending"
+              })
+            }
+          );
 
-        if (commentText) commentText.value = "";
-        if (commentTitle) commentTitle.textContent = "PENDING REVIEW";
-        saveCommentState();
-        renderCommentUi();
+          await loadRemoteComments();
+          if (commentText) commentText.value = "";
+          if (commentTitle) commentTitle.textContent = "PENDING REVIEW";
+          renderCommentUi();
+        } catch (error) {
+          console.warn("Comment submit failed", error);
+          if (commentTitle) commentTitle.textContent = "SUBMIT FAILED";
+        }
       };
 
-      const reviewComment = (id, status) => {
+      const reviewComment = async (id, status) => {
         if (!isCommentAdmin()) {
           if (commentTitle) commentTitle.textContent = "ADMIN ONLY";
           return;
         }
 
+        try {
+          await requestCommentApi(
+            `/rest/v1/megastructure_comments?id=eq.${encodeURIComponent(id)}`,
+            {
+              method: "PATCH",
+              headers: { Prefer: "return=representation" },
+              body: JSON.stringify({
+                status,
+                reviewed_at: new Date().toISOString()
+              })
+            }
+          );
+          await loadRemoteComments();
+          renderCommentUi();
+        } catch (error) {
+          console.warn("Comment review failed", error);
+          if (commentTitle) commentTitle.textContent = "REVIEW FAILED";
+        }
+      };
+
+      const deleteComment = async (id) => {
         const comment = comments.find((item) => item.id === id);
 
         if (!comment) {
           return;
         }
 
-        comment.status = status;
-        comment.reviewedAt = new Date().toISOString();
-        saveCommentState();
-        renderCommentUi();
-      };
-
-      const deleteComment = (id) => {
-        const index = comments.findIndex((item) => item.id === id);
-
-        if (index < 0) {
-          return;
-        }
-
-        if (!canManageComment(comments[index])) {
+        if (!canManageComment(comment)) {
           if (commentTitle) commentTitle.textContent = "DELETE LOCKED";
           return;
         }
 
-        comments.splice(index, 1);
-        saveCommentState();
-        setCommentDetail(null);
-        renderCommentUi();
-        if (commentTitle) commentTitle.textContent = "DELETED";
+        try {
+          await requestCommentApi(`/rest/v1/megastructure_comments?id=eq.${encodeURIComponent(id)}`, {
+            method: "DELETE"
+          });
+
+          comments = comments.filter((item) => item.id !== id);
+          if (selectedCommentId === id) {
+            selectedCommentId = "";
+          }
+          setCommentDetail(null);
+          renderCommentUi();
+          if (commentTitle) commentTitle.textContent = "DELETED";
+        } catch (error) {
+          console.warn("Comment delete failed", error);
+          if (commentTitle) commentTitle.textContent = "DELETE FAILED";
+        }
       };
 
       const setNoClipTrace = (fromNode, toNode) => {
@@ -1600,11 +1746,21 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         authenticateCommentUser("register");
       });
 
-      commentLogoutButton?.addEventListener("click", () => {
+      commentLogoutButton?.addEventListener("click", async () => {
+        if (commentSession?.access_token) {
+          requestCommentApi("/auth/v1/logout", { method: "POST" }).catch((error) => {
+            console.warn("Comment logout request failed", error);
+          });
+        }
+        commentSession = null;
         currentCommentUser = "";
-        try {
-          window.localStorage.removeItem(commentKeys.session);
-        } catch {}
+        currentCommentUserId = "";
+        currentCommentRole = "user";
+        saveCommentSession();
+        await loadRemoteComments().catch((error) => {
+          comments = [];
+          console.warn("Public comments reload failed", error);
+        });
         renderCommentUi();
       });
 

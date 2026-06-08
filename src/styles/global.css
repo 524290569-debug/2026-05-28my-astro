@@ -2560,13 +2560,13 @@ img {
 }
 
 .mega-lab {
-  --lab-bg: #060707;
-  --lab-panel: rgba(12, 14, 14, 0.72);
-  --lab-border: rgba(224, 231, 228, 0.16);
-  --lab-border-soft: rgba(224, 231, 228, 0.08);
-  --lab-ink: rgba(240, 244, 242, 0.92);
-  --lab-muted: rgba(184, 193, 190, 0.64);
-  --lab-dim: rgba(156, 166, 164, 0.48);
+  --lab-bg: #080909;
+  --lab-panel: rgba(18, 21, 21, 0.76);
+  --lab-border: rgba(224, 231, 228, 0.22);
+  --lab-border-soft: rgba(224, 231, 228, 0.12);
+  --lab-ink: rgba(244, 247, 245, 0.96);
+  --lab-muted: rgba(196, 206, 202, 0.74);
+  --lab-dim: rgba(174, 184, 181, 0.58);
   min-height: 100vh;
   overflow-x: hidden;
   background: var(--lab-bg);
@@ -2579,7 +2579,7 @@ img {
   overflow: hidden;
   isolation: isolate;
   background:
-    linear-gradient(180deg, #0a0b0b, #060707 64%, #040505),
+    linear-gradient(180deg, #111313, #0a0b0b 64%, #070808),
     var(--lab-bg);
 }
 
@@ -2601,8 +2601,8 @@ img {
 
 .mega-lab-stage::before {
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.76), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.58)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.44), transparent 32%, rgba(0, 0, 0, 0.62));
+    linear-gradient(90deg, rgba(0, 0, 0, 0.58), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.42)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 32%, rgba(0, 0, 0, 0.48));
 }
 
 .mega-lab-stage::after {
@@ -2620,8 +2620,8 @@ img {
   height: 110%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.86;
-  filter: brightness(0.58) contrast(1.12) saturate(0.72);
+  opacity: 0.92;
+  filter: brightness(0.68) contrast(1.08) saturate(0.76);
   transform: translate3d(var(--drift-x, 0), var(--drift-y, 0), 0) scale(var(--stage-scale, 1.05));
   transform-origin: var(--focus-x, 50%) var(--focus-y, 50%);
   transition:
@@ -2633,13 +2633,13 @@ img {
 }
 
 .mega-lab.is-node-unfocused .mega-lab-backdrop {
-  filter: brightness(0.5) contrast(1.18) saturate(0.64);
+  filter: brightness(0.6) contrast(1.12) saturate(0.68);
 }
 
 .mega-lab-grid {
   inset: 0;
   z-index: 2;
-  opacity: 0.36;
+  opacity: 0.42;
   background:
     linear-gradient(90deg, transparent 0 18%, rgba(230, 236, 234, 0.08) 18.08% 18.16%, transparent 18.3%),
     linear-gradient(90deg, transparent 0 50%, rgba(230, 236, 234, 0.06) 50.08% 50.14%, transparent 50.3%),
@@ -2651,8 +2651,8 @@ img {
   inset: 0;
   z-index: 3;
   background:
-    linear-gradient(180deg, transparent 0 30%, rgba(190, 204, 204, 0.12) 48%, transparent 68%),
-    radial-gradient(ellipse at 16% 58%, rgba(160, 178, 180, 0.12), transparent 22rem),
+    linear-gradient(180deg, transparent 0 30%, rgba(204, 216, 216, 0.16) 48%, transparent 68%),
+    radial-gradient(ellipse at 16% 58%, rgba(178, 194, 196, 0.16), transparent 22rem),
     radial-gradient(ellipse at 78% 38%, var(--mode-haze), transparent 22rem);
   filter: blur(10px);
   animation: megaLabHaze 16s ease-in-out infinite alternate;
@@ -3210,17 +3210,20 @@ img {
   width: 2.05rem;
   height: 2.05rem;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--mode-accent) 46%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 72%, transparent);
   background:
-    linear-gradient(180deg, rgba(25, 28, 28, 0.72), rgba(6, 7, 7, 0.84)),
+    linear-gradient(180deg, rgba(42, 47, 47, 0.82), rgba(14, 17, 17, 0.9)),
     var(--lab-panel);
-  color: rgba(238, 242, 241, 0.82);
+  color: rgba(247, 250, 249, 0.98);
   cursor: pointer;
   font: inherit;
   font-size: 0.55rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   pointer-events: auto;
+  box-shadow:
+    0 0 0 1px rgba(238, 242, 241, 0.1),
+    0 0 1.2rem color-mix(in srgb, var(--mode-accent) 34%, transparent);
   transform: translate(-50%, -50%);
 }
 
@@ -3228,25 +3231,25 @@ img {
 .mega-comment-pin::after {
   position: absolute;
   inset: 0.32rem;
-  border: 1px solid rgba(238, 242, 241, 0.12);
+  border: 1px solid rgba(238, 242, 241, 0.28);
   content: "";
   transform: rotate(45deg);
 }
 
 .mega-comment-pin::after {
   inset: 0.78rem;
-  background: color-mix(in srgb, var(--mode-accent) 54%, transparent);
+  background: color-mix(in srgb, var(--mode-accent) 78%, transparent);
 }
 
 .mega-comment-pin.is-pending {
   border-style: dashed;
-  color: rgba(238, 242, 241, 0.58);
+  color: rgba(238, 242, 241, 0.84);
 }
 
 .mega-comment-pin.is-rejected {
-  border-color: rgba(140, 146, 144, 0.22);
-  color: rgba(238, 242, 241, 0.38);
-  opacity: 0.72;
+  border-color: rgba(190, 198, 196, 0.34);
+  color: rgba(238, 242, 241, 0.56);
+  opacity: 0.82;
 }
 
 .mega-comment-popover {
@@ -3257,11 +3260,11 @@ img {
   gap: 0.75rem;
   border: 1px solid var(--lab-border);
   background:
-    linear-gradient(180deg, rgba(31, 35, 35, 0.78), rgba(6, 7, 7, 0.9)),
+    linear-gradient(180deg, rgba(40, 45, 45, 0.86), rgba(12, 14, 14, 0.94)),
     var(--lab-panel);
   box-shadow:
     0 1.4rem 4rem rgba(0, 0, 0, 0.42),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   padding: 0.85rem;
   backdrop-filter: blur(14px);
 }
@@ -3286,7 +3289,8 @@ img {
 .mega-comment-session span,
 .mega-comment-list > span,
 .mega-comment-review > span,
-.mega-comment-row span {
+.mega-comment-row span,
+.mega-comment-detail span {
   color: var(--mode-accent);
   font-size: 0.58rem;
   font-weight: 500;
@@ -3310,6 +3314,7 @@ img {
 .mega-comment-auth[hidden],
 .mega-comment-session[hidden],
 .mega-comment-form[hidden],
+.mega-comment-list[hidden],
 .mega-comment-detail[hidden],
 .mega-comment-review[hidden] {
   display: none;
@@ -3318,9 +3323,9 @@ img {
 .mega-comment-auth input,
 .mega-comment-form textarea {
   width: 100%;
-  border: 1px solid rgba(224, 231, 228, 0.16);
-  background: rgba(4, 5, 5, 0.42);
-  color: rgba(238, 242, 241, 0.88);
+  border: 1px solid rgba(224, 231, 228, 0.24);
+  background: rgba(6, 8, 8, 0.58);
+  color: rgba(247, 250, 249, 0.94);
   font: inherit;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
@@ -3340,9 +3345,9 @@ img {
 
 .mega-comment-popover button {
   min-height: 2rem;
-  border: 1px solid rgba(224, 231, 228, 0.18);
-  background: rgba(224, 231, 228, 0.045);
-  color: rgba(238, 242, 241, 0.86);
+  border: 1px solid rgba(224, 231, 228, 0.26);
+  background: rgba(224, 231, 228, 0.075);
+  color: rgba(247, 250, 249, 0.94);
   cursor: pointer;
   font: inherit;
   font-size: 0.62rem;
@@ -3368,25 +3373,31 @@ img {
 
 .mega-comment-row,
 .mega-comment-detail {
-  border: 1px solid rgba(224, 231, 228, 0.11);
-  background: rgba(4, 5, 5, 0.28);
+  border: 1px solid rgba(224, 231, 228, 0.18);
+  background: rgba(7, 9, 9, 0.42);
   padding: 0.62rem;
 }
 
 .mega-comment-row p,
 .mega-comment-detail p {
-  margin: 0.34rem 0 0;
-  color: rgba(238, 242, 241, 0.76);
+  margin: 0;
+  color: rgba(247, 250, 249, 0.9);
   font-size: 0.72rem;
   line-height: 1.55;
 }
 
+.mega-comment-row span,
+.mega-comment-detail span {
+  display: block;
+  margin-top: 0.45rem;
+}
+
 .mega-comment-row.is-pending p {
-  color: rgba(238, 242, 241, 0.58);
+  color: rgba(238, 242, 241, 0.76);
 }
 
 .mega-comment-row.is-rejected {
-  opacity: 0.64;
+  opacity: 0.76;
 }
 
 .mega-observer-panel {
