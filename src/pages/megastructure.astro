@@ -283,37 +283,37 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
       <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
         <div class="mega-comment-head">
-          <span data-comment-title>COMMENT</span>
+          <span data-comment-title>评论</span>
           <button type="button" data-comment-close aria-label="Close comment panel">x</button>
         </div>
         <p class="mega-comment-position" data-comment-position>X 00.0 / Y 00.0</p>
         <div class="mega-comment-auth" data-comment-auth>
-          <input type="text" data-comment-name autocomplete="username" maxlength="24" placeholder="NAME" />
-          <input type="email" data-comment-email autocomplete="email" maxlength="80" placeholder="EMAIL" />
+          <input type="text" data-comment-name autocomplete="username" maxlength="24" placeholder="名称（注册用）" />
+          <input type="email" data-comment-email autocomplete="email" maxlength="80" placeholder="账号邮箱" />
           <input
             type="password"
             data-comment-password
             autocomplete="current-password"
             maxlength="32"
-            placeholder="PASSWORD"
+            placeholder="密码（至少 6 位）"
           />
           <div>
-            <button type="button" data-comment-login>LOGIN</button>
-            <button type="button" data-comment-register>REGISTER</button>
+            <button type="button" data-comment-login>登录</button>
+            <button type="button" data-comment-register>注册</button>
           </div>
         </div>
         <div class="mega-comment-session" data-comment-session hidden>
-          <span data-comment-user>USER / -</span>
-          <button type="button" data-comment-logout>LOG OUT</button>
+          <span data-comment-user>用户 / -</span>
+          <button type="button" data-comment-logout>退出</button>
         </div>
         <form class="mega-comment-form" data-comment-form hidden>
-          <textarea data-comment-text maxlength="180" rows="4" placeholder="Write comment"></textarea>
-          <button type="submit">SUBMIT FOR REVIEW</button>
+          <textarea data-comment-text maxlength="180" rows="4" placeholder="写下评论"></textarea>
+          <button type="submit">提交审核</button>
         </form>
         <div class="mega-comment-detail" data-comment-detail hidden></div>
         <div class="mega-comment-list" data-comment-list></div>
         <div class="mega-comment-review" data-comment-review hidden>
-          <span>REVIEW</span>
+          <span>待审核</span>
           <div data-comment-review-list></div>
         </div>
       </aside>
@@ -508,6 +508,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let currentCommentUser = "";
       let currentCommentUserId = "";
       let currentCommentRole = "user";
+      let currentCommentLocked = false;
       let commentSession = null;
       let commentDraftPoint = null;
       let commentPressTimer = 0;
@@ -573,6 +574,37 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       const normalizeCommentEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 80);
 
+      const commentErrorText = (error, fallback = "操作失败") => {
+        const message = String(error?.message || error || "");
+
+        if (/email not confirmed/i.test(message)) {
+          return "邮箱未确认，请检查注册邮箱的确认邮件";
+        }
+        if (/invalid login credentials/i.test(message)) {
+          return "账号邮箱或密码错误";
+        }
+        if (/user already registered|already registered|already exists|duplicate key/i.test(message)) {
+          return "邮箱已经注册";
+        }
+        if (/rate limit|too many|email rate/i.test(message)) {
+          return "请求过于频繁，请稍后再试";
+        }
+        if (/permission denied/i.test(message)) {
+          return "数据库权限不足，请先执行 Supabase SQL 脚本";
+        }
+        if (/could not find|schema cache|relation .* does not exist|function .* does not exist/i.test(message)) {
+          return "数据库脚本未更新，请先执行 Supabase SQL 脚本";
+        }
+        if (/database error/i.test(message)) {
+          return "数据库写入失败，请检查 Supabase SQL 脚本";
+        }
+        if (/supabase config missing/i.test(message)) {
+          return "评论服务未配置";
+        }
+
+        return fallback;
+      };
+
       const commentAuthHeaders = (useSession = true) => {
         const token = useSession && commentSession?.access_token ? commentSession.access_token : commentSupabaseKey;
         return {
@@ -604,6 +636,52 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         return data;
       };
 
+      const requestCommentRpc = (name, payload = {}, useSession = true) =>
+        requestCommentApi(
+          `/rest/v1/rpc/${encodeURIComponent(name)}`,
+          {
+            method: "POST",
+            body: JSON.stringify(payload)
+          },
+          useSession
+        );
+
+      const firstCommentRpcRow = (data) => (Array.isArray(data) ? data[0] || null : data);
+
+      const booleanCommentRpcValue = (data) => {
+        const value = firstCommentRpcRow(data);
+
+        if (typeof value === "boolean") {
+          return value;
+        }
+        if (value && typeof value === "object") {
+          return Boolean(Object.values(value)[0]);
+        }
+
+        return Boolean(value);
+      };
+
+      const normalizeCommentLockStatus = (data) => {
+        const row = firstCommentRpcRow(data) || {};
+
+        return {
+          emailRegistered: Boolean(row.email_registered),
+          isLocked: Boolean(row.is_locked),
+          failedCount: Number(row.failed_count || 0)
+        };
+      };
+
+      const getCommentEmailRegistered = async (email) =>
+        booleanCommentRpcValue(await requestCommentRpc("comment_email_registered", { p_email: email }, false));
+
+      const getCommentLockStatus = async (email) =>
+        normalizeCommentLockStatus(await requestCommentRpc("comment_login_lock_status", { p_email: email }, false));
+
+      const registerCommentLoginFailure = async (email) =>
+        normalizeCommentLockStatus(await requestCommentRpc("register_comment_login_failure", { p_email: email }, false));
+
+      const clearCommentLoginFailures = () => requestCommentRpc("clear_comment_login_failures", {}, true);
+
       const saveCommentSession = () => {
         try {
           if (commentSession) {
@@ -618,12 +696,13 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         normalizeCommentName(
           commentSession?.user?.user_metadata?.display_name ||
             commentSession?.user?.email?.split("@")[0] ||
-            "USER"
+            "用户"
         );
 
       const loadCurrentCommentProfile = async () => {
         currentCommentUserId = commentSession?.user?.id || "";
         currentCommentRole = "user";
+        currentCommentLocked = false;
         currentCommentUser = currentCommentUserId ? profileNameFromSession() : "";
 
         if (!currentCommentUserId) {
@@ -631,7 +710,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         const rows = await requestCommentApi(
-          `/rest/v1/comment_profiles?id=eq.${encodeURIComponent(currentCommentUserId)}&select=display_name,role&limit=1`
+          `/rest/v1/comment_profiles?id=eq.${encodeURIComponent(currentCommentUserId)}&select=display_name,role,is_locked,failed_login_count&limit=1`
         );
         const profile = Array.isArray(rows) ? rows[0] : null;
 
@@ -641,6 +720,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         if (profile?.role) {
           currentCommentRole = profile.role;
         }
+        currentCommentLocked = Boolean(profile?.is_locked);
       };
 
       const applyCommentSession = async (session) => {
@@ -678,11 +758,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           currentCommentUser = "";
           currentCommentUserId = "";
           currentCommentRole = "user";
+          currentCommentLocked = false;
           return;
         }
 
         try {
           await loadCurrentCommentProfile();
+          if (currentCommentLocked) {
+            commentSession = null;
+            currentCommentUser = "";
+            currentCommentUserId = "";
+            currentCommentRole = "user";
+            currentCommentLocked = false;
+            saveCommentSession();
+          }
         } catch (error) {
           try {
             await refreshCommentSession();
@@ -691,6 +780,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
             currentCommentUser = "";
             currentCommentUserId = "";
             currentCommentRole = "user";
+            currentCommentLocked = false;
             saveCommentSession();
             console.warn("Comment session restore failed", error);
           }
@@ -701,7 +791,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const profile = Array.isArray(row.comment_profiles) ? row.comment_profiles[0] : row.comment_profiles;
         return {
           id: row.id,
-          author: normalizeCommentName(profile?.display_name || "USER"),
+          author: normalizeCommentName(profile?.display_name || "用户"),
           userId: row.user_id,
           role: profile?.role || "user",
           text: String(row.body || ""),
@@ -744,7 +834,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const isCommentAdmin = () => currentCommentRole === "admin";
 
       const canManageComment = (comment) =>
-        Boolean(comment && currentCommentUserId && (isCommentAdmin() || comment.userId === currentCommentUserId));
+        Boolean(comment && currentCommentUserId && (isCommentAdmin() || (!currentCommentLocked && comment.userId === currentCommentUserId)));
 
       const getCommentPoint = (event) => {
         if (!labStage) {
@@ -810,7 +900,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         selectedCommentId = selectedComment?.id || "";
         commentOpenedAt = Date.now();
 
-        if (commentTitle) commentTitle.textContent = selectedComment ? "COMMENT LOG" : "COMMENT";
+        if (commentTitle) commentTitle.textContent = selectedComment ? "评论详情" : "评论";
         if (commentPosition) {
           commentPosition.hidden = Boolean(selectedComment);
           commentPosition.textContent = formatCommentPosition(point);
@@ -873,7 +963,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         remove.type = "button";
         remove.dataset.commentAction = "delete";
         remove.dataset.commentId = comment.id;
-        remove.textContent = "DELETE";
+        remove.textContent = "删除";
 
         actions.append(remove);
         row.append(actions);
@@ -913,8 +1003,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         if (commentForm) commentForm.hidden = !isLoggedIn || isViewingComment;
         if (commentUser) {
           commentUser.textContent = isLoggedIn
-            ? `${adminMode ? "ADMIN" : "USER"} / ${currentCommentUser}`
-            : "USER / -";
+            ? `${adminMode ? "管理员" : "用户"} / ${currentCommentUser}`
+            : "用户 / -";
         }
 
         if (commentList) {
@@ -926,7 +1016,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
           if (!isViewingComment && visibleLog.length) {
             const label = document.createElement("span");
-            label.textContent = adminMode ? "ALL LOG" : "MY LOG";
+            label.textContent = adminMode ? "全部评论" : "我的评论";
             commentList.append(
               label,
               ...visibleLog.map((comment) => appendCommentDeleteAction(createCommentRow(comment, true), comment))
@@ -955,19 +1045,19 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
             approve.type = "button";
             approve.dataset.commentAction = "approve";
             approve.dataset.commentId = comment.id;
-            approve.textContent = "APPROVE";
+            approve.textContent = "通过";
 
             const reject = document.createElement("button");
             reject.type = "button";
             reject.dataset.commentAction = "reject";
             reject.dataset.commentId = comment.id;
-            reject.textContent = "REJECT";
+            reject.textContent = "拒绝";
 
             const remove = document.createElement("button");
             remove.type = "button";
             remove.dataset.commentAction = "delete";
             remove.dataset.commentId = comment.id;
-            remove.textContent = "DELETE";
+            remove.textContent = "删除";
 
             actions.append(approve, reject, remove);
             row.append(actions);
@@ -980,7 +1070,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       const loadCommentState = async () => {
         if (!hasRemoteComments) {
-          if (commentTitle) commentTitle.textContent = "REMOTE CONFIG MISSING";
+          if (commentTitle) commentTitle.textContent = "评论服务未配置";
           renderCommentUi();
           return;
         }
@@ -990,37 +1080,62 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           await loadRemoteComments();
         } catch (error) {
           console.warn("Comment load failed", error);
-          if (commentTitle) commentTitle.textContent = "REMOTE LOAD FAILED";
+          if (commentTitle) commentTitle.textContent = "评论加载失败";
         }
 
         renderCommentUi();
       };
 
       const authenticateCommentUser = async (mode) => {
+        const isRegister = mode === "register";
         const name = normalizeCommentName(commentName?.value);
         const rawName = String(commentName?.value || "");
         const email = normalizeCommentEmail(commentEmail?.value || (rawName.includes("@") ? rawName : ""));
         const password = String(commentPassword?.value || "");
 
         if (!hasRemoteComments) {
-          if (commentTitle) commentTitle.textContent = "REMOTE CONFIG MISSING";
+          if (commentTitle) commentTitle.textContent = "评论服务未配置";
           return;
         }
 
-        if (!email || password.length < 6 || (mode === "register" && !name)) {
-          if (commentTitle) {
-            commentTitle.textContent = mode === "register" ? "NAME / EMAIL / PASSWORD REQUIRED" : "EMAIL / PASSWORD REQUIRED";
-          }
+        if (isRegister && !name) {
+          if (commentTitle) commentTitle.textContent = "请输入名称";
+          return;
+        }
+
+        if (!email) {
+          if (commentTitle) commentTitle.textContent = "请输入账号邮箱";
+          return;
+        }
+
+        if (password.length < 6) {
+          if (commentTitle) commentTitle.textContent = "密码至少 6 位";
           return;
         }
 
         try {
+          if (isRegister) {
+            const emailRegistered = await getCommentEmailRegistered(email);
+
+            if (emailRegistered) {
+              if (commentTitle) commentTitle.textContent = "邮箱已经注册";
+              return;
+            }
+          } else {
+            const lockStatus = await getCommentLockStatus(email);
+
+            if (lockStatus.isLocked) {
+              if (commentTitle) commentTitle.textContent = "账号已锁定，请联系管理员处理";
+              return;
+            }
+          }
+
           const data = await requestCommentApi(
-            mode === "register" ? "/auth/v1/signup" : "/auth/v1/token?grant_type=password",
+            isRegister ? "/auth/v1/signup" : "/auth/v1/token?grant_type=password",
             {
               method: "POST",
               body: JSON.stringify(
-                mode === "register"
+                isRegister
                   ? { email, password, data: { display_name: name } }
                   : { email, password }
               )
@@ -1030,19 +1145,67 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           const session = data.session || (data.access_token ? data : null);
 
           if (!session) {
-            if (commentTitle) commentTitle.textContent = "CHECK EMAIL";
+            if (commentTitle) commentTitle.textContent = isRegister
+              ? "注册成功，请先确认邮箱"
+              : "邮箱未确认，请检查注册邮箱的确认邮件";
             return;
           }
 
           await applyCommentSession(session);
+
+          if (currentCommentLocked) {
+            await requestCommentApi("/auth/v1/logout", { method: "POST" }).catch((error) => {
+              console.warn("Locked comment logout request failed", error);
+            });
+            commentSession = null;
+            currentCommentUser = "";
+            currentCommentUserId = "";
+            currentCommentRole = "user";
+            currentCommentLocked = false;
+            saveCommentSession();
+            renderCommentUi();
+            if (commentTitle) commentTitle.textContent = "账号已锁定，请联系管理员处理";
+            return;
+          }
+
+          if (!isRegister) {
+            await clearCommentLoginFailures().catch((error) => {
+              console.warn("Comment login failure counter clear failed", error);
+            });
+            await loadCurrentCommentProfile().catch((error) => {
+              console.warn("Comment profile reload failed", error);
+            });
+          }
+
           await loadRemoteComments();
           if (commentPassword) commentPassword.value = "";
           renderCommentUi();
-          if (commentTitle) commentTitle.textContent = isCommentAdmin() ? "ADMIN" : "COMMENT";
+          if (commentTitle) commentTitle.textContent = isCommentAdmin() ? "管理员已登录" : "已登录";
           commentText?.focus({ preventScroll: true });
         } catch (error) {
           console.warn("Comment auth failed", error);
-          if (commentTitle) commentTitle.textContent = mode === "register" ? "REGISTER FAILED" : "LOGIN FAILED";
+          const message = String(error?.message || error || "");
+
+          if (!isRegister && /invalid login credentials/i.test(message)) {
+            try {
+              const lockStatus = await registerCommentLoginFailure(email);
+
+              if (lockStatus.isLocked) {
+                if (commentTitle) commentTitle.textContent = "密码错误已超过 3 次，账号已锁定";
+              } else if (lockStatus.emailRegistered) {
+                const remain = Math.max(0, 3 - lockStatus.failedCount);
+                if (commentTitle) commentTitle.textContent = `密码错误，还剩 ${remain} 次机会`;
+              } else if (commentTitle) {
+                commentTitle.textContent = "账号邮箱或密码错误";
+              }
+            } catch (lockError) {
+              console.warn("Comment login failure counter failed", lockError);
+              if (commentTitle) commentTitle.textContent = commentErrorText(lockError, "账号邮箱或密码错误");
+            }
+            return;
+          }
+
+          if (commentTitle) commentTitle.textContent = commentErrorText(error, isRegister ? "注册失败" : "登录失败");
         }
       };
 
@@ -1050,7 +1213,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const text = String(commentText?.value || "").trim();
 
         if (!currentCommentUserId || !commentDraftPoint || !text) {
-          if (commentTitle) commentTitle.textContent = "LOGIN REQUIRED";
+          if (commentTitle) commentTitle.textContent = "请先登录";
+          return;
+        }
+
+        if (currentCommentLocked) {
+          if (commentTitle) commentTitle.textContent = "账号已锁定，请联系管理员处理";
           return;
         }
 
@@ -1073,17 +1241,17 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
           await loadRemoteComments();
           if (commentText) commentText.value = "";
-          if (commentTitle) commentTitle.textContent = "PENDING REVIEW";
+          if (commentTitle) commentTitle.textContent = "已提交审核";
           renderCommentUi();
         } catch (error) {
           console.warn("Comment submit failed", error);
-          if (commentTitle) commentTitle.textContent = "SUBMIT FAILED";
+          if (commentTitle) commentTitle.textContent = "提交失败";
         }
       };
 
       const reviewComment = async (id, status) => {
         if (!isCommentAdmin()) {
-          if (commentTitle) commentTitle.textContent = "ADMIN ONLY";
+          if (commentTitle) commentTitle.textContent = "仅管理员可操作";
           return;
         }
 
@@ -1103,7 +1271,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           renderCommentUi();
         } catch (error) {
           console.warn("Comment review failed", error);
-          if (commentTitle) commentTitle.textContent = "REVIEW FAILED";
+          if (commentTitle) commentTitle.textContent = "审核失败";
         }
       };
 
@@ -1115,7 +1283,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         if (!canManageComment(comment)) {
-          if (commentTitle) commentTitle.textContent = "DELETE LOCKED";
+          if (commentTitle) commentTitle.textContent = "无权删除";
           return;
         }
 
@@ -1130,10 +1298,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           }
           setCommentDetail(null);
           renderCommentUi();
-          if (commentTitle) commentTitle.textContent = "DELETED";
+          if (commentTitle) commentTitle.textContent = "已删除";
         } catch (error) {
           console.warn("Comment delete failed", error);
-          if (commentTitle) commentTitle.textContent = "DELETE FAILED";
+          if (commentTitle) commentTitle.textContent = "删除失败";
         }
       };
 
@@ -1756,6 +1924,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         currentCommentUser = "";
         currentCommentUserId = "";
         currentCommentRole = "user";
+        currentCommentLocked = false;
         saveCommentSession();
         await loadRemoteComments().catch((error) => {
           comments = [];
