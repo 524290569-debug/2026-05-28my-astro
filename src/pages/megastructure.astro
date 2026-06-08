@@ -478,7 +478,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentPassword = lab.querySelector("[data-comment-password]");
       const commentLoginButton = lab.querySelector("[data-comment-login]");
       const commentRegisterButton = lab.querySelector("[data-comment-register]");
-      const commentSession = lab.querySelector("[data-comment-session]");
+      const commentSessionPanel = lab.querySelector("[data-comment-session]");
       const commentUser = lab.querySelector("[data-comment-user]");
       const commentLogoutButton = lab.querySelector("[data-comment-logout]");
       const commentForm = lab.querySelector("[data-comment-form]");
@@ -909,7 +909,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const isViewingComment = Boolean(selectedCommentId);
 
         if (commentAuth) commentAuth.hidden = isLoggedIn || isViewingComment;
-        if (commentSession) commentSession.hidden = !isLoggedIn || isViewingComment;
+        if (commentSessionPanel) commentSessionPanel.hidden = !isLoggedIn || isViewingComment;
         if (commentForm) commentForm.hidden = !isLoggedIn || isViewingComment;
         if (commentUser) {
           commentUser.textContent = isLoggedIn
