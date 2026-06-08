@@ -270,6 +270,43 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <i></i>
       </div>
 
+      <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
+      <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
+        <div class="mega-comment-head">
+          <span data-comment-title>COMMENT</span>
+          <button type="button" data-comment-close aria-label="Close comment panel">x</button>
+        </div>
+        <p class="mega-comment-position" data-comment-position>X 00.0 / Y 00.0</p>
+        <div class="mega-comment-auth" data-comment-auth>
+          <input type="text" data-comment-name autocomplete="username" maxlength="24" placeholder="NAME" />
+          <input
+            type="password"
+            data-comment-password
+            autocomplete="current-password"
+            maxlength="32"
+            placeholder="PASSWORD"
+          />
+          <div>
+            <button type="button" data-comment-login>LOGIN</button>
+            <button type="button" data-comment-register>REGISTER</button>
+          </div>
+        </div>
+        <div class="mega-comment-session" data-comment-session hidden>
+          <span data-comment-user>USER / -</span>
+          <button type="button" data-comment-logout>LOG OUT</button>
+        </div>
+        <form class="mega-comment-form" data-comment-form hidden>
+          <textarea data-comment-text maxlength="180" rows="4" placeholder="Write comment"></textarea>
+          <button type="submit">SUBMIT FOR REVIEW</button>
+        </form>
+        <div class="mega-comment-detail" data-comment-detail hidden></div>
+        <div class="mega-comment-list" data-comment-list></div>
+        <div class="mega-comment-review" data-comment-review hidden>
+          <span>REVIEW</span>
+          <div data-comment-review-list></div>
+        </div>
+      </aside>
+
       <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
         <div class="mega-panel-head" data-panel-drag aria-label="拖动移动观察窗口">
           <span data-node-code>{firstNode.code}</span>
@@ -418,6 +455,26 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const qualityMeterIntegrity = lab.querySelector("[data-quality-meter-integrity]");
       const qualityMeterNoise = lab.querySelector("[data-quality-meter-noise]");
       const observerPanel = lab.querySelector(".mega-observer-panel");
+      const labStage = lab.querySelector(".mega-lab-stage");
+      const commentLayer = lab.querySelector("[data-comment-layer]");
+      const commentPopover = lab.querySelector("[data-comment-popover]");
+      const commentTitle = lab.querySelector("[data-comment-title]");
+      const commentPosition = lab.querySelector("[data-comment-position]");
+      const commentCloseButton = lab.querySelector("[data-comment-close]");
+      const commentAuth = lab.querySelector("[data-comment-auth]");
+      const commentName = lab.querySelector("[data-comment-name]");
+      const commentPassword = lab.querySelector("[data-comment-password]");
+      const commentLoginButton = lab.querySelector("[data-comment-login]");
+      const commentRegisterButton = lab.querySelector("[data-comment-register]");
+      const commentSession = lab.querySelector("[data-comment-session]");
+      const commentUser = lab.querySelector("[data-comment-user]");
+      const commentLogoutButton = lab.querySelector("[data-comment-logout]");
+      const commentForm = lab.querySelector("[data-comment-form]");
+      const commentText = lab.querySelector("[data-comment-text]");
+      const commentDetail = lab.querySelector("[data-comment-detail]");
+      const commentList = lab.querySelector("[data-comment-list]");
+      const commentReview = lab.querySelector("[data-comment-review]");
+      const commentReviewList = lab.querySelector("[data-comment-review-list]");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       let activeModeId = modes[0].id;
       let activeNodeId = nodes[0].id;
@@ -435,6 +492,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let panelFrame = 0;
       let pendingPanelBox = null;
       let pendingPanelMode = "floating";
+      let comments = [];
+      let commentUsers = [];
+      let currentCommentUser = "";
+      let commentDraftPoint = null;
+      let commentPressTimer = 0;
+      let commentPressStart = null;
+      let commentOpenedAt = 0;
+      let commentReleaseClickPoint = null;
+      const commentKeys = {
+        users: "mega-comment-users-v1",
+        comments: "mega-comments-v1",
+        session: "mega-comment-session-v1"
+      };
+      const commentHoldMs = 620;
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
@@ -480,6 +551,444 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           panelScreen.style.setProperty("--viewport-y", String(viewport.y) + "%");
           panelScreen.style.setProperty("--viewport-slit", String(viewport.slit) + "%");
         }
+      };
+
+      const readCommentJson = (key, fallback) => {
+        try {
+          const value = window.localStorage.getItem(key);
+          return value ? JSON.parse(value) : fallback;
+        } catch {
+          return fallback;
+        }
+      };
+
+      const writeCommentJson = (key, value) => {
+        try {
+          window.localStorage.setItem(key, JSON.stringify(value));
+        } catch {}
+      };
+
+      const normalizeCommentName = (value) => String(value || "").trim().replace(/\s+/g, " ").slice(0, 24);
+
+      const hashCommentPassword = async (password) => {
+        const value = String(password || "");
+
+        if (window.crypto?.subtle && window.TextEncoder) {
+          const bytes = new TextEncoder().encode(value);
+          const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+          return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        let hash = 0;
+        for (let index = 0; index < value.length; index += 1) {
+          hash = (hash << 5) - hash + value.charCodeAt(index);
+          hash |= 0;
+        }
+        return `fallback-${Math.abs(hash)}`;
+      };
+
+      const saveCommentState = () => {
+        writeCommentJson(commentKeys.users, commentUsers);
+        writeCommentJson(commentKeys.comments, comments);
+      };
+
+      const formatCommentTime = (value) => {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return "--:--";
+        }
+
+        return date.toLocaleString("zh-CN", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      };
+
+      const formatCommentPosition = (point) =>
+        `X ${Number(point?.x || 0).toFixed(1)} / Y ${Number(point?.y || 0).toFixed(1)}`;
+
+      const isCommentAdmin = () => currentCommentUser.toLowerCase() === "admin";
+
+      const canManageComment = (comment) =>
+        Boolean(comment && currentCommentUser && (isCommentAdmin() || comment.author === currentCommentUser));
+
+      const getCommentPoint = (event) => {
+        if (!labStage) {
+          return { x: 50, y: 50 };
+        }
+
+        const rect = labStage.getBoundingClientRect();
+        return {
+          x: clamp(((event.clientX - rect.left) / Math.max(rect.width, 1)) * 100, 0, 100),
+          y: clamp(((event.clientY - rect.top) / Math.max(rect.height, 1)) * 100, 0, 100)
+        };
+      };
+
+      const clearCommentPress = () => {
+        if (commentPressTimer) {
+          window.clearTimeout(commentPressTimer);
+          commentPressTimer = 0;
+        }
+        commentPressStart = null;
+      };
+
+      const placeCommentPopover = (point) => {
+        if (!commentPopover || !labStage) {
+          return;
+        }
+
+        const stageRect = labStage.getBoundingClientRect();
+        const left = (Number(point.x) / 100) * stageRect.width;
+        const top = (Number(point.y) / 100) * stageRect.height;
+        commentPopover.hidden = false;
+
+        window.requestAnimationFrame(() => {
+          const popRect = commentPopover.getBoundingClientRect();
+          const gutter = 16;
+          const nextLeft = clamp(left + 16, gutter, Math.max(gutter, stageRect.width - popRect.width - gutter));
+          const nextTop = clamp(top + 16, gutter, Math.max(gutter, stageRect.height - popRect.height - gutter));
+          commentPopover.style.left = `${nextLeft}px`;
+          commentPopover.style.top = `${nextTop}px`;
+        });
+      };
+
+      const setCommentDetail = (comment) => {
+        if (!commentDetail) {
+          return;
+        }
+
+        commentDetail.textContent = "";
+        commentDetail.hidden = !comment;
+
+        if (!comment) {
+          return;
+        }
+
+        const meta = document.createElement("span");
+        meta.textContent = `${comment.author} / ${comment.status.toUpperCase()} / ${formatCommentTime(comment.createdAt)}`;
+        const text = document.createElement("p");
+        text.textContent = comment.text;
+        commentDetail.append(meta, text);
+
+        if (canManageComment(comment)) {
+          const actions = document.createElement("div");
+          actions.className = "mega-comment-row-actions";
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.dataset.commentAction = "delete";
+          remove.dataset.commentId = comment.id;
+          remove.textContent = "DELETE";
+
+          actions.append(remove);
+          commentDetail.append(actions);
+        }
+      };
+
+      const openCommentPanel = (point, selectedComment = null) => {
+        commentDraftPoint = point;
+        commentOpenedAt = Date.now();
+
+        if (commentTitle) commentTitle.textContent = selectedComment ? "COMMENT LOG" : "COMMENT";
+        if (commentPosition) commentPosition.textContent = formatCommentPosition(point);
+        if (commentText) commentText.value = "";
+        setCommentDetail(selectedComment);
+        renderCommentUi();
+        placeCommentPopover(point);
+
+        window.requestAnimationFrame(() => {
+          if (!currentCommentUser) {
+            commentName?.focus({ preventScroll: true });
+          } else if (!selectedComment) {
+            commentText?.focus({ preventScroll: true });
+          }
+        });
+      };
+
+      const closeCommentPanel = () => {
+        if (commentPopover) {
+          commentPopover.hidden = true;
+        }
+        commentDraftPoint = null;
+        setCommentDetail(null);
+      };
+
+      const isCommentPressTarget = (target) => {
+        if (!(target instanceof HTMLElement)) {
+          return false;
+        }
+
+        return !target.closest(
+          "a, button, input, textarea, label, .mega-observer-panel, .mega-panel-reopen, .mega-comment-popover, .mega-comment-pin"
+        );
+      };
+
+      const createCommentRow = (comment, compact = false) => {
+        const row = document.createElement("article");
+        row.className = `mega-comment-row is-${comment.status}`;
+        row.dataset.commentId = comment.id;
+
+        const meta = document.createElement("span");
+        meta.textContent = compact
+          ? `${comment.author} / ${comment.status.toUpperCase()}`
+          : `${comment.author} / ${comment.status.toUpperCase()} / ${formatCommentPosition(comment)} / ${formatCommentTime(comment.createdAt)}`;
+        const text = document.createElement("p");
+        text.textContent = comment.text;
+        row.append(meta, text);
+        return row;
+      };
+
+      const appendCommentDeleteAction = (row, comment) => {
+        if (!row || !canManageComment(comment)) {
+          return row;
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "mega-comment-row-actions";
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.dataset.commentAction = "delete";
+        remove.dataset.commentId = comment.id;
+        remove.textContent = "DELETE";
+
+        actions.append(remove);
+        row.append(actions);
+        return row;
+      };
+
+      const renderCommentMarkers = () => {
+        if (!commentLayer) {
+          return;
+        }
+
+        commentLayer.textContent = "";
+        const visibleComments = comments.filter(
+          (comment) => isCommentAdmin() || comment.status === "approved" || comment.author === currentCommentUser
+        );
+
+        visibleComments.forEach((comment, index) => {
+          const pin = document.createElement("button");
+          pin.type = "button";
+          pin.className = `mega-comment-pin is-${comment.status}`;
+          pin.style.left = `${comment.x}%`;
+          pin.style.top = `${comment.y}%`;
+          pin.dataset.commentId = comment.id;
+          pin.setAttribute("aria-label", `Comment ${index + 1} ${comment.status}`);
+          pin.textContent = String(index + 1).padStart(2, "0");
+          commentLayer.append(pin);
+        });
+      };
+
+      const renderCommentUi = () => {
+        const isLoggedIn = Boolean(currentCommentUser);
+        const adminMode = isCommentAdmin();
+
+        if (commentAuth) commentAuth.hidden = isLoggedIn;
+        if (commentSession) commentSession.hidden = !isLoggedIn;
+        if (commentForm) commentForm.hidden = !isLoggedIn;
+        if (commentUser) {
+          commentUser.textContent = isLoggedIn
+            ? `${adminMode ? "ADMIN" : "USER"} / ${currentCommentUser}`
+            : "USER / -";
+        }
+
+        if (commentList) {
+          commentList.textContent = "";
+          const visibleLog = currentCommentUser
+            ? (adminMode ? comments.slice().reverse().slice(0, 8) : comments.filter((comment) => comment.author === currentCommentUser).slice().reverse().slice(0, 4))
+            : [];
+
+          if (visibleLog.length) {
+            const label = document.createElement("span");
+            label.textContent = adminMode ? "ALL LOG" : "MY LOG";
+            commentList.append(
+              label,
+              ...visibleLog.map((comment) => appendCommentDeleteAction(createCommentRow(comment, true), comment))
+            );
+          }
+        }
+
+        if (commentReview && commentReviewList) {
+          const pendingComments = adminMode
+            ? comments.filter((comment) => comment.status === "pending").slice().reverse().slice(0, 8)
+            : [];
+          commentReview.hidden = !pendingComments.length;
+          commentReviewList.textContent = "";
+
+          pendingComments.forEach((comment) => {
+            const row = createCommentRow(comment);
+            const actions = document.createElement("div");
+            actions.className = "mega-comment-review-actions";
+
+            const approve = document.createElement("button");
+            approve.type = "button";
+            approve.dataset.commentAction = "approve";
+            approve.dataset.commentId = comment.id;
+            approve.textContent = "APPROVE";
+
+            const reject = document.createElement("button");
+            reject.type = "button";
+            reject.dataset.commentAction = "reject";
+            reject.dataset.commentId = comment.id;
+            reject.textContent = "REJECT";
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.dataset.commentAction = "delete";
+            remove.dataset.commentId = comment.id;
+            remove.textContent = "DELETE";
+
+            actions.append(approve, reject, remove);
+            row.append(actions);
+            commentReviewList.append(row);
+          });
+        }
+
+        renderCommentMarkers();
+      };
+
+      const loadCommentState = () => {
+        commentUsers = readCommentJson(commentKeys.users, []);
+        comments = readCommentJson(commentKeys.comments, []);
+
+        if (!Array.isArray(commentUsers)) commentUsers = [];
+        if (!Array.isArray(comments)) comments = [];
+
+        try {
+          currentCommentUser = window.localStorage.getItem(commentKeys.session) || "";
+        } catch {
+          currentCommentUser = "";
+        }
+
+        if (currentCommentUser.toLowerCase() === "admin") {
+          currentCommentUser = "admin";
+        }
+
+        if (!isCommentAdmin() && !commentUsers.some((user) => user.name === currentCommentUser)) {
+          currentCommentUser = "";
+        }
+
+        renderCommentUi();
+      };
+
+      const authenticateCommentUser = async (mode) => {
+        const name = normalizeCommentName(commentName?.value);
+        const password = String(commentPassword?.value || "");
+
+        if (!name || password.length < 3) {
+          if (commentTitle) commentTitle.textContent = "NAME / PASSWORD REQUIRED";
+          return;
+        }
+
+        if (name.toLowerCase() === "admin") {
+          if (mode === "register") {
+            if (commentTitle) commentTitle.textContent = "ADMIN RESERVED";
+            return;
+          }
+
+          if (password !== "admin") {
+            if (commentTitle) commentTitle.textContent = "LOGIN FAILED";
+            return;
+          }
+
+          currentCommentUser = "admin";
+          try {
+            window.localStorage.setItem(commentKeys.session, currentCommentUser);
+          } catch {}
+          if (commentPassword) commentPassword.value = "";
+          renderCommentUi();
+          if (commentTitle) commentTitle.textContent = "ADMIN";
+          commentText?.focus({ preventScroll: true });
+          return;
+        }
+
+        const passwordHash = await hashCommentPassword(password);
+        const existingUser = commentUsers.find((user) => user.name.toLowerCase() === name.toLowerCase());
+
+        if (mode === "register") {
+          if (existingUser) {
+            if (commentTitle) commentTitle.textContent = "NAME EXISTS";
+            return;
+          }
+
+          commentUsers.push({ name, passwordHash, createdAt: new Date().toISOString() });
+        } else if (!existingUser || existingUser.passwordHash !== passwordHash) {
+          if (commentTitle) commentTitle.textContent = "LOGIN FAILED";
+          return;
+        }
+
+        currentCommentUser = mode === "register" ? name : existingUser.name;
+        try {
+          window.localStorage.setItem(commentKeys.session, currentCommentUser);
+        } catch {}
+        if (commentPassword) commentPassword.value = "";
+        saveCommentState();
+        renderCommentUi();
+        if (commentTitle) commentTitle.textContent = "COMMENT";
+        commentText?.focus({ preventScroll: true });
+      };
+
+      const submitComment = () => {
+        const text = String(commentText?.value || "").trim();
+
+        if (!currentCommentUser || !commentDraftPoint || !text) {
+          return;
+        }
+
+        comments.push({
+          id: `comment-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+          author: currentCommentUser,
+          text: text.slice(0, 180),
+          x: Number(commentDraftPoint.x.toFixed(2)),
+          y: Number(commentDraftPoint.y.toFixed(2)),
+          status: "pending",
+          createdAt: new Date().toISOString()
+        });
+
+        if (commentText) commentText.value = "";
+        if (commentTitle) commentTitle.textContent = "PENDING REVIEW";
+        saveCommentState();
+        renderCommentUi();
+      };
+
+      const reviewComment = (id, status) => {
+        if (!isCommentAdmin()) {
+          if (commentTitle) commentTitle.textContent = "ADMIN ONLY";
+          return;
+        }
+
+        const comment = comments.find((item) => item.id === id);
+
+        if (!comment) {
+          return;
+        }
+
+        comment.status = status;
+        comment.reviewedAt = new Date().toISOString();
+        saveCommentState();
+        renderCommentUi();
+      };
+
+      const deleteComment = (id) => {
+        const index = comments.findIndex((item) => item.id === id);
+
+        if (index < 0) {
+          return;
+        }
+
+        if (!canManageComment(comments[index])) {
+          if (commentTitle) commentTitle.textContent = "DELETE LOCKED";
+          return;
+        }
+
+        comments.splice(index, 1);
+        saveCommentState();
+        setCommentDetail(null);
+        renderCommentUi();
+        if (commentTitle) commentTitle.textContent = "DELETED";
       };
 
       const setNoClipTrace = (fromNode, toNode) => {
@@ -1083,6 +1592,166 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         event.preventDefault();
       });
 
+      commentLoginButton?.addEventListener("click", () => {
+        authenticateCommentUser("login");
+      });
+
+      commentRegisterButton?.addEventListener("click", () => {
+        authenticateCommentUser("register");
+      });
+
+      commentLogoutButton?.addEventListener("click", () => {
+        currentCommentUser = "";
+        try {
+          window.localStorage.removeItem(commentKeys.session);
+        } catch {}
+        renderCommentUi();
+      });
+
+      commentCloseButton?.addEventListener("click", () => {
+        closeCommentPanel();
+      });
+
+      commentForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitComment();
+      });
+
+      commentLayer?.addEventListener("click", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const pin = target.closest("[data-comment-id]");
+        const comment = comments.find((item) => item.id === pin?.dataset.commentId);
+
+        if (comment) {
+          openCommentPanel({ x: comment.x, y: comment.y }, comment);
+        }
+      });
+
+      const handleCommentDeleteClick = (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const button = target.closest("[data-comment-action='delete']");
+        const id = button?.dataset.commentId;
+
+        if (id) {
+          deleteComment(id);
+        }
+      };
+
+      commentDetail?.addEventListener("click", handleCommentDeleteClick);
+      commentList?.addEventListener("click", handleCommentDeleteClick);
+
+      commentReviewList?.addEventListener("click", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const button = target.closest("[data-comment-action]");
+        const action = button?.dataset.commentAction;
+        const id = button?.dataset.commentId;
+
+        if (id && action === "approve") {
+          reviewComment(id, "approved");
+        } else if (id && action === "reject") {
+          reviewComment(id, "rejected");
+        } else if (id && action === "delete") {
+          deleteComment(id);
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!commentPopover || commentPopover.hidden || Date.now() - commentOpenedAt < 180) {
+          return;
+        }
+
+        const target = event.target;
+
+        if (!(target instanceof Node)) {
+          return;
+        }
+
+        if (commentPopover.contains(target)) {
+          return;
+        }
+
+        if (target instanceof HTMLElement && target.closest(".mega-comment-pin")) {
+          return;
+        }
+
+        if (commentReleaseClickPoint) {
+          const dx = event.clientX - commentReleaseClickPoint.x;
+          const dy = event.clientY - commentReleaseClickPoint.y;
+          commentReleaseClickPoint = null;
+
+          if (Math.hypot(dx, dy) <= 16) {
+            return;
+          }
+        }
+
+        closeCommentPanel();
+      });
+
+      labStage?.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0 || panelGesture || !isCommentPressTarget(event.target)) {
+          return;
+        }
+
+        clearCommentPress();
+        commentPressStart = {
+          x: event.clientX,
+          y: event.clientY,
+          point: getCommentPoint(event)
+        };
+        commentPressTimer = window.setTimeout(() => {
+          if (commentPressStart) {
+            commentReleaseClickPoint = {
+              x: commentPressStart.x,
+              y: commentPressStart.y
+            };
+            openCommentPanel(commentPressStart.point);
+          }
+          clearCommentPress();
+        }, commentHoldMs);
+      });
+
+      labStage?.addEventListener(
+        "pointermove",
+        (event) => {
+          if (!commentPressStart) {
+            return;
+          }
+
+          const dx = event.clientX - commentPressStart.x;
+          const dy = event.clientY - commentPressStart.y;
+
+          if (Math.hypot(dx, dy) > 10) {
+            clearCommentPress();
+          }
+        },
+        { passive: true }
+      );
+
+      ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+        labStage?.addEventListener(eventName, clearCommentPress);
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && commentPopover && !commentPopover.hidden) {
+          closeCommentPanel();
+        }
+      });
+
       window.addEventListener("resize", clampPanelPlacement);
       window.addEventListener("scroll", clampPanelPlacement, { passive: true });
 
@@ -1120,8 +1789,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         if (panelFrame) {
           window.cancelAnimationFrame(panelFrame);
         }
+
+        clearCommentPress();
       });
 
+      loadCommentState();
       setScale(scaleRange?.value || "62");
       applyNode(activeNodeId);
       lab.dataset.ready = "true";
