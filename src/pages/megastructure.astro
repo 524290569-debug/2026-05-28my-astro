@@ -432,7 +432,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       </div>
 
       <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
-      <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">关闭评论</button>
+      <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">隐藏标记</button>
       <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
         <div class="mega-comment-head">
           <span data-comment-title>评论</span>
@@ -868,9 +868,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           return;
         }
 
-        commentToggleButton.textContent = areCommentsVisible ? "关闭评论" : "显示评论";
+        commentToggleButton.textContent = areCommentsVisible ? "隐藏标记" : "显示标记";
         commentToggleButton.setAttribute("aria-pressed", String(areCommentsVisible));
-        commentToggleButton.setAttribute("aria-label", areCommentsVisible ? "关闭所有评论标记" : "显示评论标记");
+        commentToggleButton.setAttribute(
+          "aria-label",
+          areCommentsVisible ? "隐藏所有评论标记，长按仍可写评论" : "显示评论标记"
+        );
       };
 
       const setCommentsVisible = (visible) => {
@@ -1278,9 +1281,31 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           return false;
         }
 
+        if (target.closest("[data-node-button]")) {
+          return true;
+        }
+
         return !target.closest(
           "a, button, input, textarea, label, .mega-observer-panel, .mega-panel-reopen, .mega-comment-popover, .mega-comment-admin-dialog, .mega-comment-pin"
         );
+      };
+
+      const consumeCommentPressClick = (event) => {
+        if (!commentReleaseClickPoint) {
+          return false;
+        }
+
+        const dx = event.clientX - commentReleaseClickPoint.x;
+        const dy = event.clientY - commentReleaseClickPoint.y;
+
+        if (Math.hypot(dx, dy) > 16) {
+          return false;
+        }
+
+        commentReleaseClickPoint = null;
+        event.preventDefault();
+        event.stopPropagation();
+        return true;
       };
 
       const createCommentRow = (comment, compact = false) => {
@@ -2170,7 +2195,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       nodeButtons.forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", (event) => {
+          if (consumeCommentPressClick(event)) {
+            return;
+          }
+
           applyNode(button.dataset.nodeButton);
         });
       });
@@ -2401,7 +2430,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       labStage?.addEventListener("pointerdown", (event) => {
-        if (!areCommentsVisible || event.button !== 0 || panelGesture || !isCommentPressTarget(event.target)) {
+        if (event.button !== 0 || panelGesture || !isCommentPressTarget(event.target)) {
           return;
         }
 
