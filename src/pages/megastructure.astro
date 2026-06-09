@@ -26,11 +26,6 @@ const sceneImagePathFor = (sceneId: keyof typeof sceneImagePaths) =>
 const sceneImageFor = (sceneId: keyof typeof sceneImagePaths) => assetPath(sceneImagePathFor(sceneId));
 const nodeImagePaths = {
   "fog-gallery": "assets/megastructure/node-fog-gallery-v2.webp",
-  "still-pool": "assets/megastructure/node-still-pool-v2.webp",
-  "vertical-void": "assets/megastructure/node-vertical-void-v2.webp",
-  "column-field": "assets/megastructure/node-column-field-v2.webp",
-  "low-gate": "assets/megastructure/node-low-gate-v2.webp",
-  "service-slab": "assets/megastructure/node-service-slab-v2.webp",
   "highland-city": "assets/megastructure/scene-highland-city-v1.webp",
   "lightwell-service": "assets/megastructure/scene-lightwell-service-v1.webp"
 } as const;
@@ -46,6 +41,7 @@ const scenes = [
     primaryNode: "fog-gallery",
     kicker: "冷灰混凝土 / 阈限漂移 / 粗野主义结构",
     status: "ATRIUM / INTERNAL VOID",
+    description: "冷灰混凝土中庭重新吞回路径，雾廊和柱脚把出口折回原点。",
     imagePath: sceneImagePathFor("atrium"),
     image: sceneImageFor("atrium"),
     position: "center"
@@ -57,6 +53,7 @@ const scenes = [
     primaryNode: "highland-city",
     kicker: "高原盆地 / 远距塔群 / 无人环线",
     status: "HIGHLAND / OUTER CITY",
+    description: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
     imagePath: sceneImagePathFor("highland"),
     image: sceneImageFor("highland"),
     position: "center"
@@ -68,6 +65,7 @@ const scenes = [
     primaryNode: "lightwell-service",
     kicker: "服务中庭 / 垂直光井 / 湿地反射",
     status: "LIGHTWELL / SERVICE CORE",
+    description: "光井层转入室内核心，垂直光带切开服务结构和潮湿地面。",
     imagePath: sceneImagePathFor("lightwell"),
     image: sceneImageFor("lightwell"),
     position: "center"
@@ -94,15 +92,6 @@ const modes = [
     haze: "rgba(154, 178, 184, 0.22)"
   },
   {
-    id: "pool",
-    label: "池核",
-    code: "WATER",
-    phrase: "水面复制天窗，声音被瓷砖慢慢吃掉。",
-    status: "WATER 02 / TEMP 11",
-    accent: "rgba(159, 196, 196, 0.92)",
-    haze: "rgba(108, 160, 164, 0.24)"
-  },
-  {
     id: "signal",
     label: "信号",
     code: "TRACE",
@@ -120,95 +109,15 @@ const nodes = [
     mode: "liminal",
     label: "雾廊",
     code: "A-01",
-    x: 18,
-    y: 54,
+    x: 34,
+    y: 58,
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
-    targetScene: "lightwell",
-    routeLabel: "下潜至光井",
-    sentence: "雾从柱脚升起，出口像一段被误删的记忆。",
+    targetScene: "highland",
+    routeLabel: "进入高原盆地",
+    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
     signal: "LIGHT 12 / ECHO 04"
-  },
-  {
-    id: "still-pool",
-    scene: "atrium",
-    mode: "pool",
-    label: "静池",
-    code: "B-09",
-    x: 58,
-    y: 42,
-    labelX: 3.1,
-    labelY: 0.2,
-    labelAlign: "left",
-    targetScene: "lightwell",
-    routeLabel: "沿水面进入服务层",
-    sentence: "水面没有波纹，只复制一盏过亮的天窗。",
-    signal: "WATER 02 / TEMP 11"
-  },
-  {
-    id: "vertical-void",
-    scene: "atrium",
-    mode: "structure",
-    label: "竖井",
-    code: "C-17",
-    x: 50,
-    y: 26,
-    labelX: 0,
-    labelY: -2.35,
-    labelAlign: "center",
-    targetScene: "lightwell",
-    routeLabel: "沿竖井下降",
-    sentence: "向上看不到楼层，只能看到结构继续重复。",
-    signal: "DEPTH 83 / SCALE 00"
-  },
-  {
-    id: "column-field",
-    scene: "atrium",
-    mode: "structure",
-    label: "柱阵",
-    code: "D-04",
-    x: 60,
-    y: 62,
-    labelX: 3.05,
-    labelY: 1.05,
-    labelAlign: "left",
-    targetScene: "highland",
-    routeLabel: "穿过柱阵到外部",
-    sentence: "每根柱子都像上一根柱子的回声。",
-    signal: "GRID 64 / NOISE 07"
-  },
-  {
-    id: "low-gate",
-    scene: "atrium",
-    mode: "liminal",
-    label: "低门",
-    code: "E-12",
-    x: 36,
-    y: 72,
-    labelX: -3.1,
-    labelY: 0.95,
-    labelAlign: "right",
-    targetScene: "highland",
-    routeLabel: "从低门离开中庭",
-    sentence: "门开着，但空间没有真正允许你离开。",
-    signal: "EXIT 01 / TRUST 02"
-  },
-  {
-    id: "service-slab",
-    scene: "lightwell",
-    mode: "signal",
-    label: "服务层",
-    code: "F-06",
-    x: 51,
-    y: 58,
-    labelX: -2.95,
-    labelY: -1.45,
-    labelAlign: "right",
-    targetScene: "atrium",
-    routeLabel: "从服务背面回中庭",
-    sentence: "结构背面没有功能，只剩一条低频电流。",
-    signal: "POWER 09 / HUM 33"
   },
   {
     id: "highland-city",
@@ -222,8 +131,8 @@ const nodes = [
     labelY: 2.75,
     labelAlign: "center",
     targetScene: "lightwell",
-    routeLabel: "从高原进入核心",
-    sentence: "城市从盆地里升起，像一台没有居民的垂直机器。",
+    routeLabel: "进入垂直光井",
+    sentence: "光井层转入室内核心，垂直光带切开服务结构和潮湿地面。",
     signal: "RING 31 / CLOUD 08"
   },
   {
@@ -237,31 +146,21 @@ const nodes = [
     labelX: 3.25,
     labelY: 0.2,
     labelAlign: "left",
-    targetScene: "highland",
-    routeLabel: "从光井边界上行",
-    sentence: "光从上方切开服务层，地面只负责保存回声。",
+    targetScene: "atrium",
+    routeLabel: "回到冷灰中庭",
+    sentence: "冷灰混凝土中庭重新吞回路径，雾廊和柱脚把出口折回原点。",
     signal: "LUX 44 / HUM 16"
   }
 ];
 
 const nodeQuality = {
   "fog-gallery": { integrity: 61, noise: 28, drift: "SLOW" },
-  "still-pool": { integrity: 74, noise: 12, drift: "STILL" },
-  "vertical-void": { integrity: 52, noise: 35, drift: "HIGH" },
-  "column-field": { integrity: 67, noise: 23, drift: "GRID" },
-  "low-gate": { integrity: 46, noise: 42, drift: "LOOP" },
-  "service-slab": { integrity: 58, noise: 33, drift: "HUM" },
   "highland-city": { integrity: 81, noise: 18, drift: "FAR" },
   "lightwell-service": { integrity: 63, noise: 24, drift: "CORE" }
 };
 
 const nodeViewport = {
   "fog-gallery": { frame: "OBS A-01 / FOG", x: 31, y: 44, slit: 30 },
-  "still-pool": { frame: "OBS B-09 / WATER", x: 62, y: 58, slit: 36 },
-  "vertical-void": { frame: "OBS C-17 / SHAFT", x: 48, y: 30, slit: 24 },
-  "column-field": { frame: "OBS D-04 / GRID", x: 56, y: 50, slit: 28 },
-  "low-gate": { frame: "OBS E-12 / EXIT", x: 38, y: 66, slit: 32 },
-  "service-slab": { frame: "OBS F-06 / HUM", x: 45, y: 52, slit: 26 },
   "highland-city": { frame: "OBS G-22 / BASIN", x: 50, y: 46, slit: 34 },
   "lightwell-service": { frame: "OBS H-31 / CORE", x: 53, y: 39, slit: 22 }
 };
@@ -289,6 +188,7 @@ const nodesWithQuality = nodes.map((node) => ({
 const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
 const firstScene = scenes[0];
+const firstNodeDescription = firstScene.description;
 const firstPanelSignal = panelSignalFor(firstNode.quality);
 ---
 
@@ -350,33 +250,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
             评论
             <b data-comment-pending-count>0</b>
           </button>
-          <button type="button" data-mega-random aria-label="随机漂移到另一个空间节点">No-clip</button>
         </div>
       </header>
 
       <section class="mega-lab-title" aria-label="页面标题">
         <p data-scene-kicker>{firstScene.kicker}</p>
-        <h1>巨构主义</h1>
-        <small data-mode-phrase>{firstMode.phrase}</small>
-        <span class="mega-node-state" data-node-state role="status" aria-live="polite">
-          {firstNode.code} / {firstNode.label} / {firstNode.signal}
-        </span>
-        <div class="mega-scene-switcher" aria-label="场景切换">
-          {
-            scenes.map((scene, index) => (
-              <button
-                type="button"
-                data-scene-button={scene.id}
-                class={index === 0 ? "is-active" : ""}
-                aria-pressed={index === 0 ? "true" : "false"}
-              >
-                <span>{scene.code}</span>
-                <b>{scene.label}</b>
-              </button>
-            ))
-          }
-        </div>
-        <span class="mega-scene-readout" data-scene-readout>{firstScene.status}</span>
+        <small data-mode-phrase>{firstNodeDescription}</small>
       </section>
 
       <div class="mega-node-plane" aria-label="空间节点">
@@ -400,34 +279,15 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           ))
         }
       </div>
-      <div class="mega-noclip-trace" data-noclip-trace aria-hidden="true">
-        <span></span>
-        <b data-noclip-code>NO-CLIP / STANDBY</b>
-      </div>
-      <div class="mega-drift-readout" aria-hidden="true">
-        <span>DRIFT / NO NODE</span>
-        <i></i>
-      </div>
       <div class="mega-route-console" aria-label="场景路径关系">
         <div class="mega-route-status">
           <span data-route-current>{firstScene.label}</span>
           <b data-route-link>{firstScene.status}</b>
         </div>
-        <div class="mega-route-chain" data-route-chain aria-label="已进入路径">
-          <span>{firstScene.label}</span>
-        </div>
-        <div class="mega-route-map" aria-hidden="true">
-          <span>中庭</span>
-          <i>低门 / 柱阵</i>
-          <span>高原</span>
-          <i>高原城</i>
-          <span>光井</span>
-          <i>服务层</i>
-          <span>中庭</span>
-        </div>
         <button class="mega-route-back" type="button" data-route-back disabled>
-          <small>RETURN</small>
+          <small data-route-back-context>RETURN</small>
           <strong data-route-back-label>无返回</strong>
+          <span data-route-back-description>无上一个背景</span>
         </button>
       </div>
 
@@ -483,7 +343,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     <section class="mega-design-strip" aria-label="功能设计摘要">
       <article>
         <span>01 / ATRIUM</span>
-        <p>原始中庭保留冷灰混凝土、雾廊、静池与柱阵。</p>
+        <p>中庭只保留雾廊入口，点击后进入外部高原。</p>
       </article>
       <article>
         <span>02 / HIGHLAND</span>
@@ -491,7 +351,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       </article>
       <article>
         <span>03 / LIGHTWELL</span>
-        <p>光井场景转向室内服务层，压迫感来自垂直结构。</p>
+        <p>光井场景只保留核心返回节点，压迫感来自垂直结构。</p>
       </article>
       <article>
         <span>04 / RETURN</span>
@@ -501,37 +361,32 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
   </main>
 
   <script define:vars={{ modes, scenes, nodes: nodesWithQuality, supabaseConfig }}>
-    const lab = document.querySelector("[data-mega-lab]");
+      const lab = document.querySelector("[data-mega-lab]");
 
-    if (lab) {
-      const modeButtons = Array.from(lab.querySelectorAll("[data-mode-button]"));
-      const sceneButtons = Array.from(lab.querySelectorAll("[data-scene-button]"));
-      const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
-      const randomButton = lab.querySelector("[data-mega-random]");
+      if (lab) {
+        const modeButtons = Array.from(lab.querySelectorAll("[data-mode-button]"));
+        const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
       const audioButton = lab.querySelector("[data-audio-toggle]");
       const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
       const panelReopenButton = lab.querySelector("[data-panel-reopen]");
       const panelDragHandle = lab.querySelector("[data-panel-drag]");
       const panelResizeHandle = lab.querySelector("[data-panel-resize]");
-      const noClipTrace = lab.querySelector("[data-noclip-trace]");
-      const noClipCode = lab.querySelector("[data-noclip-code]");
       const scaleRange = lab.querySelector("[data-scale-range]");
       const scaleValue = lab.querySelector("[data-scale-value]");
       const sceneBackdrop = lab.querySelector("[data-scene-backdrop]");
       const sceneKicker = lab.querySelector("[data-scene-kicker]");
-      const sceneReadout = lab.querySelector("[data-scene-readout]");
       const routeBackButton = lab.querySelector("[data-route-back]");
+      const routeBackContext = lab.querySelector("[data-route-back-context]");
       const routeBackLabel = lab.querySelector("[data-route-back-label]");
+      const routeBackDescription = lab.querySelector("[data-route-back-description]");
       const routeCurrent = lab.querySelector("[data-route-current]");
       const routeLink = lab.querySelector("[data-route-link]");
-      const routeChain = lab.querySelector("[data-route-chain]");
       const modePhrase = lab.querySelector("[data-mode-phrase]");
       const modeCode = lab.querySelector("[data-mode-code]");
       const nodeCode = lab.querySelector("[data-node-code]");
       const nodeTitle = lab.querySelector("[data-node-title]");
       const nodeSentence = lab.querySelector("[data-node-sentence]");
       const nodeSignal = lab.querySelector("[data-node-signal]");
-      const nodeState = lab.querySelector("[data-node-state]");
       const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
       const panelFrameCode = lab.querySelector("[data-panel-frame-code]");
@@ -584,7 +439,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let lowGain = null;
       let presenceGain = null;
       let gain = null;
-      let noClipTimer = 0;
       let panelGesture = null;
       let panelFrame = 0;
       let pendingPanelBox = null;
@@ -600,11 +454,15 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let commentPressStart = null;
       let commentOpenedAt = 0;
       let commentReleaseClickPoint = null;
+      let commentLoadId = 0;
+      const commentCache = new Map();
+      const trackedVisitEvents = new Set();
       let selectedCommentId = "";
       let areCommentsVisible = true;
       const commentKeys = {
         remoteSession: "mega-comment-supabase-session-v1",
-        visibility: "mega-comment-visibility-v1"
+        visibility: "mega-comment-visibility-v1",
+        visitSession: "mega-visit-session-v1"
       };
       const commentHoldMs = 620;
       const commentSupabaseUrl = String(supabaseConfig?.url || "").replace(/\/$/, "");
@@ -621,12 +479,21 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         return findNode(scene.primaryNode) || nodes.find((node) => node.scene === scene.id) || nodes[0];
       };
 
+      const nodeTargetDescription = (node) => {
+        const targetScene = findScene(node?.targetScene || node?.scene);
+        return targetScene.description || node?.sentence || targetScene.status;
+      };
+
+      const commentPageForScene = (sceneId = activeSceneId) => `megastructure:${findScene(sceneId).id}`;
+      const commentPageFilterForScene = (sceneId = activeSceneId) => {
+        const scene = findScene(sceneId);
+        const page = encodeURIComponent(commentPageForScene(scene.id));
+        return scene.id === "atrium" ? `page=in.(${page},megastructure)` : `page=eq.${page}`;
+      };
+
       const updateRouteUi = (routeNode = null) => {
         const scene = findScene(activeSceneId);
         const previousScene = sceneHistory.length ? findScene(sceneHistory[sceneHistory.length - 1]) : null;
-        const chainScenes = [...sceneHistory, activeSceneId]
-          .slice(-5)
-          .map((sceneId) => findScene(sceneId));
 
         if (routeCurrent) routeCurrent.textContent = scene.label;
 
@@ -645,15 +512,14 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           routeBackLabel.textContent = previousScene ? previousScene.label : "无返回";
         }
 
-        if (routeChain) {
-          routeChain.replaceChildren(
-            ...chainScenes.map((item, index) => {
-              const entry = document.createElement("span");
-              entry.textContent = index === 0 ? item.label : `> ${item.label}`;
-              return entry;
-            })
-          );
+        if (routeBackContext) {
+          routeBackContext.textContent = previousScene ? `RETURN / ${previousScene.label}` : "RETURN";
         }
+
+        if (routeBackDescription) {
+          routeBackDescription.textContent = previousScene ? previousScene.description : "无上一个背景";
+        }
+
       };
 
       const applyScene = (sceneId) => {
@@ -667,14 +533,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         if (sceneKicker) sceneKicker.textContent = scene.kicker;
-        if (sceneReadout) sceneReadout.textContent = scene.status;
-
-        sceneButtons.forEach((button) => {
-          const isActive = button.dataset.sceneButton === scene.id;
-          button.classList.toggle("is-active", isActive);
-          button.setAttribute("aria-pressed", String(isActive));
-        });
-
+        if (modePhrase) modePhrase.textContent = scene.description || scene.status;
         nodeButtons.forEach((button) => {
           const isCurrentSceneNode = button.dataset.nodeScene === scene.id;
           button.classList.toggle("is-scene-hidden", !isCurrentSceneNode);
@@ -885,6 +744,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         renderCommentUi();
+        trackMegastructureVisit("view");
       };
 
       const profileNameFromSession = () =>
@@ -999,16 +859,103 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         };
       };
 
-      const loadRemoteComments = async () => {
+      const loadRemoteComments = async (sceneId = activeSceneId) => {
+        const page = commentPageForScene(sceneId);
+        const pageFilter = commentPageFilterForScene(sceneId);
+        const requestId = ++commentLoadId;
         const profileSelect = isCommentAdmin() ? "display_name,email,role" : "display_name,role";
         const rows = await requestCommentApi(
-          `/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(${profileSelect})&page=eq.megastructure&order=created_at.desc`
+          `/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(${profileSelect})&${pageFilter}&order=created_at.desc`
         );
-        comments = Array.isArray(rows) ? rows.map(mapRemoteComment) : [];
+
+        if (requestId !== commentLoadId || sceneId !== activeSceneId) {
+          return;
+        }
+
+        const nextComments = Array.isArray(rows) ? rows.map(mapRemoteComment) : [];
+        commentCache.set(page, nextComments);
+        comments = nextComments;
       };
 
       const saveCommentState = () => {
         saveCommentSession();
+      };
+
+      const getVisitSessionId = () => {
+        try {
+          const stored = window.localStorage.getItem(commentKeys.visitSession);
+          if (stored) {
+            return stored;
+          }
+
+          const next =
+            window.crypto?.randomUUID?.() ||
+            `visit-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+          window.localStorage.setItem(commentKeys.visitSession, next);
+          return next;
+        } catch {
+          return `visit-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        }
+      };
+
+      const getConnectionInfo = () => {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        return connection || {};
+      };
+
+      const trackMegastructureVisit = (eventType = "view") => {
+        if (!hasRemoteComments) {
+          return;
+        }
+
+        const dedupeKey = `${eventType}:${activeSceneId}:${currentCommentUserId || "anon"}`;
+        if (trackedVisitEvents.has(dedupeKey)) {
+          return;
+        }
+        trackedVisitEvents.add(dedupeKey);
+
+        const connection = getConnectionInfo();
+        const payload = {
+          event_type: eventType,
+          page: "megastructure",
+          scene: activeSceneId,
+          session_id: getVisitSessionId(),
+          user_id: currentCommentUserId || null,
+          display_name: currentCommentUser || null,
+          email: normalizeCommentEmail(commentSession?.user?.email || ""),
+          path: window.location.pathname,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent || null,
+          language: navigator.language || null,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+          viewport_width: window.innerWidth,
+          viewport_height: window.innerHeight,
+          screen_width: window.screen?.width || null,
+          screen_height: window.screen?.height || null,
+          device_pixel_ratio: Number(window.devicePixelRatio || 1),
+          hardware_concurrency: navigator.hardwareConcurrency || null,
+          device_memory: navigator.deviceMemory || null,
+          platform: navigator.platform || null,
+          connection_type: connection.type || null,
+          effective_type: connection.effectiveType || null,
+          downlink: connection.downlink || null,
+          reduced_motion: reduceMotion.matches,
+          color_scheme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+          touch_points: navigator.maxTouchPoints || 0
+        };
+
+        requestCommentApi(
+          "/rest/v1/megastructure_visits",
+          {
+            method: "POST",
+            headers: { Prefer: "return=minimal" },
+            body: JSON.stringify(payload)
+          },
+          Boolean(commentSession?.access_token)
+        ).catch((error) => {
+          trackedVisitEvents.delete(dedupeKey);
+          console.warn("Visit tracking failed", error);
+        });
       };
 
       const formatCommentTime = (value) => {
@@ -1103,11 +1050,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       };
 
       const openCommentPanel = (point, selectedComment = null) => {
-        if (!areCommentsVisible) {
-          return;
-        }
-
-        commentDraftPoint = point;
+        commentDraftPoint = selectedComment ? null : { ...point, sceneId: activeSceneId };
         selectedCommentId = selectedComment?.id || "";
         commentOpenedAt = Date.now();
 
@@ -1522,6 +1465,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           if (commentPassword) commentPassword.value = "";
           renderCommentUi();
           if (commentTitle) commentTitle.textContent = isCommentAdmin() ? "管理员已登录" : "已登录";
+          trackMegastructureVisit("login");
           commentText?.focus({ preventScroll: true });
         } catch (error) {
           console.warn("Comment auth failed", error);
@@ -1570,7 +1514,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
               method: "POST",
               headers: { Prefer: "return=representation" },
               body: JSON.stringify({
-                page: "megastructure",
+                page: commentPageForScene(commentDraftPoint.sceneId || activeSceneId),
                 user_id: currentCommentUserId,
                 body: text.slice(0, 180),
                 x: Number(commentDraftPoint.x.toFixed(2)),
@@ -1646,55 +1590,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
       };
 
-      const setNoClipTrace = (fromNode, toNode) => {
-        if (!noClipTrace || !fromNode || !toNode) {
-          return;
-        }
-
-        const stage = lab.querySelector(".mega-lab-stage");
-        const rect = stage ? stage.getBoundingClientRect() : lab.getBoundingClientRect();
-        const fromX = (Number(fromNode.x) / 100) * rect.width;
-        const fromY = (Number(fromNode.y) / 100) * rect.height;
-        const toX = (Number(toNode.x) / 100) * rect.width;
-        const toY = (Number(toNode.y) / 100) * rect.height;
-        const dx = toX - fromX;
-        const dy = toY - fromY;
-        const panelRect = observerPanel?.getBoundingClientRect();
-        const hasSidePanel = panelRect && panelRect.left > rect.width * 0.55 && panelRect.width < rect.width * 0.55;
-        const hasBottomPanel = panelRect && panelRect.top > rect.height * 0.45 && panelRect.width > rect.width * 0.75;
-        const labelMaxX = Math.max(14, hasSidePanel ? panelRect.left - 180 : rect.width - 190);
-        const labelMaxY = Math.max(70, hasBottomPanel ? panelRect.top - 42 : rect.height - 70);
-        const labelX = Math.min(Math.max((fromX + toX) / 2, 14), labelMaxX);
-        const labelY = Math.min(Math.max((fromY + toY) / 2, 70), labelMaxY);
-
-        noClipTrace.style.setProperty("--trace-left", String(fromX) + "px");
-        noClipTrace.style.setProperty("--trace-top", String(fromY) + "px");
-        noClipTrace.style.setProperty("--trace-distance", String(Math.max(Math.hypot(dx, dy), 1)) + "px");
-        noClipTrace.style.setProperty("--trace-angle", String(Math.atan2(dy, dx) * 180 / Math.PI) + "deg");
-        noClipTrace.style.setProperty("--trace-label-left", String(labelX) + "px");
-        noClipTrace.style.setProperty("--trace-label-top", String(labelY) + "px");
-        if (noClipCode) noClipCode.textContent = `NO-CLIP / ${fromNode.code} -> ${toNode.code}`;
-
-        lab.classList.remove("is-noclip-tracing");
-        void noClipTrace.offsetWidth;
-        lab.classList.add("is-noclip-tracing");
-
-        if (noClipTimer) {
-          window.clearTimeout(noClipTimer);
-        }
-
-        noClipTimer = window.setTimeout(() => {
-          noClipTimer = 0;
-          lab.classList.remove("is-noclip-tracing");
-        }, 2600);
-      };
-
       const applyMode = (modeId) => {
         const mode = findMode(modeId);
         activeModeId = mode.id;
         lab.style.setProperty("--mode-accent", mode.accent);
         lab.style.setProperty("--mode-haze", mode.haze);
-        if (modePhrase) modePhrase.textContent = mode.phrase;
         if (modeCode) modeCode.textContent = mode.code;
 
         modeButtons.forEach((button) => {
@@ -2061,9 +1961,27 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           button.setAttribute("aria-expanded", "false");
         });
 
-        if (nodeState) nodeState.textContent = "NO NODE / OBSERVER COLLAPSED";
         if (locatorCode) locatorCode.textContent = "NULL";
         setPanelCollapsed(true);
+      };
+
+      const reloadCommentsForActiveScene = () => {
+        closeCommentPanel();
+        comments = commentCache.get(commentPageForScene(activeSceneId)) || [];
+        renderCommentUi();
+        trackMegastructureVisit("view");
+
+        if (!hasRemoteComments) {
+          return;
+        }
+
+        loadRemoteComments(activeSceneId)
+          .then(renderCommentUi)
+          .catch((error) => {
+            comments = [];
+            renderCommentUi();
+            console.warn("Scene comments reload failed", error);
+          });
       };
 
       const enterScene = (sceneId, options = {}) => {
@@ -2095,13 +2013,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         if (nodeCode) nodeCode.textContent = landingNode.code;
         if (nodeTitle) nodeTitle.textContent = landingNode.label;
-        if (nodeSentence) nodeSentence.textContent = landingNode.sentence;
+        const landingDescription = nodeTargetDescription(landingNode);
+
+        if (nodeSentence) nodeSentence.textContent = landingDescription;
         if (nodeSignal) nodeSignal.textContent = landingNode.signal;
-        if (nodeState) {
-          nodeState.textContent = routeNode
-            ? `${routeNode.code} / ${routeNode.routeLabel} / ${findScene(routeNode.scene).label} -> ${targetScene.label}`
-            : `${landingNode.code} / ${targetScene.status}`;
-        }
         if (reopenCode) reopenCode.textContent = landingNode.code;
         if (locatorCode) locatorCode.textContent = landingNode.code;
         setSignalQuality(landingNode);
@@ -2109,6 +2024,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         updateRouteUi(routeNode);
 
         applyMode(landingNode.mode);
+
+        if (options.reloadComments !== false) {
+          reloadCommentsForActiveScene();
+        }
       };
 
       const applyNode = (nodeId, options = {}) => {
@@ -2187,13 +2106,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         });
       });
 
-      sceneButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const sceneId = button.dataset.sceneButton;
-          enterScene(sceneId, { recordHistory: sceneId !== activeSceneId });
-        });
-      });
-
       nodeButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
           if (consumeCommentPressClick(event)) {
@@ -2202,19 +2114,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
           applyNode(button.dataset.nodeButton);
         });
-      });
-
-      randomButton?.addEventListener("click", () => {
-        const fromNode = findNode(activeNodeId || lastNodeId || nodes[0].id);
-        const scenePool = nodes.filter((node) => node.scene === activeSceneId);
-        const pool = scenePool.length > 1
-          ? scenePool.filter((node) => node.id !== fromNode.id)
-          : scenePool.length
-            ? scenePool
-            : nodes;
-        const nextNode = pool[Math.floor(Math.random() * pool.length)] || nodes[0];
-        setNoClipTrace(fromNode, nextNode);
-        applyNode(nextNode.id);
       });
 
       audioButton?.addEventListener("click", () => {
@@ -2516,10 +2415,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           audioContext.close();
         }
 
-        if (noClipTimer) {
-          window.clearTimeout(noClipTimer);
-        }
-
         if (panelFrame) {
           window.cancelAnimationFrame(panelFrame);
         }
@@ -2528,9 +2423,9 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       loadCommentVisibilityPreference();
-      loadCommentState();
       setScale(scaleRange?.value || "62");
-      enterScene(activeSceneId, { recordHistory: false });
+      enterScene(activeSceneId, { recordHistory: false, reloadComments: false });
+      loadCommentState();
       lab.dataset.ready = "true";
     }
   </script>

@@ -2836,15 +2836,6 @@ img {
   letter-spacing: 0.16em;
 }
 
-.mega-lab-title h1 {
-  margin: 0;
-  color: rgba(247, 249, 248, 0.96);
-  font-size: clamp(3.7rem, 10vw, 8.8rem);
-  font-weight: 220;
-  letter-spacing: 0;
-  line-height: 0.88;
-}
-
 .mega-lab-title small {
   display: block;
   max-width: 23rem;
@@ -2853,84 +2844,6 @@ img {
   font-size: 0.86rem;
   font-weight: 300;
   line-height: 1.6;
-}
-
-.mega-node-state {
-  display: inline-flex;
-  max-width: min(26rem, 100%);
-  min-height: 1.75rem;
-  align-items: center;
-  margin-top: 0.9rem;
-  border-left: 1px solid color-mix(in srgb, var(--mode-accent) 44%, transparent);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 10%, transparent), transparent 82%),
-    rgba(8, 9, 9, 0.42);
-  padding: 0.28rem 0.72rem;
-  color: rgba(224, 231, 228, 0.72);
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-}
-
-.mega-scene-switcher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  max-width: min(31rem, 100%);
-  margin-top: 1rem;
-}
-
-.mega-scene-switcher button {
-  display: grid;
-  min-width: 6.8rem;
-  min-height: 3.05rem;
-  align-content: center;
-  gap: 0.22rem;
-  border: 1px solid rgba(224, 231, 228, 0.16);
-  background:
-    linear-gradient(180deg, rgba(224, 231, 228, 0.055), rgba(5, 6, 6, 0.32)),
-    rgba(8, 10, 10, 0.58);
-  padding: 0.54rem 0.66rem;
-  color: rgba(238, 242, 241, 0.78);
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-}
-
-.mega-scene-switcher button:hover,
-.mega-scene-switcher button:focus-visible,
-.mega-scene-switcher button.is-active {
-  border-color: color-mix(in srgb, var(--mode-accent) 42%, transparent);
-  outline: none;
-}
-
-.mega-scene-switcher button.is-active {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 13%, transparent), transparent 74%),
-    rgba(10, 12, 12, 0.72);
-}
-
-.mega-scene-switcher span {
-  color: rgba(224, 231, 228, 0.48);
-  font-size: 0.52rem;
-  font-weight: 520;
-  letter-spacing: 0.16em;
-}
-
-.mega-scene-switcher b {
-  color: rgba(244, 247, 246, 0.88);
-  font-size: 0.82rem;
-  font-weight: 360;
-  letter-spacing: 0.12em;
-}
-
-.mega-scene-readout {
-  display: block;
-  margin-top: 0.62rem;
-  color: rgba(224, 231, 228, 0.44);
-  font-size: 0.58rem;
-  font-weight: 520;
-  letter-spacing: 0.16em;
 }
 
 .mega-node-plane {
@@ -3061,80 +2974,6 @@ img {
   opacity: 1;
 }
 
-.mega-noclip-trace {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.mega-noclip-trace span,
-.mega-noclip-trace b {
-  position: absolute;
-  pointer-events: none;
-}
-
-.mega-noclip-trace span {
-  top: var(--trace-top, 50%);
-  left: var(--trace-left, 50%);
-  width: var(--trace-distance, 0);
-  height: 1px;
-  background:
-    linear-gradient(90deg, rgba(238, 242, 241, 0), color-mix(in srgb, var(--mode-accent) 58%, rgba(238, 242, 241, 0.2)), rgba(238, 242, 241, 0));
-  box-shadow:
-    0 -0.65rem 0 rgba(238, 242, 241, 0.035),
-    0 0.65rem 0 rgba(238, 242, 241, 0.025),
-    0 0 1.8rem color-mix(in srgb, var(--mode-accent) 22%, transparent);
-  transform: rotate(var(--trace-angle, 0deg));
-  transform-origin: left center;
-}
-
-.mega-noclip-trace span::before,
-.mega-noclip-trace span::after {
-  position: absolute;
-  top: 50%;
-  width: 0.45rem;
-  height: 0.45rem;
-  border: 1px solid color-mix(in srgb, var(--mode-accent) 54%, transparent);
-  background: rgba(7, 8, 8, 0.74);
-  content: "";
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.mega-noclip-trace span::before {
-  left: -0.22rem;
-  opacity: 0.46;
-}
-
-.mega-noclip-trace span::after {
-  right: -0.22rem;
-  box-shadow: 0 0 1.2rem color-mix(in srgb, var(--mode-accent) 30%, transparent);
-}
-
-.mega-noclip-trace b {
-  top: var(--trace-label-top, 50%);
-  left: var(--trace-label-left, 50%);
-  max-width: min(14rem, calc(100vw - 2rem));
-  border-left: 1px solid color-mix(in srgb, var(--mode-accent) 42%, transparent);
-  background:
-    linear-gradient(90deg, rgba(8, 9, 9, 0.72), rgba(8, 9, 9, 0.08)),
-    rgba(8, 9, 9, 0.34);
-  padding: 0.34rem 0.58rem;
-  color: rgba(238, 242, 241, 0.64);
-  font-size: 0.56rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-shadow: 0 0.9rem 1.8rem rgba(0, 0, 0, 0.86);
-  transform: translate(0.74rem, -50%);
-  white-space: nowrap;
-}
-
-.mega-lab.is-noclip-tracing .mega-noclip-trace {
-  animation: megaNoClipTrace 2600ms ease both;
-}
-
 .mega-node-cross {
   position: relative;
   width: 0.9rem;
@@ -3255,53 +3094,15 @@ img {
   color: rgba(247, 250, 249, 0.94);
 }
 
-.mega-drift-readout {
-  position: absolute;
-  z-index: 8;
-  top: 50%;
-  left: 50%;
-  display: grid;
-  width: min(18rem, calc(100% - 2rem));
-  gap: 0.58rem;
-  pointer-events: none;
-  opacity: 0;
-  text-align: center;
-  text-shadow: 0 0.9rem 2.2rem rgba(0, 0, 0, 0.82);
-  transform: translate(-50%, -50%) scale(0.96);
-  transition:
-    opacity 180ms ease,
-    transform 240ms ease;
-}
-
-.mega-drift-readout span {
-  color: rgba(238, 242, 241, 0.72);
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-}
-
-.mega-drift-readout i {
-  display: block;
-  width: min(11rem, 72%);
-  height: 1px;
-  justify-self: center;
-  background: linear-gradient(90deg, transparent, var(--mode-accent), transparent);
-  opacity: 0.72;
-}
-
-.mega-lab.is-node-unfocused .mega-drift-readout {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
 .mega-route-console {
   position: absolute;
   z-index: 10;
   right: clamp(1rem, 2.6vw, 1.7rem);
   bottom: clamp(1rem, 4vh, 2rem);
-  left: clamp(7.8rem, 17vw, 12rem);
+  left: auto;
   display: grid;
-  grid-template-columns: minmax(9rem, 0.58fr) minmax(11rem, 0.82fr) minmax(13rem, 1.1fr) minmax(6rem, auto);
+  width: min(34rem, calc(100% - clamp(8.7rem, 18vw, 13.5rem)));
+  grid-template-columns: minmax(10rem, 1fr) minmax(11rem, 0.9fr);
   gap: 1px;
   border: 1px solid rgba(224, 231, 228, 0.16);
   background: rgba(224, 231, 228, 0.1);
@@ -3310,8 +3111,6 @@ img {
 }
 
 .mega-route-status,
-.mega-route-chain,
-.mega-route-map,
 .mega-route-back {
   min-width: 0;
   background:
@@ -3333,8 +3132,6 @@ img {
 }
 
 .mega-route-status b,
-.mega-route-chain,
-.mega-route-map,
 .mega-route-back small {
   color: rgba(224, 231, 228, 0.55);
   font-size: 0.54rem;
@@ -3342,43 +3139,9 @@ img {
   letter-spacing: 0.14em;
 }
 
-.mega-route-chain {
-  display: flex;
-  min-height: 3.55rem;
-  align-items: center;
-  gap: 0.5rem;
-  overflow: hidden;
-  padding: 0.62rem 0.82rem;
-  white-space: nowrap;
-}
-
-.mega-route-chain span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mega-route-map {
-  display: flex;
-  min-height: 3.55rem;
-  align-items: center;
-  gap: 0.46rem;
-  overflow: hidden;
-  padding: 0.62rem 0.82rem;
-  white-space: nowrap;
-}
-
-.mega-route-map span {
-  color: rgba(244, 247, 246, 0.74);
-}
-
-.mega-route-map i {
-  color: rgba(224, 231, 228, 0.38);
-  font-style: normal;
-}
-
 .mega-route-back {
   display: grid;
-  min-width: 6.8rem;
+  min-width: 11rem;
   min-height: 3.55rem;
   align-content: center;
   gap: 0.18rem;
@@ -3387,14 +3150,27 @@ img {
   color: rgba(247, 250, 249, 0.88);
   cursor: pointer;
   font: inherit;
-  text-align: center;
+  padding: 0.58rem 0.72rem;
+  text-align: left;
 }
 
 .mega-route-back strong {
   color: rgba(247, 250, 249, 0.88);
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   font-weight: 360;
   letter-spacing: 0.14em;
+}
+
+.mega-route-back span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: rgba(224, 231, 228, 0.62);
+  font-size: 0.54rem;
+  font-weight: 360;
+  letter-spacing: 0;
+  line-height: 1.42;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .mega-route-back:not(:disabled):hover,
@@ -4316,26 +4092,6 @@ img {
   }
 }
 
-@keyframes megaNoClipTrace {
-  0% {
-    opacity: 0;
-    filter: blur(3px);
-  }
-
-  14% {
-    opacity: 0.82;
-    filter: blur(0);
-  }
-
-  68% {
-    opacity: 0.72;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
 @media (max-width: 1080px) {
   .mega-lab-stage {
     min-height: 940px;
@@ -4395,43 +4151,7 @@ img {
     letter-spacing: 0.1em;
   }
 
-  .mega-lab-title h1 {
-    font-size: clamp(3rem, 17vw, 4.2rem);
-  }
-
   .mega-lab-title small {
-    display: none;
-  }
-
-  .mega-node-state {
-    display: none;
-  }
-
-  .mega-scene-switcher {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    max-width: min(24rem, 100%);
-    gap: 0.34rem;
-    margin-top: 0.78rem;
-  }
-
-  .mega-scene-switcher button {
-    min-width: 0;
-    min-height: 2.55rem;
-    padding: 0.42rem 0.48rem;
-  }
-
-  .mega-scene-switcher span {
-    font-size: 0.44rem;
-    letter-spacing: 0.1em;
-  }
-
-  .mega-scene-switcher b {
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-  }
-
-  .mega-scene-readout {
     display: none;
   }
 
@@ -4465,18 +4185,6 @@ img {
   .mega-node-cross::after {
     top: -0.9rem;
     height: 2.6rem;
-  }
-
-  .mega-noclip-trace {
-    z-index: 6;
-  }
-
-  .mega-noclip-trace b {
-    max-width: 9.6rem;
-    padding: 0.26rem 0.42rem;
-    font-size: 0.48rem;
-    letter-spacing: 0.1em;
-    transform: translate(0.52rem, -50%);
   }
 
   .mega-depth-field {
@@ -4513,12 +4221,11 @@ img {
     right: 0.85rem;
     bottom: 3.75rem;
     left: 0.85rem;
+    width: auto;
     grid-template-columns: 1fr auto;
   }
 
   .mega-route-status,
-  .mega-route-chain,
-  .mega-route-map,
   .mega-route-back {
     min-height: 2.8rem;
   }
@@ -4536,20 +4243,10 @@ img {
     letter-spacing: 0.1em;
   }
 
-  .mega-route-chain {
-    display: none;
-  }
-
-  .mega-route-map {
-    grid-column: 1 / -1;
-    min-height: 2.15rem;
-    padding: 0.38rem 0.62rem;
-    font-size: 0.48rem;
-  }
-
   .mega-route-back {
-    min-width: 5.3rem;
+    min-width: 7.8rem;
     min-height: 2.8rem;
+    padding: 0.48rem 0.56rem;
   }
 
   .mega-route-back small {
@@ -4557,34 +4254,19 @@ img {
   }
 
   .mega-route-back strong {
-    font-size: 0.62rem;
+    font-size: 0.56rem;
+  }
+
+  .mega-route-back span {
+    font-size: 0.46rem;
+    line-height: 1.32;
+    -webkit-line-clamp: 2;
   }
 
   .mega-lab-node:nth-child(3) {
     left: 48%;
     top: 29%;
     --label-mobile-y: 2.12rem;
-  }
-
-  .mega-lab-node:nth-child(4) {
-    left: 72%;
-    top: 43%;
-    --label-mobile-x: 2.5rem;
-    --label-mobile-y: 0.85rem;
-  }
-
-  .mega-lab-node:nth-child(5) {
-    left: 30%;
-    top: 43%;
-    --label-mobile-x: -2.5rem;
-    --label-mobile-y: 0.72rem;
-  }
-
-  .mega-lab-node:nth-child(6) {
-    left: 50%;
-    top: 36%;
-    --label-mobile-x: -1.65rem;
-    --label-mobile-y: 1.18rem;
   }
 
   .mega-observer-panel {
