@@ -2619,7 +2619,7 @@ img {
   width: 110%;
   height: 110%;
   object-fit: cover;
-  object-position: center;
+  object-position: var(--scene-position, center);
   opacity: 0.92;
   filter: brightness(0.68) contrast(1.08) saturate(0.76);
   transform: translate3d(var(--drift-x, 0), var(--drift-y, 0), 0) scale(var(--stage-scale, 1.05));
@@ -2872,6 +2872,67 @@ img {
   letter-spacing: 0.14em;
 }
 
+.mega-scene-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  max-width: min(31rem, 100%);
+  margin-top: 1rem;
+}
+
+.mega-scene-switcher button {
+  display: grid;
+  min-width: 6.8rem;
+  min-height: 3.05rem;
+  align-content: center;
+  gap: 0.22rem;
+  border: 1px solid rgba(224, 231, 228, 0.16);
+  background:
+    linear-gradient(180deg, rgba(224, 231, 228, 0.055), rgba(5, 6, 6, 0.32)),
+    rgba(8, 10, 10, 0.58);
+  padding: 0.54rem 0.66rem;
+  color: rgba(238, 242, 241, 0.78);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.mega-scene-switcher button:hover,
+.mega-scene-switcher button:focus-visible,
+.mega-scene-switcher button.is-active {
+  border-color: color-mix(in srgb, var(--mode-accent) 42%, transparent);
+  outline: none;
+}
+
+.mega-scene-switcher button.is-active {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 13%, transparent), transparent 74%),
+    rgba(10, 12, 12, 0.72);
+}
+
+.mega-scene-switcher span {
+  color: rgba(224, 231, 228, 0.48);
+  font-size: 0.52rem;
+  font-weight: 520;
+  letter-spacing: 0.16em;
+}
+
+.mega-scene-switcher b {
+  color: rgba(244, 247, 246, 0.88);
+  font-size: 0.82rem;
+  font-weight: 360;
+  letter-spacing: 0.12em;
+}
+
+.mega-scene-readout {
+  display: block;
+  margin-top: 0.62rem;
+  color: rgba(224, 231, 228, 0.44);
+  font-size: 0.58rem;
+  font-weight: 520;
+  letter-spacing: 0.16em;
+}
+
 .mega-node-plane {
   position: absolute;
   inset: 0;
@@ -2974,6 +3035,11 @@ img {
 
 .mega-lab-node.is-muted {
   opacity: 0.42;
+}
+
+.mega-lab-node.is-scene-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .mega-lab-node.is-muted:hover,
@@ -3226,6 +3292,122 @@ img {
 .mega-lab.is-node-unfocused .mega-drift-readout {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+.mega-route-console {
+  position: absolute;
+  z-index: 10;
+  right: clamp(1rem, 2.6vw, 1.7rem);
+  bottom: clamp(1rem, 4vh, 2rem);
+  left: clamp(7.8rem, 17vw, 12rem);
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.58fr) minmax(11rem, 0.82fr) minmax(13rem, 1.1fr) minmax(6rem, auto);
+  gap: 1px;
+  border: 1px solid rgba(224, 231, 228, 0.16);
+  background: rgba(224, 231, 228, 0.1);
+  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.mega-route-status,
+.mega-route-chain,
+.mega-route-map,
+.mega-route-back {
+  min-width: 0;
+  background:
+    linear-gradient(180deg, rgba(23, 27, 27, 0.9), rgba(7, 9, 9, 0.94)),
+    var(--lab-panel);
+}
+
+.mega-route-status {
+  display: grid;
+  gap: 0.34rem;
+  padding: 0.72rem 0.82rem;
+}
+
+.mega-route-status span {
+  color: rgba(247, 250, 249, 0.92);
+  font-size: 0.82rem;
+  font-weight: 360;
+  letter-spacing: 0.12em;
+}
+
+.mega-route-status b,
+.mega-route-chain,
+.mega-route-map,
+.mega-route-back small {
+  color: rgba(224, 231, 228, 0.55);
+  font-size: 0.54rem;
+  font-weight: 520;
+  letter-spacing: 0.14em;
+}
+
+.mega-route-chain {
+  display: flex;
+  min-height: 3.55rem;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  padding: 0.62rem 0.82rem;
+  white-space: nowrap;
+}
+
+.mega-route-chain span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mega-route-map {
+  display: flex;
+  min-height: 3.55rem;
+  align-items: center;
+  gap: 0.46rem;
+  overflow: hidden;
+  padding: 0.62rem 0.82rem;
+  white-space: nowrap;
+}
+
+.mega-route-map span {
+  color: rgba(244, 247, 246, 0.74);
+}
+
+.mega-route-map i {
+  color: rgba(224, 231, 228, 0.38);
+  font-style: normal;
+}
+
+.mega-route-back {
+  display: grid;
+  min-width: 6.8rem;
+  min-height: 3.55rem;
+  align-content: center;
+  gap: 0.18rem;
+  border: 0;
+  border-left: 1px solid rgba(224, 231, 228, 0.12);
+  color: rgba(247, 250, 249, 0.88);
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.mega-route-back strong {
+  color: rgba(247, 250, 249, 0.88);
+  font-size: 0.76rem;
+  font-weight: 360;
+  letter-spacing: 0.14em;
+}
+
+.mega-route-back:not(:disabled):hover,
+.mega-route-back:not(:disabled):focus-visible {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--mode-accent) 13%, transparent), transparent),
+    rgba(10, 12, 12, 0.94);
+  outline: none;
+}
+
+.mega-route-back:disabled {
+  cursor: default;
+  opacity: 0.42;
 }
 
 .mega-comment-layer {
@@ -4225,6 +4407,34 @@ img {
     display: none;
   }
 
+  .mega-scene-switcher {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: min(24rem, 100%);
+    gap: 0.34rem;
+    margin-top: 0.78rem;
+  }
+
+  .mega-scene-switcher button {
+    min-width: 0;
+    min-height: 2.55rem;
+    padding: 0.42rem 0.48rem;
+  }
+
+  .mega-scene-switcher span {
+    font-size: 0.44rem;
+    letter-spacing: 0.1em;
+  }
+
+  .mega-scene-switcher b {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .mega-scene-readout {
+    display: none;
+  }
+
   .mega-lab-node {
     width: 4.5rem;
     min-height: 3.25rem;
@@ -4297,6 +4507,57 @@ img {
   .mega-ground-sheen {
     height: 40%;
     opacity: 0.24;
+  }
+
+  .mega-route-console {
+    right: 0.85rem;
+    bottom: 3.75rem;
+    left: 0.85rem;
+    grid-template-columns: 1fr auto;
+  }
+
+  .mega-route-status,
+  .mega-route-chain,
+  .mega-route-map,
+  .mega-route-back {
+    min-height: 2.8rem;
+  }
+
+  .mega-route-status {
+    padding: 0.52rem 0.62rem;
+  }
+
+  .mega-route-status span {
+    font-size: 0.7rem;
+  }
+
+  .mega-route-status b {
+    font-size: 0.46rem;
+    letter-spacing: 0.1em;
+  }
+
+  .mega-route-chain {
+    display: none;
+  }
+
+  .mega-route-map {
+    grid-column: 1 / -1;
+    min-height: 2.15rem;
+    padding: 0.38rem 0.62rem;
+    font-size: 0.48rem;
+  }
+
+  .mega-route-back {
+    min-width: 5.3rem;
+    min-height: 2.8rem;
+  }
+
+  .mega-route-back small {
+    font-size: 0.45rem;
+  }
+
+  .mega-route-back strong {
+    font-size: 0.62rem;
   }
 
   .mega-lab-node:nth-child(3) {

@@ -16,18 +16,63 @@ const supabaseConfig = {
     "sb_publishable_3XfkcJuOqqFKjLcWIyaB_g_5B5mmZGR"
 };
 
-const atriumImage = assetPath("assets/megastructure/atrium-cold-concrete.webp");
+const sceneImagePaths = {
+  atrium: "assets/megastructure/atrium-cold-concrete.webp",
+  highland: "assets/megastructure/scene-highland-city-v1.webp",
+  lightwell: "assets/megastructure/scene-lightwell-service-v1.webp"
+} as const;
+const sceneImagePathFor = (sceneId: keyof typeof sceneImagePaths) =>
+  sceneImagePaths[sceneId] ?? sceneImagePaths.atrium;
+const sceneImageFor = (sceneId: keyof typeof sceneImagePaths) => assetPath(sceneImagePathFor(sceneId));
 const nodeImagePaths = {
   "fog-gallery": "assets/megastructure/node-fog-gallery-v2.webp",
   "still-pool": "assets/megastructure/node-still-pool-v2.webp",
   "vertical-void": "assets/megastructure/node-vertical-void-v2.webp",
   "column-field": "assets/megastructure/node-column-field-v2.webp",
   "low-gate": "assets/megastructure/node-low-gate-v2.webp",
-  "service-slab": "assets/megastructure/node-service-slab-v2.webp"
+  "service-slab": "assets/megastructure/node-service-slab-v2.webp",
+  "highland-city": "assets/megastructure/scene-highland-city-v1.webp",
+  "lightwell-service": "assets/megastructure/scene-lightwell-service-v1.webp"
 } as const;
 const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
   nodeImagePaths[nodeId] ?? nodeImagePaths["fog-gallery"];
 const nodeImageFor = (nodeId: keyof typeof nodeImagePaths) => assetPath(nodeImagePathFor(nodeId));
+
+const scenes = [
+  {
+    id: "atrium",
+    label: "中庭",
+    code: "SCENE 01",
+    primaryNode: "fog-gallery",
+    kicker: "冷灰混凝土 / 阈限漂移 / 粗野主义结构",
+    status: "ATRIUM / INTERNAL VOID",
+    imagePath: sceneImagePathFor("atrium"),
+    image: sceneImageFor("atrium"),
+    position: "center"
+  },
+  {
+    id: "highland",
+    label: "高原",
+    code: "SCENE 02",
+    primaryNode: "highland-city",
+    kicker: "高原盆地 / 远距塔群 / 无人环线",
+    status: "HIGHLAND / OUTER CITY",
+    imagePath: sceneImagePathFor("highland"),
+    image: sceneImageFor("highland"),
+    position: "center"
+  },
+  {
+    id: "lightwell",
+    label: "光井",
+    code: "SCENE 03",
+    primaryNode: "lightwell-service",
+    kicker: "服务中庭 / 垂直光井 / 湿地反射",
+    status: "LIGHTWELL / SERVICE CORE",
+    imagePath: sceneImagePathFor("lightwell"),
+    image: sceneImageFor("lightwell"),
+    position: "center"
+  }
+];
 
 const modes = [
   {
@@ -71,6 +116,7 @@ const modes = [
 const nodes = [
   {
     id: "fog-gallery",
+    scene: "atrium",
     mode: "liminal",
     label: "雾廊",
     code: "A-01",
@@ -79,11 +125,14 @@ const nodes = [
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
+    targetScene: "lightwell",
+    routeLabel: "下潜至光井",
     sentence: "雾从柱脚升起，出口像一段被误删的记忆。",
     signal: "LIGHT 12 / ECHO 04"
   },
   {
     id: "still-pool",
+    scene: "atrium",
     mode: "pool",
     label: "静池",
     code: "B-09",
@@ -92,11 +141,14 @@ const nodes = [
     labelX: 3.1,
     labelY: 0.2,
     labelAlign: "left",
+    targetScene: "lightwell",
+    routeLabel: "沿水面进入服务层",
     sentence: "水面没有波纹，只复制一盏过亮的天窗。",
     signal: "WATER 02 / TEMP 11"
   },
   {
     id: "vertical-void",
+    scene: "atrium",
     mode: "structure",
     label: "竖井",
     code: "C-17",
@@ -105,11 +157,14 @@ const nodes = [
     labelX: 0,
     labelY: -2.35,
     labelAlign: "center",
+    targetScene: "lightwell",
+    routeLabel: "沿竖井下降",
     sentence: "向上看不到楼层，只能看到结构继续重复。",
     signal: "DEPTH 83 / SCALE 00"
   },
   {
     id: "column-field",
+    scene: "atrium",
     mode: "structure",
     label: "柱阵",
     code: "D-04",
@@ -118,11 +173,14 @@ const nodes = [
     labelX: 3.05,
     labelY: 1.05,
     labelAlign: "left",
+    targetScene: "highland",
+    routeLabel: "穿过柱阵到外部",
     sentence: "每根柱子都像上一根柱子的回声。",
     signal: "GRID 64 / NOISE 07"
   },
   {
     id: "low-gate",
+    scene: "atrium",
     mode: "liminal",
     label: "低门",
     code: "E-12",
@@ -131,11 +189,14 @@ const nodes = [
     labelX: -3.1,
     labelY: 0.95,
     labelAlign: "right",
+    targetScene: "highland",
+    routeLabel: "从低门离开中庭",
     sentence: "门开着，但空间没有真正允许你离开。",
     signal: "EXIT 01 / TRUST 02"
   },
   {
     id: "service-slab",
+    scene: "lightwell",
     mode: "signal",
     label: "服务层",
     code: "F-06",
@@ -144,8 +205,42 @@ const nodes = [
     labelX: -2.95,
     labelY: -1.45,
     labelAlign: "right",
+    targetScene: "atrium",
+    routeLabel: "从服务背面回中庭",
     sentence: "结构背面没有功能，只剩一条低频电流。",
     signal: "POWER 09 / HUM 33"
+  },
+  {
+    id: "highland-city",
+    scene: "highland",
+    mode: "structure",
+    label: "高原城",
+    code: "G-22",
+    x: 50,
+    y: 47,
+    labelX: 0,
+    labelY: 2.75,
+    labelAlign: "center",
+    targetScene: "lightwell",
+    routeLabel: "从高原进入核心",
+    sentence: "城市从盆地里升起，像一台没有居民的垂直机器。",
+    signal: "RING 31 / CLOUD 08"
+  },
+  {
+    id: "lightwell-service",
+    scene: "lightwell",
+    mode: "signal",
+    label: "光井层",
+    code: "H-31",
+    x: 52,
+    y: 38,
+    labelX: 3.25,
+    labelY: 0.2,
+    labelAlign: "left",
+    targetScene: "highland",
+    routeLabel: "从光井边界上行",
+    sentence: "光从上方切开服务层，地面只负责保存回声。",
+    signal: "LUX 44 / HUM 16"
   }
 ];
 
@@ -155,7 +250,9 @@ const nodeQuality = {
   "vertical-void": { integrity: 52, noise: 35, drift: "HIGH" },
   "column-field": { integrity: 67, noise: 23, drift: "GRID" },
   "low-gate": { integrity: 46, noise: 42, drift: "LOOP" },
-  "service-slab": { integrity: 58, noise: 33, drift: "HUM" }
+  "service-slab": { integrity: 58, noise: 33, drift: "HUM" },
+  "highland-city": { integrity: 81, noise: 18, drift: "FAR" },
+  "lightwell-service": { integrity: 63, noise: 24, drift: "CORE" }
 };
 
 const nodeViewport = {
@@ -164,7 +261,9 @@ const nodeViewport = {
   "vertical-void": { frame: "OBS C-17 / SHAFT", x: 48, y: 30, slit: 24 },
   "column-field": { frame: "OBS D-04 / GRID", x: 56, y: 50, slit: 28 },
   "low-gate": { frame: "OBS E-12 / EXIT", x: 38, y: 66, slit: 32 },
-  "service-slab": { frame: "OBS F-06 / HUM", x: 45, y: 52, slit: 26 }
+  "service-slab": { frame: "OBS F-06 / HUM", x: 45, y: 52, slit: 26 },
+  "highland-city": { frame: "OBS G-22 / BASIN", x: 50, y: 46, slit: 34 },
+  "lightwell-service": { frame: "OBS H-31 / CORE", x: 53, y: 39, slit: 22 }
 };
 
 const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["fog-gallery"];
@@ -189,6 +288,7 @@ const nodesWithQuality = nodes.map((node) => ({
 }));
 const firstMode = modes[0];
 const firstNode = nodesWithQuality[0];
+const firstScene = scenes[0];
 const firstPanelSignal = panelSignalFor(firstNode.quality);
 ---
 
@@ -201,7 +301,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
   imageHeight={1024}
   skipTarget="#megastructure-main"
   preloadImages={[
-    { href: "assets/megastructure/atrium-cold-concrete.webp", type: "image/webp", fetchPriority: "high" },
+    ...scenes.map((scene, index) => ({
+      href: scene.imagePath,
+      type: "image/webp",
+      fetchPriority: index === 0 ? "high" : "auto"
+    })),
     ...nodesWithQuality.map((node, index) => ({
       href: node.imagePath,
       type: "image/webp",
@@ -213,15 +317,17 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     id="megastructure-main"
     class="mega-lab"
     data-mega-lab
-    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
+    data-active-scene={firstScene.id}
+    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --scene-position: ${firstScene.position}; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
         class="mega-lab-backdrop"
-        src={atriumImage}
+        data-scene-backdrop
+        src={firstScene.image}
         alt=""
         width="1536"
-        height="1024"
+        height="864"
         loading="eager"
         decoding="async"
         fetchpriority="high"
@@ -249,12 +355,28 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       </header>
 
       <section class="mega-lab-title" aria-label="页面标题">
-        <p>冷灰混凝土 / 阈限漂移 / 粗野主义结构</p>
+        <p data-scene-kicker>{firstScene.kicker}</p>
         <h1>巨构主义</h1>
         <small data-mode-phrase>{firstMode.phrase}</small>
         <span class="mega-node-state" data-node-state role="status" aria-live="polite">
           {firstNode.code} / {firstNode.label} / {firstNode.signal}
         </span>
+        <div class="mega-scene-switcher" aria-label="场景切换">
+          {
+            scenes.map((scene, index) => (
+              <button
+                type="button"
+                data-scene-button={scene.id}
+                class={index === 0 ? "is-active" : ""}
+                aria-pressed={index === 0 ? "true" : "false"}
+              >
+                <span>{scene.code}</span>
+                <b>{scene.label}</b>
+              </button>
+            ))
+          }
+        </div>
+        <span class="mega-scene-readout" data-scene-readout>{firstScene.status}</span>
       </section>
 
       <div class="mega-node-plane" aria-label="空间节点">
@@ -262,14 +384,15 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           nodesWithQuality.map((node, index) => (
             <button
               type="button"
-              class={`mega-lab-node${index === 0 ? " is-active" : ""}`}
+              class={`mega-lab-node${index === 0 ? " is-active" : ""}${node.scene !== firstScene.id ? " is-scene-hidden" : ""}`}
               data-node-button={node.id}
               data-node-mode={node.mode}
+              data-node-scene={node.scene}
               style={`--x: ${node.x}%; --y: ${node.y}%; --label-x: ${node.labelX}rem; --label-y: ${node.labelY}rem; --label-align: ${node.labelAlign};`}
-              aria-label={`观察节点 ${node.code} ${node.label}`}
-              aria-controls="mega-observer-panel"
+              aria-label={`路径节点 ${node.code} ${node.label}，${node.routeLabel}`}
               aria-pressed={index === 0 ? "true" : "false"}
-              aria-expanded={index === 0 ? "true" : "false"}
+              aria-hidden={node.scene !== firstScene.id ? "true" : "false"}
+              tabindex={node.scene !== firstScene.id ? "-1" : "0"}
             >
               <span class="mega-node-cross" aria-hidden="true"></span>
               <span class="mega-node-text">{node.label}</span>
@@ -284,6 +407,28 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       <div class="mega-drift-readout" aria-hidden="true">
         <span>DRIFT / NO NODE</span>
         <i></i>
+      </div>
+      <div class="mega-route-console" aria-label="场景路径关系">
+        <div class="mega-route-status">
+          <span data-route-current>{firstScene.label}</span>
+          <b data-route-link>{firstScene.status}</b>
+        </div>
+        <div class="mega-route-chain" data-route-chain aria-label="已进入路径">
+          <span>{firstScene.label}</span>
+        </div>
+        <div class="mega-route-map" aria-hidden="true">
+          <span>中庭</span>
+          <i>低门 / 柱阵</i>
+          <span>高原</span>
+          <i>高原城</i>
+          <span>光井</span>
+          <i>服务层</i>
+          <span>中庭</span>
+        </div>
+        <button class="mega-route-back" type="button" data-route-back disabled>
+          <small>RETURN</small>
+          <strong data-route-back-label>无返回</strong>
+        </button>
       </div>
 
       <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
@@ -333,126 +478,34 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <div class="mega-comment-admin-list" data-comment-admin-list></div>
       </aside>
 
-      <aside id="mega-observer-panel" class="mega-observer-panel" aria-label="空间播放窗口">
-        <div class="mega-panel-head" data-panel-drag aria-label="拖动移动观察窗口">
-          <span data-node-code>{firstNode.code}</span>
-          <div class="mega-panel-actions">
-            <button type="button" data-audio-toggle aria-pressed="false">低频</button>
-            <button
-              class="mega-panel-collapse"
-              type="button"
-              data-panel-collapse
-              aria-controls="mega-observer-panel"
-              aria-expanded="true"
-              aria-label="收起观察窗口"
-            ></button>
-          </div>
-        </div>
-        <div
-          class="mega-panel-screen"
-          data-panel-screen
-          style={`--node-image: url("${firstNode.image}"); --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
-          aria-hidden="true"
-        >
-          <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
-          <span class="mega-panel-locator" aria-hidden="true">
-            <span class="mega-locator-trace"></span>
-            <span class="mega-locator-mark"></span>
-            <b data-locator-code>{firstNode.code}</b>
-          </span>
-          <span class="mega-panel-condensation" aria-hidden="true"></span>
-          <span class="mega-panel-faults" aria-hidden="true"></span>
-          <i></i>
-        </div>
-        <div class="mega-panel-copy">
-          <small data-mode-code>{firstMode.code}</small>
-          <strong data-node-title>{firstNode.label}</strong>
-          <p data-node-sentence>{firstNode.sentence}</p>
-          <span data-node-signal>{firstNode.signal}</span>
-        </div>
-        <div class="mega-signal-readout" data-signal-readout aria-label="Signal quality">
-          <span>
-            <small>INTEGRITY</small>
-            <b data-quality-integrity>{firstNode.quality.integrity}</b>
-            <i
-              data-quality-meter-integrity
-              role="meter"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow={String(firstNode.quality.integrity)}
-              style={`--meter: ${firstNode.quality.integrity}%;`}
-            ></i>
-          </span>
-          <span>
-            <small>NOISE</small>
-            <b data-quality-noise>{firstNode.quality.noise}</b>
-            <i
-              data-quality-meter-noise
-              role="meter"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow={String(firstNode.quality.noise)}
-              style={`--meter: ${firstNode.quality.noise}%;`}
-            ></i>
-          </span>
-          <span>
-            <small>DRIFT</small>
-            <b data-quality-drift>{firstNode.quality.drift}</b>
-            <i data-quality-drift-line aria-hidden="true"></i>
-          </span>
-        </div>
-        <label class="mega-scale-control">
-          <span>尺度压力</span>
-          <input type="range" min="0" max="100" value="62" data-scale-range />
-          <b data-scale-value>62</b>
-        </label>
-        <button
-          class="mega-panel-resize"
-          type="button"
-          data-panel-resize
-          aria-label="拖动调整观察窗口大小"
-        ></button>
-      </aside>
-
-      <button
-        class="mega-panel-reopen"
-        type="button"
-        data-panel-reopen
-        aria-controls="mega-observer-panel"
-        aria-expanded="true"
-        aria-hidden="true"
-        tabindex="-1"
-      >
-        <span>OPEN</span>
-        <strong data-reopen-code>{firstNode.code}</strong>
-      </button>
     </section>
 
     <section class="mega-design-strip" aria-label="功能设计摘要">
       <article>
-        <span>01 / FRAME</span>
-        <p>模式切换不改变路线，只改变空间的观察权重。</p>
+        <span>01 / ATRIUM</span>
+        <p>原始中庭保留冷灰混凝土、雾廊、静池与柱阵。</p>
       </article>
       <article>
-        <span>02 / DRIFT</span>
-        <p>No-clip 随机选择节点，模拟无目的漂移。</p>
+        <span>02 / HIGHLAND</span>
+        <p>高原场景把观察距离拉远，巨构从盆地里升起。</p>
       </article>
       <article>
-        <span>03 / NODE</span>
-        <p>节点只返回小图与一句话，后续可逐步扩展。</p>
+        <span>03 / LIGHTWELL</span>
+        <p>光井场景转向室内服务层，压迫感来自垂直结构。</p>
       </article>
       <article>
-        <span>04 / SIGNAL</span>
-        <p>声场必须手动启动，避免自动播放污染体验。</p>
+        <span>04 / RETURN</span>
+        <p>底部返回节点记录上一个场景，形成可回退的路径。</p>
       </article>
     </section>
   </main>
 
-  <script define:vars={{ modes, nodes: nodesWithQuality, supabaseConfig }}>
+  <script define:vars={{ modes, scenes, nodes: nodesWithQuality, supabaseConfig }}>
     const lab = document.querySelector("[data-mega-lab]");
 
     if (lab) {
       const modeButtons = Array.from(lab.querySelectorAll("[data-mode-button]"));
+      const sceneButtons = Array.from(lab.querySelectorAll("[data-scene-button]"));
       const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
       const randomButton = lab.querySelector("[data-mega-random]");
       const audioButton = lab.querySelector("[data-audio-toggle]");
@@ -464,6 +517,14 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const noClipCode = lab.querySelector("[data-noclip-code]");
       const scaleRange = lab.querySelector("[data-scale-range]");
       const scaleValue = lab.querySelector("[data-scale-value]");
+      const sceneBackdrop = lab.querySelector("[data-scene-backdrop]");
+      const sceneKicker = lab.querySelector("[data-scene-kicker]");
+      const sceneReadout = lab.querySelector("[data-scene-readout]");
+      const routeBackButton = lab.querySelector("[data-route-back]");
+      const routeBackLabel = lab.querySelector("[data-route-back-label]");
+      const routeCurrent = lab.querySelector("[data-route-current]");
+      const routeLink = lab.querySelector("[data-route-link]");
+      const routeChain = lab.querySelector("[data-route-chain]");
       const modePhrase = lab.querySelector("[data-mode-phrase]");
       const modeCode = lab.querySelector("[data-mode-code]");
       const nodeCode = lab.querySelector("[data-node-code]");
@@ -510,9 +571,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentReview = lab.querySelector("[data-comment-review]");
       const commentReviewList = lab.querySelector("[data-comment-review-list]");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let activeSceneId = scenes[0].id;
       let activeModeId = modes[0].id;
       let activeNodeId = nodes[0].id;
       let lastNodeId = activeNodeId;
+      let sceneHistory = [];
       let isPanelCollapsed = false;
       let pointerFrame = 0;
       let audioContext = null;
@@ -549,8 +612,76 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const hasRemoteComments = Boolean(commentSupabaseUrl && commentSupabaseKey);
 
       const findMode = (modeId) => modes.find((mode) => mode.id === modeId) || modes[0];
+      const findScene = (sceneId) => scenes.find((scene) => scene.id === sceneId) || scenes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+      const nodeForScene = (sceneId) => {
+        const scene = findScene(sceneId);
+        return findNode(scene.primaryNode) || nodes.find((node) => node.scene === scene.id) || nodes[0];
+      };
+
+      const updateRouteUi = (routeNode = null) => {
+        const scene = findScene(activeSceneId);
+        const previousScene = sceneHistory.length ? findScene(sceneHistory[sceneHistory.length - 1]) : null;
+        const chainScenes = [...sceneHistory, activeSceneId]
+          .slice(-5)
+          .map((sceneId) => findScene(sceneId));
+
+        if (routeCurrent) routeCurrent.textContent = scene.label;
+
+        if (routeLink) {
+          routeLink.textContent = routeNode
+            ? `${routeNode.routeLabel} / ${findScene(routeNode.scene).label} -> ${scene.label}`
+            : scene.status;
+        }
+
+        if (routeBackButton) {
+          routeBackButton.disabled = !previousScene;
+          routeBackButton.setAttribute("aria-disabled", String(!previousScene));
+        }
+
+        if (routeBackLabel) {
+          routeBackLabel.textContent = previousScene ? previousScene.label : "无返回";
+        }
+
+        if (routeChain) {
+          routeChain.replaceChildren(
+            ...chainScenes.map((item, index) => {
+              const entry = document.createElement("span");
+              entry.textContent = index === 0 ? item.label : `> ${item.label}`;
+              return entry;
+            })
+          );
+        }
+      };
+
+      const applyScene = (sceneId) => {
+        const scene = findScene(sceneId);
+        activeSceneId = scene.id;
+        lab.dataset.activeScene = scene.id;
+        lab.style.setProperty("--scene-position", scene.position || "center");
+
+        if (sceneBackdrop && scene.image && sceneBackdrop.getAttribute("src") !== scene.image) {
+          sceneBackdrop.setAttribute("src", scene.image);
+        }
+
+        if (sceneKicker) sceneKicker.textContent = scene.kicker;
+        if (sceneReadout) sceneReadout.textContent = scene.status;
+
+        sceneButtons.forEach((button) => {
+          const isActive = button.dataset.sceneButton === scene.id;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        nodeButtons.forEach((button) => {
+          const isCurrentSceneNode = button.dataset.nodeScene === scene.id;
+          button.classList.toggle("is-scene-hidden", !isCurrentSceneNode);
+          button.setAttribute("aria-hidden", String(!isCurrentSceneNode));
+          button.setAttribute("tabindex", isCurrentSceneNode ? "0" : "-1");
+        });
+      };
 
       const setMeter = (meter, value) => {
         if (!meter) {
@@ -1910,43 +2041,59 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         setPanelCollapsed(true);
       };
 
-      const applyNode = (nodeId, options = {}) => {
-        const node = findNode(nodeId);
-        const isSameNode = node.id === activeNodeId;
+      const enterScene = (sceneId, options = {}) => {
+        const targetScene = findScene(sceneId);
+        const routeNode = options.routeNode || null;
+        const shouldRecordHistory = options.recordHistory !== false;
+        const fromSceneId = activeSceneId;
+        const landingNode = nodeForScene(targetScene.id);
 
-        if (options.toggleIfSame && isSameNode && !isPanelCollapsed) {
-          clearNodeFocus();
-          return;
+        if (shouldRecordHistory && targetScene.id !== fromSceneId) {
+          sceneHistory.push(fromSceneId);
         }
 
-        activeNodeId = node.id;
-        lastNodeId = node.id;
+        activeNodeId = landingNode.id;
+        lastNodeId = landingNode.id;
         lab.classList.remove("is-node-unfocused");
-        lab.dataset.focusState = "node";
-        lab.style.setProperty("--focus-x", String(node.x) + "%");
-        lab.style.setProperty("--focus-y", String(node.y) + "%");
-        lab.style.setProperty("--map-x", String(node.x) + "%");
-        lab.style.setProperty("--map-y", String(node.y) + "%");
+        lab.dataset.focusState = "route";
+        applyScene(targetScene.id);
+        lab.style.setProperty("--focus-x", String(landingNode.x) + "%");
+        lab.style.setProperty("--focus-y", String(landingNode.y) + "%");
+        lab.style.setProperty("--map-x", String(landingNode.x) + "%");
+        lab.style.setProperty("--map-y", String(landingNode.y) + "%");
 
         nodeButtons.forEach((button) => {
-          const isActive = button.dataset.nodeButton === node.id;
+          const isActive = button.dataset.nodeButton === landingNode.id;
           button.classList.toggle("is-active", isActive);
           button.setAttribute("aria-pressed", String(isActive));
         });
 
-        if (nodeCode) nodeCode.textContent = node.code;
-        if (nodeTitle) nodeTitle.textContent = node.label;
-        if (nodeSentence) nodeSentence.textContent = node.sentence;
-        if (nodeSignal) nodeSignal.textContent = node.signal;
-        if (nodeState) nodeState.textContent = `${node.code} / ${node.label} / ${node.signal}`;
-        if (reopenCode) reopenCode.textContent = node.code;
-        if (locatorCode) locatorCode.textContent = node.code;
-        setSignalQuality(node);
-        setPanelViewport(node);
+        if (nodeCode) nodeCode.textContent = landingNode.code;
+        if (nodeTitle) nodeTitle.textContent = landingNode.label;
+        if (nodeSentence) nodeSentence.textContent = landingNode.sentence;
+        if (nodeSignal) nodeSignal.textContent = landingNode.signal;
+        if (nodeState) {
+          nodeState.textContent = routeNode
+            ? `${routeNode.code} / ${routeNode.routeLabel} / ${findScene(routeNode.scene).label} -> ${targetScene.label}`
+            : `${landingNode.code} / ${targetScene.status}`;
+        }
+        if (reopenCode) reopenCode.textContent = landingNode.code;
+        if (locatorCode) locatorCode.textContent = landingNode.code;
+        setSignalQuality(landingNode);
+        setPanelViewport(landingNode);
+        updateRouteUi(routeNode);
 
-        applyMode(node.mode);
-        setPanelCollapsed(false);
-        window.requestAnimationFrame(clampPanelPlacement);
+        applyMode(landingNode.mode);
+      };
+
+      const applyNode = (nodeId, options = {}) => {
+        const routeNode = findNode(nodeId);
+        const targetScene = findScene(routeNode.targetScene || routeNode.scene);
+
+        enterScene(targetScene.id, {
+          recordHistory: options.recordHistory !== false,
+          routeNode
+        });
       };
 
       const setScale = (value) => {
@@ -2009,22 +2156,33 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       modeButtons.forEach((button) => {
         button.addEventListener("click", () => {
           const modeId = button.dataset.modeButton;
-          const firstNodeInMode = nodes.find((node) => node.mode === modeId);
+          const firstNodeInMode = nodes.find((node) => node.scene === activeSceneId && node.mode === modeId)
+            || nodes.find((node) => node.mode === modeId);
           applyNode(firstNodeInMode ? firstNodeInMode.id : activeNodeId || nodes[0].id);
+        });
+      });
+
+      sceneButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const sceneId = button.dataset.sceneButton;
+          enterScene(sceneId, { recordHistory: sceneId !== activeSceneId });
         });
       });
 
       nodeButtons.forEach((button) => {
         button.addEventListener("click", () => {
-          applyNode(button.dataset.nodeButton, { toggleIfSame: true });
+          applyNode(button.dataset.nodeButton);
         });
       });
 
       randomButton?.addEventListener("click", () => {
         const fromNode = findNode(activeNodeId || lastNodeId || nodes[0].id);
-        const pool = nodes.length > 1
-          ? nodes.filter((node) => node.id !== fromNode.id)
-          : nodes;
+        const scenePool = nodes.filter((node) => node.scene === activeSceneId);
+        const pool = scenePool.length > 1
+          ? scenePool.filter((node) => node.id !== fromNode.id)
+          : scenePool.length
+            ? scenePool
+            : nodes;
         const nextNode = pool[Math.floor(Math.random() * pool.length)] || nodes[0];
         setNoClipTrace(fromNode, nextNode);
         applyNode(nextNode.id);
@@ -2051,6 +2209,17 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       scaleRange?.addEventListener("input", () => {
         setScale(scaleRange.value);
+      });
+
+      routeBackButton?.addEventListener("click", () => {
+        const previousSceneId = sceneHistory.pop();
+
+        if (!previousSceneId) {
+          updateRouteUi();
+          return;
+        }
+
+        enterScene(previousSceneId, { recordHistory: false });
       });
 
       panelDragHandle?.addEventListener("pointerdown", (event) => {
@@ -2332,7 +2501,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       loadCommentVisibilityPreference();
       loadCommentState();
       setScale(scaleRange?.value || "62");
-      applyNode(activeNodeId);
+      enterScene(activeSceneId, { recordHistory: false });
       lab.dataset.ready = "true";
     }
   </script>
