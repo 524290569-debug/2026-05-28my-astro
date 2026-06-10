@@ -335,6 +335,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           <button type="button" data-comment-admin-close aria-label="Close comment review panel">x</button>
         </div>
         <p class="mega-comment-admin-summary" data-comment-admin-summary>全部评论 / 0</p>
+        <div class="mega-comment-admin-filters" aria-label="评论状态筛选">
+          <button type="button" class="is-active" data-comment-admin-filter="pending" aria-pressed="true">
+            <span>待审核</span>
+            <b>0</b>
+          </button>
+          <button type="button" data-comment-admin-filter="approved" aria-pressed="false">
+            <span>已通过</span>
+            <b>0</b>
+          </button>
+          <button type="button" data-comment-admin-filter="rejected" aria-pressed="false">
+            <span>已拒绝</span>
+            <b>0</b>
+          </button>
+        </div>
         <div class="mega-comment-admin-list" data-comment-admin-list></div>
       </aside>
 
@@ -405,6 +419,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentAdminDialog = lab.querySelector("[data-comment-admin-dialog]");
       const commentAdminCloseButton = lab.querySelector("[data-comment-admin-close]");
       const commentAdminSummary = lab.querySelector("[data-comment-admin-summary]");
+      const commentAdminFilterButtons = Array.from(lab.querySelectorAll("[data-comment-admin-filter]"));
       const commentAdminList = lab.querySelector("[data-comment-admin-list]");
       const commentPopover = lab.querySelector("[data-comment-popover]");
       const commentTitle = lab.querySelector("[data-comment-title]");
@@ -444,6 +459,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let pendingPanelBox = null;
       let pendingPanelMode = "floating";
       let comments = [];
+      let activeCommentAdminFilter = "pending";
       let currentCommentUser = "";
       let currentCommentUserId = "";
       let currentCommentRole = "user";
@@ -997,6 +1013,18 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         return "待审核";
       };
 
+      const commentAdminFilterStatuses = ["pending", "approved", "rejected"];
+
+      const commentAdminEmptyLabel = (status) => {
+        if (status === "approved") {
+          return "已通过";
+        }
+        if (status === "rejected") {
+          return "已拒绝";
+        }
+        return "待审核";
+      };
+
       const canManageComment = (comment) =>
         Boolean(comment && currentCommentUserId && (isCommentAdmin() || (!currentCommentLocked && comment.userId === currentCommentUserId)));
 
@@ -1159,7 +1187,15 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       const renderCommentAdminDialog = () => {
         const adminMode = isCommentAdmin();
-        const pendingCount = comments.filter((comment) => comment.status === "pending").length;
+        const statusCounts = comments.reduce(
+          (counts, comment) => {
+            const status = commentAdminFilterStatuses.includes(comment.status) ? comment.status : "pending";
+            counts[status] += 1;
+            return counts;
+          },
+          { pending: 0, approved: 0, rejected: 0 }
+        );
+        const pendingCount = statusCounts.pending;
 
         if (commentAdminOpenButton) {
           commentAdminOpenButton.hidden = !adminMode;
@@ -1176,8 +1212,26 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         if (commentAdminSummary) {
-          commentAdminSummary.textContent = `全部评论 / ${comments.length} · 待审核 / ${pendingCount}`;
+          commentAdminSummary.textContent = `全部评论 / ${comments.length}`;
         }
+
+        if (!commentAdminFilterStatuses.includes(activeCommentAdminFilter)) {
+          activeCommentAdminFilter = "pending";
+        }
+
+        commentAdminFilterButtons.forEach((button) => {
+          const status = button.dataset.commentAdminFilter || "pending";
+          const isActive = status === activeCommentAdminFilter;
+          const count = statusCounts[status] || 0;
+          const badge = button.querySelector("b");
+
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+
+          if (badge) {
+            badge.textContent = String(count);
+          }
+        });
 
         if (!commentAdminList || commentAdminDialog?.hidden) {
           return;
@@ -1185,22 +1239,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
         commentAdminList.textContent = "";
 
-        if (!comments.length) {
+        const filteredComments = comments.filter((comment) => {
+          const status = commentAdminFilterStatuses.includes(comment.status) ? comment.status : "pending";
+          return status === activeCommentAdminFilter;
+        });
+
+        if (!filteredComments.length) {
           const empty = document.createElement("p");
           empty.className = "mega-comment-admin-empty";
-          empty.textContent = "暂无评论";
+          empty.textContent = `暂无${commentAdminEmptyLabel(activeCommentAdminFilter)}评论`;
           commentAdminList.append(empty);
           return;
         }
 
-        const sortedComments = comments.slice().sort((left, right) => {
-          const leftPending = left.status === "pending" ? 0 : 1;
-          const rightPending = right.status === "pending" ? 0 : 1;
-
-          if (leftPending !== rightPending) {
-            return leftPending - rightPending;
-          }
-
+        const sortedComments = filteredComments.slice().sort((left, right) => {
           return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
         });
 
@@ -2242,6 +2294,19 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       commentAdminCloseButton?.addEventListener("click", () => {
         closeCommentAdminDialog();
+      });
+
+      commentAdminFilterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const status = button.dataset.commentAdminFilter || "";
+
+          if (!commentAdminFilterStatuses.includes(status)) {
+            return;
+          }
+
+          activeCommentAdminFilter = status;
+          renderCommentAdminDialog();
+        });
       });
 
       commentToggleButton?.addEventListener("click", () => {
