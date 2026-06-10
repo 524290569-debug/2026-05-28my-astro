@@ -456,7 +456,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       let commentReleaseClickPoint = null;
       let commentLoadId = 0;
       const commentCache = new Map();
-      const trackedVisitEvents = new Set();
       let selectedCommentId = "";
       let areCommentsVisible = true;
       const commentKeys = {
@@ -744,7 +743,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         renderCommentUi();
-        trackMegastructureVisit("view");
       };
 
       const profileNameFromSession = () =>
@@ -903,22 +901,31 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         return connection || {};
       };
 
+      const localVisitTimestamp = (date = new Date()) => {
+        const pad = (value, length = 2) => String(value).padStart(length, "0");
+
+        return [
+          date.getFullYear(),
+          pad(date.getMonth() + 1),
+          pad(date.getDate())
+        ].join("-") + "T" + [
+          pad(date.getHours()),
+          pad(date.getMinutes()),
+          pad(date.getSeconds())
+        ].join(":") + "." + pad(date.getMilliseconds(), 3);
+      };
+
       const trackMegastructureVisit = (eventType = "view") => {
         if (!hasRemoteComments) {
           return;
         }
-
-        const dedupeKey = `${eventType}:${activeSceneId}:${currentCommentUserId || "anon"}`;
-        if (trackedVisitEvents.has(dedupeKey)) {
-          return;
-        }
-        trackedVisitEvents.add(dedupeKey);
 
         const connection = getConnectionInfo();
         const payload = {
           event_type: eventType,
           page: "megastructure",
           scene: activeSceneId,
+          created_at: localVisitTimestamp(),
           session_id: getVisitSessionId(),
           user_id: currentCommentUserId || null,
           display_name: currentCommentUser || null,
@@ -953,7 +960,6 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           },
           Boolean(commentSession?.access_token)
         ).catch((error) => {
-          trackedVisitEvents.delete(dedupeKey);
           console.warn("Visit tracking failed", error);
         });
       };
@@ -2400,8 +2406,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
             const rect = lab.getBoundingClientRect();
             const x = (event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
             const y = (event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-            lab.style.setProperty("--drift-x", String(x * 1.2) + "rem");
-            lab.style.setProperty("--drift-y", String(y * 0.8) + "rem");
+            lab.style.setProperty("--drift-x", String(x * -1.2) + "rem");
+            lab.style.setProperty("--drift-y", String(y * -0.8) + "rem");
           });
         },
         { passive: true }

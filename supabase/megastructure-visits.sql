@@ -28,8 +28,27 @@ create table if not exists public.megastructure_visits (
   reduced_motion boolean,
   color_scheme text,
   touch_points integer,
-  created_at timestamptz not null default now()
+  created_at timestamp without time zone not null default (now() at time zone 'Asia/Shanghai')
 );
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'megastructure_visits'
+      and column_name = 'created_at'
+      and data_type = 'timestamp with time zone'
+  ) then
+    alter table public.megastructure_visits
+      alter column created_at type timestamp without time zone
+        using created_at at time zone 'Asia/Shanghai';
+  end if;
+
+  alter table public.megastructure_visits
+    alter column created_at set default (now() at time zone 'Asia/Shanghai');
+end $$;
 
 alter table public.megastructure_visits enable row level security;
 
