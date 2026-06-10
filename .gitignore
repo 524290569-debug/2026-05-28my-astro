@@ -17,6 +17,10 @@ README.md
 素材/
 tools/
 
+# Local sensitive dictionary data
+敏感词库/
+supabase/megastructure-sensitive-terms.generated.sql
+
 # Local environment and OS noise
 .env
 .env.*
