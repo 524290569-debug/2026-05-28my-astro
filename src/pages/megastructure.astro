@@ -853,7 +853,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           y: Number(row.y),
           status: row.status || "pending",
           createdAt: row.created_at,
-          reviewedAt: row.reviewed_at || ""
+          reviewedAt: row.reviewed_at || "",
+          reviewReason: String(row.review_reason || ""),
+          reviewScore: Number(row.review_score || 0),
+          reviewLabels: Array.isArray(row.review_labels) ? row.review_labels : [],
+          reviewedBy: String(row.reviewed_by || "")
         };
       };
 
@@ -863,7 +867,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const requestId = ++commentLoadId;
         const profileSelect = isCommentAdmin() ? "display_name,email,role" : "display_name,role";
         const rows = await requestCommentApi(
-          `/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,user_id,comment_profiles(${profileSelect})&${pageFilter}&order=created_at.desc`
+          `/rest/v1/megastructure_comments?select=id,body,x,y,status,created_at,reviewed_at,review_reason,review_score,review_labels,reviewed_by,user_id,comment_profiles(${profileSelect})&${pageFilter}&order=created_at.desc`
         );
 
         if (requestId !== commentLoadId || sceneId !== activeSceneId) {
@@ -1107,7 +1111,10 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
           ["状态", commentStatusLabel(comment.status)],
           ["时间", formatCommentTime(comment.createdAt)],
           ["评论人", comment.author || "-"],
-          ["邮箱", comment.authorEmail || "-"]
+          ["邮箱", comment.authorEmail || "-"],
+          ["审核说明", comment.reviewReason || "-"],
+          ["风险分", Number.isFinite(comment.reviewScore) ? comment.reviewScore.toFixed(2) : "-"],
+          ["审核来源", comment.reviewedBy || "-"]
         ];
 
         metaItems.forEach(([label, value]) => {
@@ -1554,7 +1561,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
               headers: { Prefer: "return=representation" },
               body: JSON.stringify({
                 status,
-                reviewed_at: new Date().toISOString()
+                reviewed_at: new Date().toISOString(),
+                review_reason: status === "approved" ? "管理员人工通过。" : "管理员人工拒绝。",
+                review_score: status === "approved" ? 0 : 1,
+                review_labels: ["manual_review"],
+                reviewed_by: "admin"
               })
             }
           );
