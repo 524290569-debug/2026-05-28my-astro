@@ -17,20 +17,31 @@ const supabaseConfig = {
 };
 
 const sceneImagePaths = {
-  atrium: "assets/megastructure/atrium-cold-concrete.webp",
-  highland: "assets/megastructure/scene-highland-city-v1.webp",
-  lightwell: "assets/megastructure/scene-lightwell-service-v1.webp"
+  atrium: "assets/megastructure/scene-atrium-interior-v2.webp",
+  highland: "assets/megastructure/scene-highland-towers-v2.webp",
+  "ring-city": "assets/megastructure/scene-ring-city-v1.webp",
+  "cooling-vault": "assets/megastructure/scene-cooling-vault-v1.webp",
+  lightwell: "assets/megastructure/scene-lightwell-core-v2.webp",
+  "far-towers": "assets/megastructure/scene-far-tower-cluster-v1.webp"
 } as const;
 const sceneImagePathFor = (sceneId: keyof typeof sceneImagePaths) =>
   sceneImagePaths[sceneId] ?? sceneImagePaths.atrium;
 const sceneImageFor = (sceneId: keyof typeof sceneImagePaths) => assetPath(sceneImagePathFor(sceneId));
 const nodeImagePaths = {
-  "fog-gallery": "assets/megastructure/node-fog-gallery-v2.webp",
-  "highland-city": "assets/megastructure/scene-highland-city-v1.webp",
-  "lightwell-service": "assets/megastructure/scene-lightwell-service-v1.webp"
+  "atrium-to-highland": sceneImagePaths.highland,
+  "atrium-to-cooling": sceneImagePaths["cooling-vault"],
+  "highland-to-ring": sceneImagePaths["ring-city"],
+  "highland-to-far": sceneImagePaths["far-towers"],
+  "ring-to-lightwell": sceneImagePaths.lightwell,
+  "ring-to-atrium": sceneImagePaths.atrium,
+  "cooling-to-lightwell": sceneImagePaths.lightwell,
+  "cooling-to-atrium": sceneImagePaths.atrium,
+  "lightwell-to-far": sceneImagePaths["far-towers"],
+  "lightwell-to-cooling": sceneImagePaths["cooling-vault"],
+  "far-to-atrium": sceneImagePaths.atrium
 } as const;
 const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
-  nodeImagePaths[nodeId] ?? nodeImagePaths["fog-gallery"];
+  nodeImagePaths[nodeId] ?? nodeImagePaths["atrium-to-highland"];
 const nodeImageFor = (nodeId: keyof typeof nodeImagePaths) => assetPath(nodeImagePathFor(nodeId));
 
 const scenes = [
@@ -38,10 +49,10 @@ const scenes = [
     id: "atrium",
     label: "中庭",
     code: "SCENE 01",
-    primaryNode: "fog-gallery",
-    kicker: "冷灰混凝土 / 阈限漂移 / 粗野主义结构",
+    primaryNode: "atrium-to-highland",
+    kicker: "冷灰混凝土 / 内部空腔 / 回路入口",
     status: "ATRIUM / INTERNAL VOID",
-    description: "冷灰混凝土中庭重新吞回路径，雾廊和柱脚把出口折回原点。",
+    description: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
     imagePath: sceneImagePathFor("atrium"),
     image: sceneImageFor("atrium"),
     position: "center"
@@ -50,8 +61,8 @@ const scenes = [
     id: "highland",
     label: "高原",
     code: "SCENE 02",
-    primaryNode: "highland-city",
-    kicker: "高原盆地 / 远距塔群 / 无人环线",
+    primaryNode: "highland-to-ring",
+    kicker: "高原盆地 / 远距塔群 / 无人地表",
     status: "HIGHLAND / OUTER CITY",
     description: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
     imagePath: sceneImagePathFor("highland"),
@@ -59,15 +70,51 @@ const scenes = [
     position: "center"
   },
   {
+    id: "ring-city",
+    label: "环城",
+    code: "SCENE 03",
+    primaryNode: "ring-to-lightwell",
+    kicker: "环形城市 / 中央水域 / 工程秩序",
+    status: "RING CITY / CIRCULAR GRID",
+    description: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
+    imagePath: sceneImagePathFor("ring-city"),
+    image: sceneImageFor("ring-city"),
+    position: "center"
+  },
+  {
+    id: "cooling-vault",
+    label: "冷却层",
+    code: "SCENE 04",
+    primaryNode: "cooling-to-lightwell",
+    kicker: "地下冷却 / 服务管廊 / 湿冷蒸汽",
+    status: "COOLING VAULT / SUBLEVEL",
+    description: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
+    imagePath: sceneImagePathFor("cooling-vault"),
+    image: sceneImageFor("cooling-vault"),
+    position: "center"
+  },
+  {
     id: "lightwell",
     label: "光井",
-    code: "SCENE 03",
-    primaryNode: "lightwell-service",
-    kicker: "服务中庭 / 垂直光井 / 湿地反射",
+    code: "SCENE 05",
+    primaryNode: "lightwell-to-far",
+    kicker: "服务核心 / 垂直光井 / 白色切口",
     status: "LIGHTWELL / SERVICE CORE",
-    description: "光井层转入室内核心，垂直光带切开服务结构和潮湿地面。",
+    description: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
     imagePath: sceneImagePathFor("lightwell"),
     image: sceneImageFor("lightwell"),
+    position: "center"
+  },
+  {
+    id: "far-towers",
+    label: "远塔群",
+    code: "SCENE 06",
+    primaryNode: "far-to-atrium",
+    kicker: "远景塔群 / 世界边界 / 空旷湿地",
+    status: "FAR TOWERS / WORLD EDGE",
+    description: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
+    imagePath: sceneImagePathFor("far-towers"),
+    image: sceneImageFor("far-towers"),
     position: "center"
   }
 ];
@@ -104,10 +151,10 @@ const modes = [
 
 const nodes = [
   {
-    id: "fog-gallery",
+    id: "atrium-to-highland",
     scene: "atrium",
     mode: "liminal",
-    label: "雾廊",
+    label: "高原",
     code: "A-01",
     x: 34,
     y: 58,
@@ -120,53 +167,197 @@ const nodes = [
     signal: "LIGHT 12 / ECHO 04"
   },
   {
-    id: "highland-city",
+    id: "atrium-to-cooling",
+    scene: "atrium",
+    mode: "signal",
+    label: "冷却层",
+    code: "A-02",
+    x: 62,
+    y: 47,
+    labelX: 2.8,
+    labelY: 0.1,
+    labelAlign: "left",
+    targetScene: "cooling-vault",
+    routeLabel: "下行地下冷却层",
+    sentence: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
+    signal: "PIPE 08 / HUM 21"
+  },
+  {
+    id: "highland-to-ring",
     scene: "highland",
     mode: "structure",
-    label: "高原城",
+    label: "环城",
     code: "G-22",
-    x: 50,
-    y: 47,
+    x: 53,
+    y: 53,
+    labelX: 0,
+    labelY: 2.75,
+    labelAlign: "center",
+    targetScene: "ring-city",
+    routeLabel: "进入环形城市",
+    sentence: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
+    signal: "RING 31 / CLOUD 08"
+  },
+  {
+    id: "highland-to-far",
+    scene: "highland",
+    mode: "liminal",
+    label: "远塔",
+    code: "G-41",
+    x: 73,
+    y: 33,
+    labelX: 2.6,
+    labelY: 0.1,
+    labelAlign: "left",
+    targetScene: "far-towers",
+    routeLabel: "眺望远塔群",
+    sentence: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
+    signal: "SKY 14 / DIST 72"
+  },
+  {
+    id: "ring-to-lightwell",
+    scene: "ring-city",
+    mode: "signal",
+    label: "光井",
+    code: "R-09",
+    x: 49,
+    y: 45,
     labelX: 0,
     labelY: 2.75,
     labelAlign: "center",
     targetScene: "lightwell",
     routeLabel: "进入垂直光井",
-    sentence: "光井层转入室内核心，垂直光带切开服务结构和潮湿地面。",
-    signal: "RING 31 / CLOUD 08"
+    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
+    signal: "CORE 17 / LUX 39"
   },
   {
-    id: "lightwell-service",
+    id: "ring-to-atrium",
+    scene: "ring-city",
+    mode: "structure",
+    label: "中庭",
+    code: "R-12",
+    x: 31,
+    y: 64,
+    labelX: -0.3,
+    labelY: 2.5,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "回到室内中庭",
+    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
+    signal: "GRID 22 / LOOP 01"
+  },
+  {
+    id: "cooling-to-lightwell",
+    scene: "cooling-vault",
+    mode: "signal",
+    label: "光井",
+    code: "C-07",
+    x: 55,
+    y: 39,
+    labelX: 2.8,
+    labelY: 0.1,
+    labelAlign: "left",
+    targetScene: "lightwell",
+    routeLabel: "上行垂直光井",
+    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
+    signal: "STEAM 18 / LUX 44"
+  },
+  {
+    id: "cooling-to-atrium",
+    scene: "cooling-vault",
+    mode: "liminal",
+    label: "中庭",
+    code: "C-11",
+    x: 27,
+    y: 57,
+    labelX: -0.3,
+    labelY: 2.5,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "回到室内中庭",
+    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
+    signal: "DRAIN 03 / LOOP 11"
+  },
+  {
+    id: "lightwell-to-far",
     scene: "lightwell",
     mode: "signal",
-    label: "光井层",
+    label: "远塔",
     code: "H-31",
     x: 52,
-    y: 38,
+    y: 35,
     labelX: 3.25,
     labelY: 0.2,
     labelAlign: "left",
-    targetScene: "atrium",
-    routeLabel: "回到冷灰中庭",
-    sentence: "冷灰混凝土中庭重新吞回路径，雾廊和柱脚把出口折回原点。",
+    targetScene: "far-towers",
+    routeLabel: "眺望远塔群",
+    sentence: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
     signal: "LUX 44 / HUM 16"
+  },
+  {
+    id: "lightwell-to-cooling",
+    scene: "lightwell",
+    mode: "structure",
+    label: "冷却层",
+    code: "H-44",
+    x: 69,
+    y: 58,
+    labelX: 2.8,
+    labelY: 0.1,
+    labelAlign: "left",
+    targetScene: "cooling-vault",
+    routeLabel: "下行地下冷却层",
+    sentence: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
+    signal: "SHAFT 02 / PIPE 18"
+  },
+  {
+    id: "far-to-atrium",
+    scene: "far-towers",
+    mode: "liminal",
+    label: "中庭",
+    code: "F-01",
+    x: 50,
+    y: 54,
+    labelX: 0,
+    labelY: 2.75,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "回到室内中庭",
+    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
+    signal: "EDGE 90 / RETURN 01"
   }
 ];
 
 const nodeQuality = {
-  "fog-gallery": { integrity: 61, noise: 28, drift: "SLOW" },
-  "highland-city": { integrity: 81, noise: 18, drift: "FAR" },
-  "lightwell-service": { integrity: 63, noise: 24, drift: "CORE" }
+  "atrium-to-highland": { integrity: 68, noise: 22, drift: "OUT" },
+  "atrium-to-cooling": { integrity: 55, noise: 34, drift: "DOWN" },
+  "highland-to-ring": { integrity: 84, noise: 18, drift: "FAR" },
+  "highland-to-far": { integrity: 73, noise: 26, drift: "EDGE" },
+  "ring-to-lightwell": { integrity: 76, noise: 21, drift: "CORE" },
+  "ring-to-atrium": { integrity: 63, noise: 30, drift: "LOOP" },
+  "cooling-to-lightwell": { integrity: 58, noise: 37, drift: "UP" },
+  "cooling-to-atrium": { integrity: 52, noise: 40, drift: "BACK" },
+  "lightwell-to-far": { integrity: 71, noise: 24, drift: "SKY" },
+  "lightwell-to-cooling": { integrity: 61, noise: 31, drift: "DOWN" },
+  "far-to-atrium": { integrity: 66, noise: 28, drift: "HOME" }
 };
 
 const nodeViewport = {
-  "fog-gallery": { frame: "OBS A-01 / FOG", x: 31, y: 44, slit: 30 },
-  "highland-city": { frame: "OBS G-22 / BASIN", x: 50, y: 46, slit: 34 },
-  "lightwell-service": { frame: "OBS H-31 / CORE", x: 53, y: 39, slit: 22 }
+  "atrium-to-highland": { frame: "OBS A-01 / BASIN", x: 53, y: 45, slit: 28 },
+  "atrium-to-cooling": { frame: "OBS A-02 / VAULT", x: 52, y: 48, slit: 24 },
+  "highland-to-ring": { frame: "OBS G-22 / RING", x: 50, y: 48, slit: 34 },
+  "highland-to-far": { frame: "OBS G-41 / EDGE", x: 50, y: 42, slit: 36 },
+  "ring-to-lightwell": { frame: "OBS R-09 / LIGHT", x: 51, y: 43, slit: 24 },
+  "ring-to-atrium": { frame: "OBS R-12 / VOID", x: 48, y: 47, slit: 30 },
+  "cooling-to-lightwell": { frame: "OBS C-07 / SHAFT", x: 52, y: 42, slit: 22 },
+  "cooling-to-atrium": { frame: "OBS C-11 / VOID", x: 48, y: 47, slit: 30 },
+  "lightwell-to-far": { frame: "OBS H-31 / EDGE", x: 50, y: 42, slit: 36 },
+  "lightwell-to-cooling": { frame: "OBS H-44 / VAULT", x: 52, y: 48, slit: 24 },
+  "far-to-atrium": { frame: "OBS F-01 / VOID", x: 48, y: 47, slit: 30 }
 };
 
-const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["fog-gallery"];
-const viewportFor = (nodeId: keyof typeof nodeViewport) => nodeViewport[nodeId] ?? nodeViewport["fog-gallery"];
+const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["atrium-to-highland"];
+const viewportFor = (nodeId: keyof typeof nodeViewport) => nodeViewport[nodeId] ?? nodeViewport["atrium-to-highland"];
 const panelSignalFor = (quality: { integrity: number; noise: number }) => {
   const wear = Math.min(0.58, Math.max(0.2, quality.noise * 0.006 + (100 - quality.integrity) * 0.003));
   const signalBreak = Math.min(82, Math.max(22, Math.round(quality.noise * 1.42 + 10)));
@@ -195,22 +386,17 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 <BaseLayout
   title="巨构主义"
   description="巨构主义、阈限空间与粗野主义混凝土空间的交互观察器。"
-  image="assets/megastructure/atrium-cold-concrete.webp"
+  image="assets/megastructure/scene-atrium-interior-v2.webp"
   imageAlt="冷灰混凝土巨构空间中庭"
-  imageWidth={1536}
-  imageHeight={1024}
+  imageWidth={2560}
+  imageHeight={1440}
   skipTarget="#megastructure-main"
   preloadImages={[
-    ...scenes.map((scene, index) => ({
-      href: scene.imagePath,
+    {
+      href: firstScene.imagePath,
       type: "image/webp",
-      fetchPriority: index === 0 ? "high" : "auto"
-    })),
-    ...nodesWithQuality.map((node, index) => ({
-      href: node.imagePath,
-      type: "image/webp",
-      fetchPriority: index === 0 ? "high" : "auto"
-    }))
+      fetchPriority: "high"
+    }
   ]}
 >
   <main
@@ -218,7 +404,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
     class="mega-lab"
     data-mega-lab
     data-active-scene={firstScene.id}
-    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --scene-position: ${firstScene.position}; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.05; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
+    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --scene-position: ${firstScene.position}; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.025; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
   >
     <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
       <img
@@ -356,20 +542,20 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
     <section class="mega-design-strip" aria-label="功能设计摘要">
       <article>
-        <span>01 / ATRIUM</span>
-        <p>中庭只保留雾廊入口，点击后进入外部高原。</p>
+        <span>01 / WORLD</span>
+        <p>六个场景组成一个轻量迷宫，不再只是三张背景循环。</p>
       </article>
       <article>
-        <span>02 / HIGHLAND</span>
-        <p>高原场景把观察距离拉远，巨构从盆地里升起。</p>
+        <span>02 / SCALE</span>
+        <p>高原、环城和远塔群负责拉开外部尺度。</p>
       </article>
       <article>
-        <span>03 / LIGHTWELL</span>
-        <p>光井场景只保留核心返回节点，压迫感来自垂直结构。</p>
+        <span>03 / DEPTH</span>
+        <p>中庭、冷却层和光井负责内部深度与垂直路径。</p>
       </article>
       <article>
         <span>04 / RETURN</span>
-        <p>底部返回节点记录上一个场景，形成可回退的路径。</p>
+        <p>底部返回记录上一个场景，评论仍按当前场景隔离。</p>
       </article>
     </section>
   </main>
@@ -2333,6 +2519,11 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         const comment = comments.find((item) => item.id === pin?.dataset.commentId);
 
         if (comment) {
+          if (selectedCommentId === comment.id && commentPopover && !commentPopover.hidden) {
+            closeCommentPanel();
+            return;
+          }
+
           openCommentPanel({ x: comment.x, y: comment.y }, comment);
         }
       });
@@ -2505,7 +2696,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       loadCommentVisibilityPreference();
-      setScale(scaleRange?.value || "62");
+      setScale(scaleRange?.value || "12");
       enterScene(activeSceneId, { recordHistory: false, reloadComments: false });
       loadCommentState();
       lab.dataset.ready = "true";

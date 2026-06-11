@@ -2601,12 +2601,12 @@ img {
 
 .mega-lab-stage::before {
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.58), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.42)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 32%, rgba(0, 0, 0, 0.48));
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 22%, transparent 76%, rgba(0, 0, 0, 0.18)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 36%, rgba(0, 0, 0, 0.18));
 }
 
 .mega-lab-stage::after {
-  opacity: 0.09;
+  opacity: 0.055;
   background:
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.044) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(90deg, transparent 0 4.2rem, rgba(255, 255, 255, 0.038) 4.2rem 4.25rem);
@@ -2614,15 +2614,15 @@ img {
 }
 
 .mega-lab-backdrop {
-  inset: -5%;
+  inset: -3%;
   z-index: 0;
-  width: 110%;
-  height: 110%;
+  width: 106%;
+  height: 106%;
   object-fit: cover;
   object-position: var(--scene-position, center);
-  opacity: 0.92;
-  filter: brightness(0.68) contrast(1.08) saturate(0.76);
-  transform: translate3d(var(--drift-x, 0), var(--drift-y, 0), 0) scale(var(--stage-scale, 1.05));
+  opacity: 1;
+  filter: brightness(0.82) contrast(1.12) saturate(0.86);
+  transform: translate3d(var(--drift-x, 0), var(--drift-y, 0), 0) scale(var(--stage-scale, 1.025));
   transform-origin: var(--focus-x, 50%) var(--focus-y, 50%);
   transition:
     transform 680ms ease,
@@ -2633,13 +2633,13 @@ img {
 }
 
 .mega-lab.is-node-unfocused .mega-lab-backdrop {
-  filter: brightness(0.6) contrast(1.12) saturate(0.68);
+  filter: brightness(0.76) contrast(1.14) saturate(0.82);
 }
 
 .mega-lab-grid {
   inset: 0;
   z-index: 2;
-  opacity: 0.42;
+  opacity: 0.24;
   background:
     linear-gradient(90deg, transparent 0 18%, rgba(230, 236, 234, 0.08) 18.08% 18.16%, transparent 18.3%),
     linear-gradient(90deg, transparent 0 50%, rgba(230, 236, 234, 0.06) 50.08% 50.14%, transparent 50.3%),
@@ -2650,11 +2650,12 @@ img {
 .mega-lab-haze {
   inset: 0;
   z-index: 3;
+  opacity: 0.58;
   background:
-    linear-gradient(180deg, transparent 0 30%, rgba(204, 216, 216, 0.16) 48%, transparent 68%),
-    radial-gradient(ellipse at 16% 58%, rgba(178, 194, 196, 0.16), transparent 22rem),
+    linear-gradient(180deg, transparent 0 32%, rgba(204, 216, 216, 0.08) 48%, transparent 68%),
+    radial-gradient(ellipse at 16% 58%, rgba(178, 194, 196, 0.09), transparent 22rem),
     radial-gradient(ellipse at 78% 38%, var(--mode-haze), transparent 22rem);
-  filter: blur(10px);
+  filter: blur(4px);
   animation: megaLabHaze 16s ease-in-out infinite alternate;
 }
 
@@ -2665,6 +2666,7 @@ img {
 }
 
 .mega-depth-field {
+  display: none;
   inset: 0;
   z-index: 5;
   overflow: hidden;
@@ -4172,9 +4174,9 @@ img {
   }
 
   .mega-lab-backdrop {
-    inset: -8% -22%;
-    width: 144%;
-    height: 112%;
+    inset: -6% -10%;
+    width: 120%;
+    height: 108%;
     object-position: center top;
   }
 
