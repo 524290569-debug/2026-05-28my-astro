@@ -22,7 +22,7 @@ const sceneImagePaths = {
   "ring-city": "assets/megastructure/scene-ring-city-v1.webp",
   "cooling-vault": "assets/megastructure/scene-cooling-vault-v1.webp",
   lightwell: "assets/megastructure/scene-lightwell-core-v2.webp",
-  "far-towers": "assets/megastructure/scene-far-tower-cluster-v1.webp"
+  "far-towers": "assets/megastructure/scene-far-tower-boundary-v2.webp"
 } as const;
 const sceneImagePathFor = (sceneId: keyof typeof sceneImagePaths) =>
   sceneImagePaths[sceneId] ?? sceneImagePaths.atrium;
@@ -44,6 +44,40 @@ const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
   nodeImagePaths[nodeId] ?? nodeImagePaths["atrium-to-highland"];
 const nodeImageFor = (nodeId: keyof typeof nodeImagePaths) => assetPath(nodeImagePathFor(nodeId));
 
+const sceneZones = {
+  core: {
+    id: "core",
+    code: "CORE",
+    label: "内部核心",
+    detail: "中庭和光井维持回路与垂直动线。"
+  },
+  surface: {
+    id: "surface",
+    code: "SURFACE",
+    label: "外部地表",
+    detail: "高原把尺度拉远，塔群从湿冷地表升起。"
+  },
+  city: {
+    id: "city",
+    code: "RING",
+    label: "城市环线",
+    detail: "环城显示巨构的交通骨架和工程秩序。"
+  },
+  sublevel: {
+    id: "sublevel",
+    code: "SUB",
+    label: "地下服务层",
+    detail: "冷却层负责向下的压迫感和工业湿度。"
+  },
+  edge: {
+    id: "edge",
+    code: "EDGE",
+    label: "世界边界",
+    detail: "远塔群是探索终端，也是回望整个空间的边界。"
+  }
+} as const;
+const sceneZoneList = Object.values(sceneZones);
+
 const scenes = [
   {
     id: "atrium",
@@ -55,7 +89,31 @@ const scenes = [
     description: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
     imagePath: sceneImagePathFor("atrium"),
     image: sceneImageFor("atrium"),
-    position: "center"
+    position: "center",
+    map: { x: 36, y: 58, layer: "内部核心" },
+    zone: "core",
+    discovery: "湿冷中庭把入口和出口折叠到同一片反光地面。",
+    ambience: {
+      brightness: "0.83",
+      contrast: "1.12",
+      saturation: "0.86",
+      unfocusedBrightness: "0.77",
+      unfocusedContrast: "1.14",
+      unfocusedSaturation: "0.82",
+      veilSide: "rgba(0, 0, 0, 0.2)",
+      veilTop: "rgba(0, 0, 0, 0.08)",
+      veilBottom: "rgba(0, 0, 0, 0.18)",
+      scanOpacity: "0.055",
+      gridOpacity: "0.24",
+      hazeOpacity: "0.58",
+      hazeBand: "rgba(204, 216, 216, 0.08)",
+      hazeLeft: "rgba(178, 194, 196, 0.09)",
+      hazeRight: "rgba(154, 170, 170, 0.18)",
+      groundOpacity: "0.34",
+      groundUnfocusedOpacity: "0.42",
+      groundGlow: "rgba(206, 220, 218, 0.05)",
+      groundShadow: "rgba(8, 10, 10, 0.2)"
+    }
   },
   {
     id: "highland",
@@ -67,7 +125,31 @@ const scenes = [
     description: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
     imagePath: sceneImagePathFor("highland"),
     image: sceneImageFor("highland"),
-    position: "center"
+    position: "center",
+    map: { x: 42, y: 28, layer: "外部高原" },
+    zone: "surface",
+    discovery: "高原盆地把观察距离拉开，塔群像从地表被垂直抽出。",
+    ambience: {
+      brightness: "0.9",
+      contrast: "1.08",
+      saturation: "0.92",
+      unfocusedBrightness: "0.84",
+      unfocusedContrast: "1.1",
+      unfocusedSaturation: "0.88",
+      veilSide: "rgba(7, 18, 22, 0.16)",
+      veilTop: "rgba(18, 38, 44, 0.03)",
+      veilBottom: "rgba(4, 8, 8, 0.12)",
+      scanOpacity: "0.035",
+      gridOpacity: "0.16",
+      hazeOpacity: "0.68",
+      hazeBand: "rgba(194, 220, 226, 0.14)",
+      hazeLeft: "rgba(105, 150, 160, 0.16)",
+      hazeRight: "rgba(210, 228, 224, 0.18)",
+      groundOpacity: "0.25",
+      groundUnfocusedOpacity: "0.32",
+      groundGlow: "rgba(152, 190, 176, 0.09)",
+      groundShadow: "rgba(7, 16, 17, 0.14)"
+    }
   },
   {
     id: "ring-city",
@@ -79,7 +161,31 @@ const scenes = [
     description: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
     imagePath: sceneImagePathFor("ring-city"),
     image: sceneImageFor("ring-city"),
-    position: "center"
+    position: "center",
+    map: { x: 68, y: 40, layer: "城市环线" },
+    zone: "city",
+    discovery: "环城不是道路，而是一圈被放大的城市骨架。",
+    ambience: {
+      brightness: "0.86",
+      contrast: "1.16",
+      saturation: "0.88",
+      unfocusedBrightness: "0.8",
+      unfocusedContrast: "1.18",
+      unfocusedSaturation: "0.84",
+      veilSide: "rgba(2, 6, 7, 0.18)",
+      veilTop: "rgba(0, 0, 0, 0.06)",
+      veilBottom: "rgba(0, 0, 0, 0.16)",
+      scanOpacity: "0.066",
+      gridOpacity: "0.3",
+      hazeOpacity: "0.5",
+      hazeBand: "rgba(206, 218, 216, 0.06)",
+      hazeLeft: "rgba(176, 204, 202, 0.08)",
+      hazeRight: "rgba(184, 198, 190, 0.12)",
+      groundOpacity: "0.3",
+      groundUnfocusedOpacity: "0.36",
+      groundGlow: "rgba(208, 224, 220, 0.04)",
+      groundShadow: "rgba(3, 6, 7, 0.18)"
+    }
   },
   {
     id: "cooling-vault",
@@ -91,7 +197,31 @@ const scenes = [
     description: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
     imagePath: sceneImagePathFor("cooling-vault"),
     image: sceneImageFor("cooling-vault"),
-    position: "center"
+    position: "center",
+    map: { x: 30, y: 80, layer: "地下服务层" },
+    zone: "sublevel",
+    discovery: "冷却层把空间压低，水汽和管线暴露出巨构的内脏。",
+    ambience: {
+      brightness: "0.76",
+      contrast: "1.18",
+      saturation: "0.78",
+      unfocusedBrightness: "0.7",
+      unfocusedContrast: "1.2",
+      unfocusedSaturation: "0.74",
+      veilSide: "rgba(0, 0, 0, 0.24)",
+      veilTop: "rgba(0, 0, 0, 0.12)",
+      veilBottom: "rgba(0, 0, 0, 0.24)",
+      scanOpacity: "0.05",
+      gridOpacity: "0.2",
+      hazeOpacity: "0.74",
+      hazeBand: "rgba(156, 196, 198, 0.12)",
+      hazeLeft: "rgba(98, 144, 146, 0.16)",
+      hazeRight: "rgba(118, 156, 154, 0.2)",
+      groundOpacity: "0.48",
+      groundUnfocusedOpacity: "0.56",
+      groundGlow: "rgba(136, 182, 180, 0.08)",
+      groundShadow: "rgba(0, 0, 0, 0.28)"
+    }
   },
   {
     id: "lightwell",
@@ -103,7 +233,31 @@ const scenes = [
     description: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
     imagePath: sceneImagePathFor("lightwell"),
     image: sceneImageFor("lightwell"),
-    position: "center"
+    position: "center",
+    map: { x: 58, y: 68, layer: "垂直核心" },
+    zone: "core",
+    discovery: "光井像一条垂直切口，把地下服务层重新拉回核心。",
+    ambience: {
+      brightness: "0.92",
+      contrast: "1.08",
+      saturation: "0.84",
+      unfocusedBrightness: "0.84",
+      unfocusedContrast: "1.12",
+      unfocusedSaturation: "0.8",
+      veilSide: "rgba(0, 0, 0, 0.16)",
+      veilTop: "rgba(255, 255, 255, 0.025)",
+      veilBottom: "rgba(0, 0, 0, 0.16)",
+      scanOpacity: "0.045",
+      gridOpacity: "0.18",
+      hazeOpacity: "0.7",
+      hazeBand: "rgba(232, 238, 234, 0.16)",
+      hazeLeft: "rgba(196, 214, 212, 0.08)",
+      hazeRight: "rgba(236, 241, 238, 0.22)",
+      groundOpacity: "0.28",
+      groundUnfocusedOpacity: "0.36",
+      groundGlow: "rgba(236, 244, 240, 0.09)",
+      groundShadow: "rgba(6, 8, 8, 0.16)"
+    }
   },
   {
     id: "far-towers",
@@ -115,7 +269,31 @@ const scenes = [
     description: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
     imagePath: sceneImagePathFor("far-towers"),
     image: sceneImageFor("far-towers"),
-    position: "center"
+    position: "center",
+    map: { x: 86, y: 24, layer: "世界边界" },
+    zone: "edge",
+    discovery: "远塔群不是终点，更像雾后仍在延伸的世界边界。",
+    ambience: {
+      brightness: "0.84",
+      contrast: "1.1",
+      saturation: "0.9",
+      unfocusedBrightness: "0.78",
+      unfocusedContrast: "1.12",
+      unfocusedSaturation: "0.86",
+      veilSide: "rgba(4, 14, 18, 0.18)",
+      veilTop: "rgba(10, 30, 38, 0.05)",
+      veilBottom: "rgba(2, 7, 8, 0.15)",
+      scanOpacity: "0.032",
+      gridOpacity: "0.14",
+      hazeOpacity: "0.76",
+      hazeBand: "rgba(184, 214, 220, 0.14)",
+      hazeLeft: "rgba(108, 154, 166, 0.12)",
+      hazeRight: "rgba(210, 232, 228, 0.18)",
+      groundOpacity: "0.24",
+      groundUnfocusedOpacity: "0.32",
+      groundGlow: "rgba(154, 188, 176, 0.08)",
+      groundShadow: "rgba(5, 13, 15, 0.15)"
+    }
   }
 ];
 
@@ -156,8 +334,8 @@ const nodes = [
     mode: "liminal",
     label: "高原",
     code: "A-01",
-    x: 34,
-    y: 58,
+    x: 51,
+    y: 70,
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
@@ -172,9 +350,9 @@ const nodes = [
     mode: "signal",
     label: "冷却层",
     code: "A-02",
-    x: 62,
-    y: 47,
-    labelX: 2.8,
+    x: 15,
+    y: 72,
+    labelX: 2.9,
     labelY: 0.1,
     labelAlign: "left",
     targetScene: "cooling-vault",
@@ -188,8 +366,8 @@ const nodes = [
     mode: "structure",
     label: "环城",
     code: "G-22",
-    x: 53,
-    y: 53,
+    x: 55,
+    y: 50,
     labelX: 0,
     labelY: 2.75,
     labelAlign: "center",
@@ -204,8 +382,8 @@ const nodes = [
     mode: "liminal",
     label: "远塔",
     code: "G-41",
-    x: 73,
-    y: 33,
+    x: 76,
+    y: 43,
     labelX: 2.6,
     labelY: 0.1,
     labelAlign: "left",
@@ -220,8 +398,8 @@ const nodes = [
     mode: "signal",
     label: "光井",
     code: "R-09",
-    x: 49,
-    y: 45,
+    x: 50,
+    y: 43,
     labelX: 0,
     labelY: 2.75,
     labelAlign: "center",
@@ -236,8 +414,8 @@ const nodes = [
     mode: "structure",
     label: "中庭",
     code: "R-12",
-    x: 31,
-    y: 64,
+    x: 50,
+    y: 72,
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
@@ -252,9 +430,9 @@ const nodes = [
     mode: "signal",
     label: "光井",
     code: "C-07",
-    x: 55,
-    y: 39,
-    labelX: 2.8,
+    x: 50,
+    y: 31,
+    labelX: 2.9,
     labelY: 0.1,
     labelAlign: "left",
     targetScene: "lightwell",
@@ -268,10 +446,10 @@ const nodes = [
     mode: "liminal",
     label: "中庭",
     code: "C-11",
-    x: 27,
-    y: 57,
-    labelX: -0.3,
-    labelY: 2.5,
+    x: 50,
+    y: 72,
+    labelX: 0,
+    labelY: 2.75,
     labelAlign: "center",
     targetScene: "atrium",
     routeLabel: "回到室内中庭",
@@ -284,8 +462,8 @@ const nodes = [
     mode: "signal",
     label: "远塔",
     code: "H-31",
-    x: 52,
-    y: 35,
+    x: 50,
+    y: 24,
     labelX: 3.25,
     labelY: 0.2,
     labelAlign: "left",
@@ -300,8 +478,8 @@ const nodes = [
     mode: "structure",
     label: "冷却层",
     code: "H-44",
-    x: 69,
-    y: 58,
+    x: 50,
+    y: 76,
     labelX: 2.8,
     labelY: 0.1,
     labelAlign: "left",
@@ -316,8 +494,8 @@ const nodes = [
     mode: "liminal",
     label: "中庭",
     code: "F-01",
-    x: 50,
-    y: 54,
+    x: 39,
+    y: 70,
     labelX: 0,
     labelY: 2.75,
     labelAlign: "center",
@@ -381,6 +559,14 @@ const firstNode = nodesWithQuality[0];
 const firstScene = scenes[0];
 const firstNodeDescription = firstScene.description;
 const firstPanelSignal = panelSignalFor(firstNode.quality);
+const sceneMap = Object.fromEntries(scenes.map((scene) => [scene.id, scene]));
+const mapRoutes = nodes
+  .map((node) => ({
+    id: node.id,
+    from: sceneMap[node.scene],
+    to: sceneMap[node.targetScene]
+  }))
+  .filter((route) => route.from?.map && route.to?.map);
 ---
 
 <BaseLayout
@@ -412,8 +598,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         data-scene-backdrop
         src={firstScene.image}
         alt=""
-        width="1536"
-        height="864"
+        width="2560"
+        height="1440"
         loading="eager"
         decoding="async"
         fetchpriority="high"
@@ -432,12 +618,80 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         <a href={basePath}>灰雨电台</a>
         <span>MEGASTRUCTURE OBSERVER</span>
         <div class="mega-topbar-actions">
+          <button class="mega-world-map-button" type="button" data-world-map-toggle aria-expanded="false">
+            地图
+          </button>
           <button class="mega-admin-comment-button" type="button" data-comment-admin-open hidden>
             评论
             <b data-comment-pending-count>0</b>
           </button>
         </div>
       </header>
+
+      <aside class="mega-world-map" data-world-map hidden aria-label="巨构主义空间地图">
+        <div class="mega-world-map-head">
+          <div>
+            <span>空间地图</span>
+            <strong data-world-map-current>{firstScene.label}</strong>
+          </div>
+          <p data-world-map-progress>已探索 1 / {scenes.length}</p>
+          <button type="button" data-world-map-close aria-label="关闭空间地图">x</button>
+        </div>
+        <div class="mega-world-map-zones" aria-label="区域层级">
+          {
+            sceneZoneList.map((zone) => (
+              <span class={zone.id === firstScene.zone ? "is-active" : ""} data-world-map-zone={zone.id}>
+                <b>{zone.code}</b>
+                {zone.label}
+              </span>
+            ))
+          }
+        </div>
+        <div class="mega-world-map-canvas">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            {
+              mapRoutes.map((route) => (
+                <line
+                  x1={route.from.map.x}
+                  y1={route.from.map.y}
+                  x2={route.to.map.x}
+                  y2={route.to.map.y}
+                />
+              ))
+            }
+          </svg>
+          {
+            scenes.map((scene) => (
+              <button
+                class={`mega-world-map-node${scene.id === firstScene.id ? " is-active" : ""}`}
+                type="button"
+                data-world-map-scene={scene.id}
+                style={`--map-x: ${scene.map.x}%; --map-y: ${scene.map.y}%;`}
+                aria-label={`进入${scene.label}，${scene.map.layer}`}
+              >
+                <span>{scene.code.replace("SCENE ", "")}</span>
+                <strong>{scene.label}</strong>
+                <small>{scene.map.layer}</small>
+              </button>
+            ))
+          }
+        </div>
+        <div class="mega-world-map-records" aria-label="发现记录">
+          {
+            scenes.map((scene) => (
+              <article
+                class={scene.id === firstScene.id ? "is-unlocked" : ""}
+                data-world-map-record={scene.id}
+              >
+                <span>{scene.label}</span>
+                <p data-world-map-record-text={scene.id}>
+                  {scene.id === firstScene.id ? scene.discovery : "未探索"}
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </aside>
 
       <section class="mega-lab-title" aria-label="页面标题">
         <p data-scene-kicker>{firstScene.kicker}</p>
@@ -540,27 +794,27 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
     </section>
 
-    <section class="mega-design-strip" aria-label="功能设计摘要">
+    <section class="mega-design-strip" aria-label="探索状态">
       <article>
-        <span>01 / WORLD</span>
-        <p>六个场景组成一个轻量迷宫，不再只是三张背景循环。</p>
+        <span>01 / EXPLORED</span>
+        <p><b data-explore-count>1</b> / <b data-explore-total>{scenes.length}</b> 已探索</p>
       </article>
       <article>
-        <span>02 / SCALE</span>
-        <p>高原、环城和远塔群负责拉开外部尺度。</p>
+        <span>02 / ZONE</span>
+        <p><b data-current-zone>{sceneZones[firstScene.zone].label}</b><small data-current-zone-detail>{sceneZones[firstScene.zone].detail}</small></p>
       </article>
       <article>
-        <span>03 / DEPTH</span>
-        <p>中庭、冷却层和光井负责内部深度与垂直路径。</p>
+        <span>03 / RECORD</span>
+        <p data-last-discovery>{firstScene.discovery}</p>
       </article>
       <article>
-        <span>04 / RETURN</span>
-        <p>底部返回记录上一个场景，评论仍按当前场景隔离。</p>
+        <span>04 / ROUTES</span>
+        <p data-next-routes>高原 / 冷却层</p>
       </article>
     </section>
   </main>
 
-  <script define:vars={{ modes, scenes, nodes: nodesWithQuality, supabaseConfig }}>
+  <script define:vars={{ modes, scenes, nodes: nodesWithQuality, sceneZones, supabaseConfig }}>
       const lab = document.querySelector("[data-mega-lab]");
 
       if (lab) {
@@ -581,6 +835,14 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const routeBackDescription = lab.querySelector("[data-route-back-description]");
       const routeCurrent = lab.querySelector("[data-route-current]");
       const routeLink = lab.querySelector("[data-route-link]");
+      const worldMapToggleButton = lab.querySelector("[data-world-map-toggle]");
+      const worldMapPanel = lab.querySelector("[data-world-map]");
+      const worldMapCloseButton = lab.querySelector("[data-world-map-close]");
+      const worldMapCurrent = lab.querySelector("[data-world-map-current]");
+      const worldMapProgress = lab.querySelector("[data-world-map-progress]");
+      const worldMapSceneButtons = Array.from(lab.querySelectorAll("[data-world-map-scene]"));
+      const worldMapZoneBadges = Array.from(lab.querySelectorAll("[data-world-map-zone]"));
+      const worldMapRecordItems = Array.from(lab.querySelectorAll("[data-world-map-record]"));
       const modePhrase = lab.querySelector("[data-mode-phrase]");
       const modeCode = lab.querySelector("[data-mode-code]");
       const nodeCode = lab.querySelector("[data-node-code]");
@@ -626,12 +888,19 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentList = lab.querySelector("[data-comment-list]");
       const commentReview = lab.querySelector("[data-comment-review]");
       const commentReviewList = lab.querySelector("[data-comment-review-list]");
+      const exploreCount = lab.querySelector("[data-explore-count]");
+      const exploreTotal = lab.querySelector("[data-explore-total]");
+      const currentZoneLabel = lab.querySelector("[data-current-zone]");
+      const currentZoneDetail = lab.querySelector("[data-current-zone-detail]");
+      const lastDiscovery = lab.querySelector("[data-last-discovery]");
+      const nextRoutes = lab.querySelector("[data-next-routes]");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       let activeSceneId = scenes[0].id;
       let activeModeId = modes[0].id;
       let activeNodeId = nodes[0].id;
       let lastNodeId = activeNodeId;
       let sceneHistory = [];
+      let visitedSceneIds = new Set([activeSceneId]);
       let isPanelCollapsed = false;
       let pointerFrame = 0;
       let audioContext = null;
@@ -660,10 +929,12 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const commentCache = new Map();
       let selectedCommentId = "";
       let areCommentsVisible = true;
+      const sceneImagePreloads = new Map();
       const commentKeys = {
         remoteSession: "mega-comment-supabase-session-v1",
         visibility: "mega-comment-visibility-v1",
-        visitSession: "mega-visit-session-v1"
+        visitSession: "mega-visit-session-v1",
+        exploredScenes: "mega-explored-scenes-v1"
       };
       const commentHoldMs = 620;
       const commentSupabaseUrl = String(supabaseConfig?.url || "").replace(/\/$/, "");
@@ -674,6 +945,77 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const findScene = (sceneId) => scenes.find((scene) => scene.id === sceneId) || scenes[0];
       const findNode = (nodeId) => nodes.find((node) => node.id === nodeId) || nodes[0];
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+      const defaultSceneAmbience = {
+        brightness: "0.83",
+        contrast: "1.12",
+        saturation: "0.86",
+        unfocusedBrightness: "0.77",
+        unfocusedContrast: "1.14",
+        unfocusedSaturation: "0.82",
+        veilSide: "rgba(0, 0, 0, 0.2)",
+        veilTop: "rgba(0, 0, 0, 0.08)",
+        veilBottom: "rgba(0, 0, 0, 0.18)",
+        scanOpacity: "0.055",
+        gridOpacity: "0.24",
+        hazeOpacity: "0.58",
+        hazeBand: "rgba(204, 216, 216, 0.08)",
+        hazeLeft: "rgba(178, 194, 196, 0.09)",
+        hazeRight: "rgba(154, 170, 170, 0.18)",
+        groundOpacity: "0.34",
+        groundUnfocusedOpacity: "0.42",
+        groundGlow: "rgba(206, 220, 218, 0.05)",
+        groundShadow: "rgba(8, 10, 10, 0.2)"
+      };
+
+      const cssVarNameForAmbience = (key) =>
+        `--scene-${key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+
+      const applySceneAmbience = (scene) => {
+        const ambience = {
+          ...defaultSceneAmbience,
+          ...(scene?.ambience || {})
+        };
+
+        Object.entries(ambience).forEach(([key, value]) => {
+          lab.style.setProperty(cssVarNameForAmbience(key), String(value));
+        });
+      };
+
+      const preloadSceneImage = (sceneId) => {
+        const scene = findScene(sceneId);
+
+        if (!scene?.image) {
+          return Promise.resolve(false);
+        }
+
+        if (sceneImagePreloads.has(scene.image)) {
+          return sceneImagePreloads.get(scene.image);
+        }
+
+        const request = new Promise((resolve) => {
+          const image = new Image();
+          image.decoding = "async";
+          image.onload = () => resolve(true);
+          image.onerror = () => resolve(false);
+          image.src = scene.image;
+        });
+
+        sceneImagePreloads.set(scene.image, request);
+        return request;
+      };
+
+      const setSceneBackdrop = (scene) => {
+        if (!sceneBackdrop || !scene?.image) {
+          return;
+        }
+
+        const nextPosition = scene.position || "center";
+        sceneBackdrop.style.objectPosition = nextPosition;
+
+        if (sceneBackdrop.getAttribute("src") !== scene.image) {
+          sceneBackdrop.setAttribute("src", scene.image);
+        }
+      };
 
       const nodeForScene = (sceneId) => {
         const scene = findScene(sceneId);
@@ -683,6 +1025,91 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       const nodeTargetDescription = (node) => {
         const targetScene = findScene(node?.targetScene || node?.scene);
         return targetScene.description || node?.sentence || targetScene.status;
+      };
+
+      const sceneZoneFor = (scene) =>
+        sceneZones?.[scene?.zone] || {
+          id: scene?.zone || "unknown",
+          code: "ZONE",
+          label: scene?.map?.layer || "未知区域",
+          detail: scene?.description || ""
+        };
+
+      const sceneRoutesFor = (sceneId) =>
+        nodes.filter((node) => node.scene === sceneId).map((node) => findScene(node.targetScene || node.scene));
+
+      const formatSceneRoutes = (sceneId) => {
+        const labels = sceneRoutesFor(sceneId).map((scene) => scene.label);
+        return labels.length ? labels.join(" / ") : "无可用路径";
+      };
+
+      const loadExplorationState = () => {
+        try {
+          const stored = JSON.parse(localStorage.getItem(commentKeys.exploredScenes) || "[]");
+          const knownSceneIds = new Set(scenes.map((scene) => scene.id));
+          const nextVisited = Array.isArray(stored)
+            ? stored.filter((sceneId) => knownSceneIds.has(sceneId))
+            : [];
+
+          visitedSceneIds = new Set(nextVisited.length ? nextVisited : [activeSceneId]);
+        } catch {
+          visitedSceneIds = new Set([activeSceneId]);
+        }
+
+        visitedSceneIds.add(activeSceneId);
+      };
+
+      const saveExplorationState = () => {
+        try {
+          localStorage.setItem(commentKeys.exploredScenes, JSON.stringify(Array.from(visitedSceneIds)));
+        } catch {
+          // localStorage can be blocked; exploration still works for the current session.
+        }
+      };
+
+      const markSceneVisited = (sceneId) => {
+        if (!visitedSceneIds.has(sceneId)) {
+          visitedSceneIds.add(sceneId);
+          saveExplorationState();
+        }
+      };
+
+      const updateExplorationUi = () => {
+        const scene = findScene(activeSceneId);
+        const zone = sceneZoneFor(scene);
+        const exploredCount = visitedSceneIds.size;
+
+        if (exploreCount) exploreCount.textContent = String(exploredCount);
+        if (exploreTotal) exploreTotal.textContent = String(scenes.length);
+        if (worldMapProgress) worldMapProgress.textContent = `已探索 ${exploredCount} / ${scenes.length}`;
+        if (currentZoneLabel) currentZoneLabel.textContent = zone.label;
+        if (currentZoneDetail) currentZoneDetail.textContent = zone.detail;
+        if (lastDiscovery) lastDiscovery.textContent = scene.discovery || scene.description;
+        if (nextRoutes) nextRoutes.textContent = formatSceneRoutes(scene.id);
+
+        worldMapZoneBadges.forEach((badge) => {
+          badge.classList.toggle("is-active", badge.dataset.worldMapZone === zone.id);
+        });
+
+        worldMapSceneButtons.forEach((button) => {
+          const sceneId = button.dataset.worldMapScene;
+          const isVisited = visitedSceneIds.has(sceneId);
+          button.classList.toggle("is-visited", isVisited);
+          button.classList.toggle("is-unvisited", !isVisited);
+        });
+
+        worldMapRecordItems.forEach((item) => {
+          const sceneId = item.dataset.worldMapRecord;
+          const recordScene = findScene(sceneId);
+          const isUnlocked = visitedSceneIds.has(sceneId);
+          const recordText = item.querySelector("[data-world-map-record-text]");
+
+          item.classList.toggle("is-unlocked", isUnlocked);
+          item.classList.toggle("is-locked", !isUnlocked);
+          if (recordText) {
+            recordText.textContent = isUnlocked ? recordScene.discovery || recordScene.description : "未探索";
+          }
+        });
       };
 
       const commentPageForScene = (sceneId = activeSceneId) => `megastructure:${findScene(sceneId).id}`;
@@ -723,18 +1150,49 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
 
       };
 
-      const applyScene = (sceneId) => {
+      const updateWorldMapUi = () => {
+        const scene = findScene(activeSceneId);
+
+        if (worldMapCurrent) {
+          worldMapCurrent.textContent = `${scene.label} / ${scene.map?.layer || scene.status}`;
+        }
+
+        worldMapSceneButtons.forEach((button) => {
+          const isActive = button.dataset.worldMapScene === scene.id;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-current", isActive ? "location" : "false");
+        });
+
+        updateExplorationUi();
+      };
+
+      const setWorldMapOpen = (isOpen) => {
+        if (!worldMapPanel || !worldMapToggleButton) {
+          return;
+        }
+
+        worldMapPanel.hidden = !isOpen;
+        lab.classList.toggle("is-world-map-open", isOpen);
+        worldMapToggleButton.setAttribute("aria-expanded", String(isOpen));
+
+        if (isOpen) {
+          updateWorldMapUi();
+        }
+      };
+
+      const applyScene = (sceneId, options = {}) => {
         const scene = findScene(sceneId);
         activeSceneId = scene.id;
+        markSceneVisited(scene.id);
         lab.dataset.activeScene = scene.id;
         lab.style.setProperty("--scene-position", scene.position || "center");
+        applySceneAmbience(scene);
 
-        if (sceneBackdrop && scene.image && sceneBackdrop.getAttribute("src") !== scene.image) {
-          sceneBackdrop.setAttribute("src", scene.image);
-        }
+        setSceneBackdrop(scene);
 
         if (sceneKicker) sceneKicker.textContent = scene.kicker;
         if (modePhrase) modePhrase.textContent = scene.description || scene.status;
+        updateWorldMapUi();
         nodeButtons.forEach((button) => {
           const isCurrentSceneNode = button.dataset.nodeScene === scene.id;
           button.classList.toggle("is-scene-hidden", !isCurrentSceneNode);
@@ -2254,7 +2712,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         lastNodeId = landingNode.id;
         lab.classList.remove("is-node-unfocused");
         lab.dataset.focusState = "route";
-        applyScene(targetScene.id);
+        applyScene(targetScene.id, { routeNode });
         lab.style.setProperty("--focus-x", String(landingNode.x) + "%");
         lab.style.setProperty("--focus-y", String(landingNode.y) + "%");
         lab.style.setProperty("--map-x", String(landingNode.x) + "%");
@@ -2362,6 +2820,14 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       nodeButtons.forEach((button) => {
+        const preloadTargetScene = () => {
+          const routeNode = findNode(button.dataset.nodeButton);
+          preloadSceneImage(routeNode.targetScene || routeNode.scene);
+        };
+
+        button.addEventListener("mouseenter", preloadTargetScene);
+        button.addEventListener("focus", preloadTargetScene);
+
         button.addEventListener("click", (event) => {
           if (consumeCommentPressClick(event)) {
             return;
@@ -2403,6 +2869,47 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         }
 
         enterScene(previousSceneId, { recordHistory: false });
+      });
+
+      const preloadPreviousScene = () => {
+        const previousSceneId = sceneHistory[sceneHistory.length - 1];
+
+        if (previousSceneId) {
+          preloadSceneImage(previousSceneId);
+        }
+      };
+
+      routeBackButton?.addEventListener("mouseenter", preloadPreviousScene);
+      routeBackButton?.addEventListener("focus", preloadPreviousScene);
+
+      worldMapToggleButton?.addEventListener("click", () => {
+        setWorldMapOpen(Boolean(worldMapPanel?.hidden));
+      });
+
+      worldMapCloseButton?.addEventListener("click", () => {
+        setWorldMapOpen(false);
+        worldMapToggleButton?.focus({ preventScroll: true });
+      });
+
+      worldMapSceneButtons.forEach((button) => {
+        const sceneId = button.dataset.worldMapScene;
+
+        button.addEventListener("mouseenter", () => {
+          preloadSceneImage(sceneId);
+        });
+
+        button.addEventListener("focus", () => {
+          preloadSceneImage(sceneId);
+        });
+
+        button.addEventListener("click", () => {
+          if (!sceneId) {
+            return;
+          }
+
+          enterScene(sceneId);
+          setWorldMapOpen(false);
+        });
       });
 
       panelDragHandle?.addEventListener("pointerdown", (event) => {
@@ -2656,6 +3163,9 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
         if (commentAdminDialog && !commentAdminDialog.hidden) {
           closeCommentAdminDialog();
         }
+        if (worldMapPanel && !worldMapPanel.hidden) {
+          setWorldMapOpen(false);
+        }
       });
 
       window.addEventListener("resize", clampPanelPlacement);
@@ -2673,8 +3183,8 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
             const rect = lab.getBoundingClientRect();
             const x = (event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
             const y = (event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-            lab.style.setProperty("--drift-x", String(x * -1.2) + "rem");
-            lab.style.setProperty("--drift-y", String(y * -0.8) + "rem");
+            lab.style.setProperty("--drift-x", String(x * 0.85) + "rem");
+            lab.style.setProperty("--drift-y", String(y * 0.58) + "rem");
           });
         },
         { passive: true }
@@ -2696,6 +3206,7 @@ const firstPanelSignal = panelSignalFor(firstNode.quality);
       });
 
       loadCommentVisibilityPreference();
+      loadExplorationState();
       setScale(scaleRange?.value || "12");
       enterScene(activeSceneId, { recordHistory: false, reloadComments: false });
       loadCommentState();
