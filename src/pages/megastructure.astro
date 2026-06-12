@@ -30,15 +30,18 @@ const sceneImageFor = (sceneId: keyof typeof sceneImagePaths) => assetPath(scene
 const nodeImagePaths = {
   "atrium-to-highland": sceneImagePaths.highland,
   "atrium-to-cooling": sceneImagePaths["cooling-vault"],
+  "atrium-to-lightwell": sceneImagePaths.lightwell,
+  "highland-to-atrium": sceneImagePaths.atrium,
   "highland-to-ring": sceneImagePaths["ring-city"],
   "highland-to-far": sceneImagePaths["far-towers"],
   "ring-to-lightwell": sceneImagePaths.lightwell,
-  "ring-to-atrium": sceneImagePaths.atrium,
+  "ring-to-highland": sceneImagePaths.highland,
   "cooling-to-lightwell": sceneImagePaths.lightwell,
   "cooling-to-atrium": sceneImagePaths.atrium,
-  "lightwell-to-far": sceneImagePaths["far-towers"],
+  "lightwell-to-atrium": sceneImagePaths.atrium,
+  "lightwell-to-ring": sceneImagePaths["ring-city"],
   "lightwell-to-cooling": sceneImagePaths["cooling-vault"],
-  "far-to-atrium": sceneImagePaths.atrium
+  "far-to-highland": sceneImagePaths.highland
 } as const;
 const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
   nodeImagePaths[nodeId] ?? nodeImagePaths["atrium-to-highland"];
@@ -227,7 +230,7 @@ const scenes = [
     id: "lightwell",
     label: "光井",
     code: "SCENE 05",
-    primaryNode: "lightwell-to-far",
+    primaryNode: "lightwell-to-ring",
     kicker: "服务核心 / 垂直光井 / 白色切口",
     status: "LIGHTWELL / SERVICE CORE",
     description: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
@@ -263,7 +266,7 @@ const scenes = [
     id: "far-towers",
     label: "远塔群",
     code: "SCENE 06",
-    primaryNode: "far-to-atrium",
+    primaryNode: "far-to-highland",
     kicker: "远景塔群 / 世界边界 / 空旷湿地",
     status: "FAR TOWERS / WORLD EDGE",
     description: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
@@ -361,6 +364,38 @@ const nodes = [
     signal: "PIPE 08 / HUM 21"
   },
   {
+    id: "atrium-to-lightwell",
+    scene: "atrium",
+    mode: "signal",
+    label: "光井",
+    code: "A-03",
+    x: 50,
+    y: 34,
+    labelX: 2.8,
+    labelY: 0.1,
+    labelAlign: "left",
+    targetScene: "lightwell",
+    routeLabel: "进入垂直光井",
+    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
+    signal: "LUX 19 / CORE 07"
+  },
+  {
+    id: "highland-to-atrium",
+    scene: "highland",
+    mode: "liminal",
+    label: "中庭",
+    code: "G-11",
+    x: 24,
+    y: 64,
+    labelX: 0,
+    labelY: 2.75,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "回到室内中庭",
+    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
+    signal: "ENTRY 10 / LOOP 06"
+  },
+  {
     id: "highland-to-ring",
     scene: "highland",
     mode: "structure",
@@ -409,20 +444,20 @@ const nodes = [
     signal: "CORE 17 / LUX 39"
   },
   {
-    id: "ring-to-atrium",
+    id: "ring-to-highland",
     scene: "ring-city",
     mode: "structure",
-    label: "中庭",
+    label: "高原",
     code: "R-12",
     x: 50,
     y: 72,
     labelX: -0.3,
     labelY: 2.5,
     labelAlign: "center",
-    targetScene: "atrium",
-    routeLabel: "回到室内中庭",
-    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    signal: "GRID 22 / LOOP 01"
+    targetScene: "highland",
+    routeLabel: "回到高原盆地",
+    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
+    signal: "BASIN 22 / RING 01"
   },
   {
     id: "cooling-to-lightwell",
@@ -457,20 +492,36 @@ const nodes = [
     signal: "DRAIN 03 / LOOP 11"
   },
   {
-    id: "lightwell-to-far",
+    id: "lightwell-to-ring",
     scene: "lightwell",
     mode: "signal",
-    label: "远塔",
+    label: "环城",
     code: "H-31",
     x: 50,
     y: 24,
     labelX: 3.25,
     labelY: 0.2,
     labelAlign: "left",
-    targetScene: "far-towers",
-    routeLabel: "眺望远塔群",
-    sentence: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
-    signal: "LUX 44 / HUM 16"
+    targetScene: "ring-city",
+    routeLabel: "进入环形城市",
+    sentence: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
+    signal: "RING 44 / LUX 16"
+  },
+  {
+    id: "lightwell-to-atrium",
+    scene: "lightwell",
+    mode: "liminal",
+    label: "中庭",
+    code: "H-18",
+    x: 36,
+    y: 58,
+    labelX: 0,
+    labelY: 2.75,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "回到室内中庭",
+    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
+    signal: "VOID 18 / CORE 33"
   },
   {
     id: "lightwell-to-cooling",
@@ -489,49 +540,55 @@ const nodes = [
     signal: "SHAFT 02 / PIPE 18"
   },
   {
-    id: "far-to-atrium",
+    id: "far-to-highland",
     scene: "far-towers",
     mode: "liminal",
-    label: "中庭",
+    label: "高原",
     code: "F-01",
     x: 39,
     y: 70,
     labelX: 0,
     labelY: 2.75,
     labelAlign: "center",
-    targetScene: "atrium",
-    routeLabel: "回到室内中庭",
-    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    signal: "EDGE 90 / RETURN 01"
+    targetScene: "highland",
+    routeLabel: "回到高原盆地",
+    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
+    signal: "EDGE 90 / BASIN 01"
   }
 ];
 
 const nodeQuality = {
   "atrium-to-highland": { integrity: 68, noise: 22, drift: "OUT" },
   "atrium-to-cooling": { integrity: 55, noise: 34, drift: "DOWN" },
+  "atrium-to-lightwell": { integrity: 72, noise: 20, drift: "CORE" },
+  "highland-to-atrium": { integrity: 64, noise: 29, drift: "ENTRY" },
   "highland-to-ring": { integrity: 84, noise: 18, drift: "FAR" },
   "highland-to-far": { integrity: 73, noise: 26, drift: "EDGE" },
   "ring-to-lightwell": { integrity: 76, noise: 21, drift: "CORE" },
-  "ring-to-atrium": { integrity: 63, noise: 30, drift: "LOOP" },
+  "ring-to-highland": { integrity: 69, noise: 27, drift: "BASIN" },
   "cooling-to-lightwell": { integrity: 58, noise: 37, drift: "UP" },
   "cooling-to-atrium": { integrity: 52, noise: 40, drift: "BACK" },
-  "lightwell-to-far": { integrity: 71, noise: 24, drift: "SKY" },
+  "lightwell-to-atrium": { integrity: 67, noise: 27, drift: "VOID" },
+  "lightwell-to-ring": { integrity: 71, noise: 24, drift: "RING" },
   "lightwell-to-cooling": { integrity: 61, noise: 31, drift: "DOWN" },
-  "far-to-atrium": { integrity: 66, noise: 28, drift: "HOME" }
+  "far-to-highland": { integrity: 70, noise: 24, drift: "BASIN" }
 };
 
 const nodeViewport = {
   "atrium-to-highland": { frame: "OBS A-01 / BASIN", x: 53, y: 45, slit: 28 },
   "atrium-to-cooling": { frame: "OBS A-02 / VAULT", x: 52, y: 48, slit: 24 },
+  "atrium-to-lightwell": { frame: "OBS A-03 / LIGHT", x: 51, y: 43, slit: 24 },
+  "highland-to-atrium": { frame: "OBS G-11 / VOID", x: 48, y: 47, slit: 30 },
   "highland-to-ring": { frame: "OBS G-22 / RING", x: 50, y: 48, slit: 34 },
   "highland-to-far": { frame: "OBS G-41 / EDGE", x: 50, y: 42, slit: 36 },
   "ring-to-lightwell": { frame: "OBS R-09 / LIGHT", x: 51, y: 43, slit: 24 },
-  "ring-to-atrium": { frame: "OBS R-12 / VOID", x: 48, y: 47, slit: 30 },
+  "ring-to-highland": { frame: "OBS R-12 / BASIN", x: 53, y: 45, slit: 28 },
   "cooling-to-lightwell": { frame: "OBS C-07 / SHAFT", x: 52, y: 42, slit: 22 },
   "cooling-to-atrium": { frame: "OBS C-11 / VOID", x: 48, y: 47, slit: 30 },
-  "lightwell-to-far": { frame: "OBS H-31 / EDGE", x: 50, y: 42, slit: 36 },
+  "lightwell-to-atrium": { frame: "OBS H-18 / VOID", x: 48, y: 47, slit: 30 },
+  "lightwell-to-ring": { frame: "OBS H-31 / RING", x: 50, y: 48, slit: 34 },
   "lightwell-to-cooling": { frame: "OBS H-44 / VAULT", x: 52, y: 48, slit: 24 },
-  "far-to-atrium": { frame: "OBS F-01 / VOID", x: 48, y: 47, slit: 30 }
+  "far-to-highland": { frame: "OBS F-01 / BASIN", x: 50, y: 45, slit: 28 }
 };
 
 const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["atrium-to-highland"];
