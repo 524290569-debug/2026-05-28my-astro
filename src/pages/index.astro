@@ -18,7 +18,23 @@ const workImages = [
       code: "ANT-03",
       value: "82%",
       label: "天线余响"
-    }
+    },
+    hotspots: [
+      {
+        code: "R-1",
+        title: "天线背风面",
+        body: "雨线在这里变细，像有人把频段往低处拧了一格。",
+        x: 68,
+        y: 26
+      },
+      {
+        code: "R-2",
+        title: "屋顶积水",
+        body: "低频反射停在水面上，远城灯光只剩一点蓝灰。",
+        x: 38,
+        y: 56
+      }
+    ]
   },
   {
     src: assetPath("assets/works/postpunk-passage.webp"),
@@ -30,7 +46,23 @@ const workImages = [
       code: "SUB-11",
       value: "-6 dB",
       label: "通道底噪"
-    }
+    },
+    hotspots: [
+      {
+        code: "S-1",
+        title: "灯管残响",
+        body: "白光被瓷砖拆成碎片，通道里只剩轻微电流声。",
+        x: 72,
+        y: 30
+      },
+      {
+        code: "S-2",
+        title: "断讯边界",
+        body: "信号到这里开始掉帧，脚步声比频道更清楚。",
+        x: 43,
+        y: 55
+      }
+    ]
   },
   {
     src: assetPath("assets/works/postpunk-bridge.webp"),
@@ -42,9 +74,30 @@ const workImages = [
       code: "TRK-07",
       value: "41%",
       label: "远城反射"
-    }
+    },
+    hotspots: [
+      {
+        code: "B-1",
+        title: "高架余光",
+        body: "车流被雨雾削平，亮度没有上来，轮廓还在。",
+        x: 62,
+        y: 28
+      },
+      {
+        code: "B-2",
+        title: "轨道低线",
+        body: "冷蓝反射贴着铁轨滑走，像一条快要断开的信号线。",
+        x: 30,
+        y: 52
+      }
+    ]
   }
 ];
+
+const sceneHotspotTotal = workImages.reduce(
+  (total, image) => total + image.hotspots.length,
+  0
+);
 
 const fieldNotes = [
   {
@@ -329,9 +382,20 @@ const deskImageSize = { width: 1200, height: 900 };
           <h2>不是作品集陈列，而是三段从城市边缘截取的低光现场。</h2>
         </div>
 
-        <div class="image-stage-grid">
+        <div
+          class="scene-discovery-status"
+          aria-label={`现场碎片发现进度：0 / ${sceneHotspotTotal}`}
+          data-scene-discovery-status
+          data-total-hotspots={sceneHotspotTotal}
+        >
+          <span>已发现碎片</span>
+          <strong><b data-scene-found-count>0</b> / {sceneHotspotTotal}</strong>
+          <p data-scene-status-text>点击图中的弱信号点，读取现场记录。</p>
+        </div>
+
+        <div class="image-stage-grid" data-scene-discovery>
           {workImages.map((image, index) => (
-            <figure class={`work-image-card work-image-card-${index + 1}`}>
+            <figure class={`work-image-card work-image-card-${index + 1}`} data-scene-card>
               <img
                 src={image.src}
                 alt={image.title}
@@ -348,10 +412,55 @@ const deskImageSize = { width: 1200, height: 900 };
                 <strong>{image.signal.value}</strong>
                 <small>{image.signal.label}</small>
               </div>
+              <div class="scene-hotspot-layer" aria-label={`${image.title}现场热点`}>
+                {image.hotspots.map((hotspot, hotspotIndex) => {
+                  const hotspotId = `${image.signal.code}-${hotspotIndex + 1}`;
+                  const noteId = `scene-note-${index + 1}`;
+
+                  return (
+                    <button
+                      class="scene-hotspot"
+                      type="button"
+                      style={`--hotspot-x: ${hotspot.x}%; --hotspot-y: ${hotspot.y}%`}
+                      data-hotspot-button
+                      data-hotspot-id={hotspotId}
+                      data-hotspot-code={hotspot.code}
+                      data-hotspot-title={hotspot.title}
+                      data-hotspot-body={hotspot.body}
+                      aria-label={`${image.title}：${hotspot.title}`}
+                      aria-controls={noteId}
+                      aria-expanded="false"
+                    >
+                      <span>{hotspot.code}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div
+                class="scene-hotspot-panel"
+                id={`scene-note-${index + 1}`}
+                data-hotspot-panel
+                aria-live="polite"
+                hidden
+              >
+                <span data-hotspot-panel-code></span>
+                <strong data-hotspot-panel-title></strong>
+                <p data-hotspot-panel-body></p>
+              </div>
               <figcaption>
                 <strong>{image.title}</strong>
                 <span>{image.meta}</span>
               </figcaption>
+              <noscript>
+                <div class="scene-hotspot-noscript">
+                  {image.hotspots.map((hotspot) => (
+                    <p>
+                      <strong>{hotspot.code} / {hotspot.title}</strong>
+                      <span>{hotspot.body}</span>
+                    </p>
+                  ))}
+                </div>
+              </noscript>
             </figure>
           ))}
         </div>
@@ -499,3 +608,118 @@ const deskImageSize = { width: 1200, height: 900 };
     </footer>
   </main>
 </BaseLayout>
+
+<script>
+  const sceneDiscovery = document.querySelector("[data-scene-discovery]");
+  const sceneStatus = document.querySelector("[data-scene-discovery-status]");
+
+  if (sceneDiscovery && sceneStatus) {
+    const hotspotButtons = Array.from(sceneDiscovery.querySelectorAll("[data-hotspot-button]"));
+    const foundCount = sceneStatus.querySelector("[data-scene-found-count]");
+    const statusText = sceneStatus.querySelector("[data-scene-status-text]");
+    const totalHotspots = Number(sceneStatus.dataset.totalHotspots || hotspotButtons.length);
+    const foundHotspots = new Set();
+
+    const updateDiscoveryStatus = () => {
+      const count = foundHotspots.size;
+
+      if (foundCount) {
+        foundCount.textContent = String(count);
+      }
+
+      sceneStatus.setAttribute("aria-label", `现场碎片发现进度：${count} / ${totalHotspots}`);
+
+      if (statusText) {
+        statusText.textContent =
+          count === totalHotspots
+            ? "三段现场记录已接入，噪声保持在低位。"
+            : "点击图中的弱信号点，读取现场记录。";
+      }
+    };
+
+    const closeSceneCard = (card) => {
+      const panel = card.querySelector("[data-hotspot-panel]");
+
+      if (panel) {
+        panel.hidden = true;
+      }
+
+      card.querySelectorAll("[data-hotspot-button]").forEach((button) => {
+        button.setAttribute("aria-expanded", "false");
+        button.removeAttribute("data-active");
+      });
+    };
+
+    const openHotspot = (button) => {
+      const card = button.closest("[data-scene-card]");
+
+      if (!card) {
+        return;
+      }
+
+      const panel = card.querySelector("[data-hotspot-panel]");
+      const code = panel?.querySelector("[data-hotspot-panel-code]");
+      const title = panel?.querySelector("[data-hotspot-panel-title]");
+      const body = panel?.querySelector("[data-hotspot-panel-body]");
+
+      card.querySelectorAll("[data-hotspot-button]").forEach((item) => {
+        const isActive = item === button;
+
+        item.setAttribute("aria-expanded", isActive ? "true" : "false");
+        item.toggleAttribute("data-active", isActive);
+      });
+
+      if (panel) {
+        panel.hidden = false;
+      }
+
+      if (code) {
+        code.textContent = button.dataset.hotspotCode || "";
+      }
+
+      if (title) {
+        title.textContent = button.dataset.hotspotTitle || "";
+      }
+
+      if (body) {
+        body.textContent = button.dataset.hotspotBody || "";
+      }
+
+      if (button.dataset.hotspotId) {
+        foundHotspots.add(button.dataset.hotspotId);
+        updateDiscoveryStatus();
+      }
+    };
+
+    hotspotButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        openHotspot(button);
+      });
+
+      button.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+          return;
+        }
+
+        event.preventDefault();
+        openHotspot(button);
+      });
+    });
+
+    sceneDiscovery.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      const card = event.target instanceof Element
+        ? event.target.closest("[data-scene-card]")
+        : null;
+
+      if (card) {
+        closeSceneCard(card);
+      }
+    });
+
+    updateDiscoveryStatus();
+  }
+</script>
