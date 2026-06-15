@@ -477,7 +477,7 @@ const deskImageSize = { width: 1200, height: 900 };
         <div class="ambient-channel-main">
           <span>SCROLL CHANNEL</span>
           <strong data-ambient-channel-output>ROOF / RAIN</strong>
-          <p data-ambient-copy-output aria-live="polite">雨声压低了频道，屋顶天线保持在线。</p>
+          <p data-ambient-copy-output aria-live="off">雨声压低了频道，屋顶天线保持在线。</p>
         </div>
         <div class="ambient-channel-readouts" aria-label="当前频道参数">
           <span>
@@ -991,6 +991,19 @@ const deskImageSize = { width: 1200, height: 900 };
     const ambientCopy = ambientReadout.querySelector("[data-ambient-copy-output]");
     let activeAmbientId = "";
     let ambientFrame = 0;
+    let ambientObserver: IntersectionObserver | null = null;
+    let ambientResizeObserver: ResizeObserver | null = null;
+    let lastAmbientOffset = "";
+
+    const syncAmbientOffset = () => {
+      const height = Math.ceil(ambientReadout.getBoundingClientRect().height);
+      const nextOffset = height > 0 ? `${height}px` : "";
+
+      if (nextOffset && nextOffset !== lastAmbientOffset) {
+        document.documentElement.style.setProperty("--anchor-offset", nextOffset);
+        lastAmbientOffset = nextOffset;
+      }
+    };
 
     const setAmbientState = (section) => {
       if (!section || activeAmbientId === section.id) {
@@ -1019,6 +1032,8 @@ const deskImageSize = { width: 1200, height: 900 };
     };
 
     const pickAmbientSection = () => {
+      syncAmbientOffset();
+
       const anchorY = window.innerHeight * 0.42;
       const visibleSections = ambientSections
         .map((section) => {
@@ -1037,7 +1052,7 @@ const deskImageSize = { width: 1200, height: 900 };
       setAmbientState(visibleSections[0]?.section || ambientSections[0]);
     };
 
-    const scheduleAmbientPick = () => {
+    const scheduleAmbientRefresh = () => {
       if (ambientFrame) {
         return;
       }
@@ -1048,11 +1063,23 @@ const deskImageSize = { width: 1200, height: 900 };
       });
     };
 
+    const realignHashTarget = () => {
+      const hashId = window.location.hash
+        ? decodeURIComponent(window.location.hash.slice(1))
+        : "";
+      const target = hashId ? document.getElementById(hashId) : null;
+
+      if (target?.matches(".content-section")) {
+        target.scrollIntoView({ block: "start", behavior: "auto" });
+      }
+    };
+
     if (ambientSections.length) {
       setAmbientState(ambientSections[0]);
+      syncAmbientOffset();
 
       if ("IntersectionObserver" in window) {
-        const ambientObserver = new IntersectionObserver(scheduleAmbientPick, {
+        ambientObserver = new IntersectionObserver(scheduleAmbientRefresh, {
           rootMargin: "-38% 0px -38% 0px",
           threshold: [0, 0.01]
         });
@@ -1062,10 +1089,37 @@ const deskImageSize = { width: 1200, height: 900 };
         });
 
         window.__grayRainAmbientObserver = ambientObserver;
-        window.setTimeout(pickAmbientSection, 120);
       } else {
-        pickAmbientSection();
+        window.addEventListener("scroll", scheduleAmbientRefresh, { passive: true });
       }
+
+      if ("ResizeObserver" in window) {
+        ambientResizeObserver = new ResizeObserver(scheduleAmbientRefresh);
+        ambientResizeObserver.observe(ambientReadout);
+      }
+
+      window.addEventListener("resize", scheduleAmbientRefresh, { passive: true });
+      window.addEventListener("orientationchange", scheduleAmbientRefresh, { passive: true });
+      window.addEventListener("pageshow", scheduleAmbientRefresh, { passive: true });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          scheduleAmbientRefresh();
+        }
+      });
+
+      window.setTimeout(() => {
+        pickAmbientSection();
+        realignHashTarget();
+      }, 120);
+
+      window.addEventListener("beforeunload", () => {
+        if (ambientFrame) {
+          window.cancelAnimationFrame(ambientFrame);
+        }
+
+        ambientObserver?.disconnect();
+        ambientResizeObserver?.disconnect();
+      });
     }
   }
 
