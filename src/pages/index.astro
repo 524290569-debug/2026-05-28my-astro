@@ -171,41 +171,115 @@ const contactRoutes = [
   {
     label: "发送邮件",
     meta: "MAIL / DIRECT",
-    href: "mailto:hello@example.com"
+    href: "mailto:hello@example.com",
+    tone: "mail",
+    status: "MAIL / DIRECT",
+    log: "邮件通道打开。外部客户端接管发送，雨声保持在低位。",
+    signals: [
+      {
+        label: "CHANNEL",
+        value: "MAIL",
+        detail: "直接邮件入口待命",
+        level: "86%"
+      },
+      {
+        label: "HANDOFF",
+        value: "LOCAL",
+        detail: "点击后由本机邮件客户端接管",
+        level: "62%"
+      },
+      {
+        label: "WINDOW",
+        value: "LOW",
+        detail: "只保留一格暖黄窗光",
+        level: "38%"
+      }
+    ]
   },
   {
     label: "查看 GitHub",
     meta: "REPO / PUBLIC",
     href: "https://github.com/524290569-debug",
-    external: true
+    external: true,
+    tone: "repo",
+    status: "REPO / PUBLIC",
+    log: "公开仓库通道已对准。新标签页打开，不打断当前频段。",
+    signals: [
+      {
+        label: "CHANNEL",
+        value: "GIT",
+        detail: "公开代码索引可读取",
+        level: "74%"
+      },
+      {
+        label: "TRACE",
+        value: "PUBLIC",
+        detail: "外部链接将进入新窗口",
+        level: "68%"
+      },
+      {
+        label: "NOISE",
+        value: "12%",
+        detail: "仓库信号干扰保持低位",
+        level: "12%"
+      }
+    ]
   },
   {
     label: "返回顶部",
     meta: "HOME / SIGNAL",
-    href: "#home"
+    href: "#home",
+    tone: "home",
+    status: "HOME / SIGNAL",
+    log: "回到屋顶电台。天线重新对准首页的冷雨频段。",
+    signals: [
+      {
+        label: "CHANNEL",
+        value: "HOME",
+        detail: "首页锚点信号锁定",
+        level: "58%"
+      },
+      {
+        label: "ALTITUDE",
+        value: "ROOF",
+        detail: "视线返回旧楼天台",
+        level: "71%"
+      },
+      {
+        label: "RAIN",
+        value: "18 mm",
+        detail: "雨幕恢复到首屏参数",
+        level: "18%"
+      }
+    ]
   }
 ];
 
-const transmissionSignals = [
-  {
-    label: "CHANNEL",
-    value: "OPEN",
-    detail: "弱信号入口保持在线",
-    level: "82%"
-  },
-  {
-    label: "LATENCY",
-    value: "03 ms",
-    detail: "低频回声轻微延迟",
-    level: "54%"
-  },
-  {
-    label: "WINDOW",
-    value: "LOW",
-    detail: "只保留一格暖黄窗光",
-    level: "38%"
-  }
-];
+const contactTransmissionDefault = {
+  tone: "standby",
+  status: "STANDBY / CONTACT",
+  log: "弱信号入口保持在线。选择一个通道，右侧日志会切到对应状态。",
+  signals: [
+    {
+      label: "CHANNEL",
+      value: "OPEN",
+      detail: "弱信号入口保持在线",
+      level: "82%"
+    },
+    {
+      label: "LATENCY",
+      value: "03 ms",
+      detail: "低频回声轻微延迟",
+      level: "54%"
+    },
+    {
+      label: "WINDOW",
+      value: "LOW",
+      detail: "只保留一格暖黄窗光",
+      level: "38%"
+    }
+  ]
+};
 
 const archivePosts = [
   {
@@ -708,13 +782,24 @@ const deskImageSize = { width: 1200, height: 900 };
           </p>
         </div>
 
-        <div class="contact-panel" aria-label="弱信号联络面板">
+        <div
+          class="contact-panel"
+          aria-label="弱信号联络面板"
+          data-contact-panel
+          data-contact-tone={contactTransmissionDefault.tone}
+        >
           <div class="contact-link-list" aria-label="联络入口">
             {contactRoutes.map((route) => (
               <a
                 href={route.href}
                 target={route.external ? "_blank" : undefined}
                 rel={route.external ? "noreferrer" : undefined}
+                data-contact-link
+                data-contact-tone={route.tone}
+                data-contact-status={route.status}
+                data-contact-log={route.log}
+                data-contact-signals={JSON.stringify(route.signals)}
+                aria-describedby="contact-transmission-copy"
               >
                 <span>{route.label}</span>
                 <small>{route.meta}</small>
@@ -722,20 +807,29 @@ const deskImageSize = { width: 1200, height: 900 };
             ))}
           </div>
 
-          <div class="transmission-log" aria-label="传输状态">
+          <div class="transmission-log" aria-label="传输状态" data-contact-log>
             <div class="transmission-header">
               <span>TRANSMISSION LOG</span>
-              <strong>03:17</strong>
+              <strong data-contact-status-output>{contactTransmissionDefault.status}</strong>
             </div>
 
-            {transmissionSignals.map((signal) => (
-              <div class="transmission-row" style={`--level: ${signal.level}`}>
+            <p
+              class="transmission-copy"
+              id="contact-transmission-copy"
+              data-contact-copy
+              aria-live="polite"
+            >
+              {contactTransmissionDefault.log}
+            </p>
+
+            {contactTransmissionDefault.signals.map((signal) => (
+              <div class="transmission-row" style={`--level: ${signal.level}`} data-contact-row>
                 <div>
-                  <span>{signal.label}</span>
-                  <strong>{signal.value}</strong>
+                  <span data-contact-row-label>{signal.label}</span>
+                  <strong data-contact-row-value>{signal.value}</strong>
                 </div>
                 <i aria-hidden="true"></i>
-                <p>{signal.detail}</p>
+                <p data-contact-row-detail>{signal.detail}</p>
               </div>
             ))}
           </div>
@@ -992,5 +1086,104 @@ const deskImageSize = { width: 1200, height: 900 };
     if (initialFilter) {
       setFilter(initialFilter);
     }
+  }
+
+  const contactPanel = document.querySelector("[data-contact-panel]");
+
+  if (contactPanel) {
+    const contactLinks = Array.from(contactPanel.querySelectorAll("[data-contact-link]"));
+    const contactStatus = contactPanel.querySelector("[data-contact-status-output]");
+    const contactCopy = contactPanel.querySelector("[data-contact-copy]");
+    const transmissionRows = Array.from(contactPanel.querySelectorAll("[data-contact-row]"));
+
+    const defaultContactState = {
+      tone: contactPanel.dataset.contactTone || "standby",
+      status: contactStatus?.textContent?.trim() || "STANDBY / CONTACT",
+      log: contactCopy?.textContent?.trim() || "",
+      signals: transmissionRows.map((row) => ({
+        label: row.querySelector("[data-contact-row-label]")?.textContent?.trim() || "",
+        value: row.querySelector("[data-contact-row-value]")?.textContent?.trim() || "",
+        detail: row.querySelector("[data-contact-row-detail]")?.textContent?.trim() || "",
+        level: row.style.getPropertyValue("--level") || "50%"
+      }))
+    };
+
+    const parseContactSignals = (link) => {
+      try {
+        const signals = JSON.parse(link.dataset.contactSignals || "[]");
+
+        return Array.isArray(signals) ? signals : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const getContactState = (link) => ({
+      tone: link.dataset.contactTone || "standby",
+      status: link.dataset.contactStatus || defaultContactState.status,
+      log: link.dataset.contactLog || defaultContactState.log,
+      signals: parseContactSignals(link)
+    });
+
+    const setContactState = (state, activeLink = null) => {
+      contactPanel.dataset.contactTone = state.tone || "standby";
+
+      if (contactStatus) {
+        contactStatus.textContent = state.status || defaultContactState.status;
+      }
+
+      if (contactCopy) {
+        contactCopy.textContent = state.log || defaultContactState.log;
+      }
+
+      transmissionRows.forEach((row, index) => {
+        const signal = state.signals[index] || defaultContactState.signals[index];
+
+        if (!signal) {
+          return;
+        }
+
+        const label = row.querySelector("[data-contact-row-label]");
+        const value = row.querySelector("[data-contact-row-value]");
+        const detail = row.querySelector("[data-contact-row-detail]");
+
+        if (label) {
+          label.textContent = signal.label || "";
+        }
+
+        if (value) {
+          value.textContent = signal.value || "";
+        }
+
+        if (detail) {
+          detail.textContent = signal.detail || "";
+        }
+
+        row.style.setProperty("--level", signal.level || "50%");
+      });
+
+      contactLinks.forEach((link) => {
+        link.toggleAttribute("data-contact-active", link === activeLink);
+      });
+    };
+
+    contactLinks.forEach((link) => {
+      const updateContactState = () => {
+        setContactState(getContactState(link), link);
+      };
+
+      link.addEventListener("pointerenter", updateContactState);
+      link.addEventListener("pointerdown", updateContactState, { passive: true });
+      link.addEventListener("focus", updateContactState);
+      link.addEventListener("click", updateContactState);
+    });
+
+    contactPanel.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setContactState(defaultContactState);
+    });
   }
 </script>

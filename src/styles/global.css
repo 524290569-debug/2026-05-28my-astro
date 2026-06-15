@@ -2866,6 +2866,27 @@ img {
   display: grid;
   gap: 0;
   overflow: hidden;
+  --contact-accent: rgba(120, 233, 255, 0.68);
+  --contact-accent-soft: rgba(120, 233, 255, 0.045);
+  --contact-accent-trace: rgba(120, 233, 255, 0.18);
+}
+
+.contact-panel[data-contact-tone="mail"] {
+  --contact-accent: rgba(120, 233, 255, 0.82);
+  --contact-accent-soft: rgba(120, 233, 255, 0.07);
+  --contact-accent-trace: rgba(120, 233, 255, 0.26);
+}
+
+.contact-panel[data-contact-tone="repo"] {
+  --contact-accent: rgba(240, 90, 157, 0.64);
+  --contact-accent-soft: rgba(240, 90, 157, 0.06);
+  --contact-accent-trace: rgba(240, 90, 157, 0.2);
+}
+
+.contact-panel[data-contact-tone="home"] {
+  --contact-accent: rgba(215, 182, 106, 0.74);
+  --contact-accent-soft: rgba(215, 182, 106, 0.06);
+  --contact-accent-trace: rgba(215, 182, 106, 0.2);
 }
 
 .contact-link-list {
@@ -2897,7 +2918,7 @@ img {
   bottom: 0.8rem;
   left: 0;
   width: 2px;
-  background: linear-gradient(180deg, rgba(120, 233, 255, 0.68), rgba(240, 90, 157, 0.16), transparent);
+  background: linear-gradient(180deg, var(--contact-accent), var(--contact-accent-trace), transparent);
   content: "";
   opacity: 0;
   transform: scaleY(0.35);
@@ -2916,7 +2937,7 @@ img {
 }
 
 .contact-link-list a small {
-  color: rgba(120, 233, 255, 0.62);
+  color: var(--contact-accent);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -2931,7 +2952,7 @@ img {
   gap: 0.85rem;
   border-top: 1px solid rgba(190, 223, 232, 0.12);
   background:
-    radial-gradient(circle at 78% 10%, rgba(240, 90, 157, 0.085), transparent 9rem),
+    radial-gradient(circle at 78% 10%, var(--contact-accent-soft), transparent 9rem),
     linear-gradient(180deg, rgba(3, 7, 10, 0.24), rgba(3, 7, 10, 0.48));
   padding: 1.15rem 1.25rem 1.25rem;
 }
@@ -2942,7 +2963,7 @@ img {
   pointer-events: none;
   background:
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 0.8rem),
-    linear-gradient(90deg, rgba(120, 233, 255, 0.05), transparent 55%);
+    linear-gradient(90deg, var(--contact-accent-soft), transparent 55%);
   content: "";
   opacity: 0.52;
 }
@@ -2962,7 +2983,7 @@ img {
 
 .transmission-header span,
 .transmission-row span {
-  color: rgba(120, 233, 255, 0.62);
+  color: var(--contact-accent);
   font-size: 0.66rem;
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -2974,6 +2995,18 @@ img {
   color: rgba(239, 247, 249, 0.88);
   font-size: 0.9rem;
   font-weight: 400;
+}
+
+.transmission-copy {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  border-left: 1px solid var(--contact-accent-trace);
+  padding: 0.02rem 0 0.02rem 0.78rem;
+  color: rgba(200, 217, 222, 0.72);
+  font-size: 0.8rem;
+  font-weight: 300;
+  line-height: 1.58;
 }
 
 .transmission-row {
@@ -2995,11 +3028,11 @@ img {
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(120, 233, 255, 0.62) 0 var(--level),
+    var(--contact-accent) 0 var(--level),
     rgba(190, 223, 232, 0.12) var(--level),
     transparent 100%
   );
-  box-shadow: 0 0 1rem rgba(120, 233, 255, 0.1);
+  box-shadow: 0 0 1rem var(--contact-accent-soft);
 }
 
 .transmission-row p {
@@ -3073,14 +3106,16 @@ img {
 }
 
 .contact-link-list a:hover,
-.contact-link-list a:focus-visible {
-  background: rgba(120, 233, 255, 0.045);
+.contact-link-list a:focus-visible,
+.contact-link-list a[data-contact-active] {
+  background: var(--contact-accent-soft);
   color: var(--ink);
   outline: none;
 }
 
 .contact-link-list a:hover::before,
-.contact-link-list a:focus-visible::before {
+.contact-link-list a:focus-visible::before,
+.contact-link-list a[data-contact-active]::before {
   opacity: 1;
   transform: scaleY(1);
 }
