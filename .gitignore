@@ -22,6 +22,8 @@ tools/
 supabase/megastructure-sensitive-terms.generated.sql
 
 # Local environment and OS noise
+.vscode/
+music/
 .env
 .env.*
 !.env.example
