@@ -83,6 +83,16 @@ a {
   transform: translate(-50%, 0);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -3124,6 +3134,177 @@ img {
   transform: translateY(1px);
 }
 
+.keyboard-router {
+  position: fixed;
+  right: clamp(1rem, 3vw, 1.6rem);
+  bottom: clamp(1rem, 3vw, 1.45rem);
+  z-index: 90;
+  display: grid;
+  justify-items: end;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.keyboard-router button,
+.keyboard-router a {
+  pointer-events: auto;
+}
+
+.keyboard-router-toggle {
+  display: inline-grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  place-items: center;
+  border: 1px solid rgba(120, 233, 255, 0.32);
+  background:
+    linear-gradient(180deg, rgba(18, 34, 42, 0.72), rgba(4, 9, 12, 0.82)),
+    rgba(3, 7, 10, 0.88);
+  color: rgba(239, 247, 249, 0.9);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+  letter-spacing: 0;
+  box-shadow:
+    0 0 0 1px rgba(3, 7, 10, 0.72),
+    0 1rem 2.4rem rgba(0, 0, 0, 0.38);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.keyboard-router-toggle:hover,
+.keyboard-router-toggle:focus-visible,
+.keyboard-router[data-router-open] .keyboard-router-toggle {
+  border-color: rgba(215, 182, 106, 0.48);
+  background:
+    linear-gradient(180deg, rgba(25, 48, 58, 0.82), rgba(4, 9, 12, 0.9)),
+    rgba(3, 7, 10, 0.92);
+  color: rgba(215, 182, 106, 0.92);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.keyboard-router-panel {
+  width: min(22rem, calc(100vw - 2rem));
+  border: 1px solid rgba(190, 223, 232, 0.14);
+  background:
+    linear-gradient(145deg, rgba(120, 233, 255, 0.055), transparent 34%),
+    linear-gradient(180deg, rgba(18, 34, 42, 0.86), rgba(4, 9, 12, 0.94)),
+    rgba(3, 7, 10, 0.96);
+  padding: 0.9rem;
+  box-shadow:
+    0 0 0 1px rgba(3, 7, 10, 0.78),
+    0 1.4rem 3.2rem rgba(0, 0, 0, 0.46);
+}
+
+.keyboard-router-panel[hidden] {
+  display: none;
+}
+
+.keyboard-router-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.keyboard-router-head span {
+  color: rgba(120, 233, 255, 0.64);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.keyboard-router-head strong {
+  color: rgba(239, 247, 249, 0.9);
+  font-size: 0.84rem;
+  font-weight: 400;
+}
+
+.keyboard-route-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.keyboard-route-grid a,
+.keyboard-router-close {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  border: 1px solid rgba(190, 223, 232, 0.12);
+  background: rgba(5, 12, 16, 0.5);
+  color: rgba(224, 235, 238, 0.78);
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.keyboard-route-grid a {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 0.34rem;
+  min-height: 2.55rem;
+  padding: 0.54rem 0.62rem;
+}
+
+.keyboard-router-close {
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.62rem;
+  cursor: pointer;
+}
+
+.keyboard-route-grid a:hover,
+.keyboard-route-grid a:focus-visible,
+.keyboard-router-close:hover,
+.keyboard-router-close:focus-visible {
+  border-color: rgba(120, 233, 255, 0.32);
+  background:
+    linear-gradient(90deg, rgba(120, 233, 255, 0.07), transparent 68%),
+    rgba(5, 12, 16, 0.62);
+  color: rgba(239, 247, 249, 0.92);
+  outline: none;
+}
+
+.keyboard-router kbd {
+  display: inline-grid;
+  min-width: 1.45rem;
+  min-height: 1.35rem;
+  place-items: center;
+  border: 1px solid rgba(120, 233, 255, 0.22);
+  background: rgba(3, 7, 10, 0.58);
+  color: rgba(120, 233, 255, 0.72);
+  font: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0;
+}
+
+.keyboard-route-grid span,
+.keyboard-router-close span {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keyboard-router-status {
+  min-height: 1.2rem;
+  margin: 0.72rem 0 0;
+  color: rgba(180, 199, 205, 0.64);
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
 .site-footer {
   border-top: 1px solid rgba(190, 223, 232, 0.08);
   background: #020508;
@@ -5991,6 +6172,30 @@ img {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.24rem;
+  }
+
+  .keyboard-router {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .keyboard-router-toggle {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .keyboard-router-panel {
+    width: 100%;
+    padding: 0.78rem;
+  }
+
+  .keyboard-route-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .keyboard-route-grid a {
+    min-height: 2.36rem;
   }
 
   .footer-inner {

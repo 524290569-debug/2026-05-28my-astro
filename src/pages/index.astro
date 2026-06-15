@@ -837,6 +837,65 @@ const deskImageSize = { width: 1200, height: 900 };
       </div>
     </section>
 
+    <aside class="keyboard-router" data-keyboard-router aria-label="键盘路由">
+      <button
+        class="keyboard-router-toggle"
+        type="button"
+        aria-controls="keyboard-router-panel"
+        aria-expanded="false"
+        aria-keyshortcuts="?"
+        data-shortcut-trigger
+      >
+        <span aria-hidden="true">?</span>
+        <span class="visually-hidden">打开键盘路由</span>
+      </button>
+      <div
+        class="keyboard-router-panel"
+        id="keyboard-router-panel"
+        data-shortcut-panel
+        hidden
+      >
+        <div class="keyboard-router-head">
+          <span>KEY ROUTER</span>
+          <strong>弱信号导航</strong>
+        </div>
+        <div class="keyboard-route-grid" aria-label="分区快捷入口">
+          <a href="#home" data-shortcut-jump="home" aria-keyshortcuts="Alt+1">
+            <kbd>Alt</kbd>
+            <kbd>1</kbd>
+            <span>屋顶</span>
+          </a>
+          <a href="#works" data-shortcut-jump="works" aria-keyshortcuts="Alt+2">
+            <kbd>Alt</kbd>
+            <kbd>2</kbd>
+            <span>现场</span>
+          </a>
+          <a href="#blog" data-shortcut-jump="blog" aria-keyshortcuts="Alt+3">
+            <kbd>Alt</kbd>
+            <kbd>3</kbd>
+            <span>档案</span>
+          </a>
+          <a href="#contact" data-shortcut-jump="contact" aria-keyshortcuts="Alt+4">
+            <kbd>Alt</kbd>
+            <kbd>4</kbd>
+            <span>联络</span>
+          </a>
+        </div>
+        <button
+          class="keyboard-router-close"
+          type="button"
+          data-shortcut-close
+          aria-keyshortcuts="Escape"
+        >
+          <kbd>Esc</kbd>
+          <span>收束面板</span>
+        </button>
+        <p class="keyboard-router-status" data-shortcut-status aria-live="polite">
+          路由待机，频道保持安静。
+        </p>
+      </div>
+    </aside>
+
     <footer class="site-footer">
       <div class="footer-inner">
         <span>灰雨电台 / 雨声频道</span>
@@ -1184,6 +1243,169 @@ const deskImageSize = { width: 1200, height: 900 };
       }
 
       setContactState(defaultContactState);
+    });
+  }
+
+  const keyboardRouter = document.querySelector("[data-keyboard-router]");
+
+  if (keyboardRouter) {
+    const routerToggle = keyboardRouter.querySelector("[data-shortcut-trigger]");
+    const routerPanel = keyboardRouter.querySelector("[data-shortcut-panel]");
+    const routerClose = keyboardRouter.querySelector("[data-shortcut-close]");
+    const routerStatus = keyboardRouter.querySelector("[data-shortcut-status]");
+    const shortcutLinks = Array.from(keyboardRouter.querySelectorAll("[data-shortcut-jump]"));
+    const routeFocusTargets = {
+      home: "[data-channel-option]",
+      works: "[data-hotspot-button]",
+      blog: "[data-archive-filter]",
+      contact: "[data-contact-link]"
+    };
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const setRouterStatus = (message) => {
+      if (routerStatus) {
+        routerStatus.textContent = message;
+      }
+    };
+
+    const setRouterOpen = (isOpen, shouldFocus = false) => {
+      if (!routerPanel || !routerToggle) {
+        return;
+      }
+
+      routerPanel.hidden = !isOpen;
+      routerToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      keyboardRouter.toggleAttribute("data-router-open", isOpen);
+
+      if (isOpen) {
+        setRouterStatus("路由面板已接入，选择一个频道。");
+      }
+
+      if (shouldFocus) {
+        (isOpen ? shortcutLinks[0] : routerToggle)?.focus();
+      }
+    };
+
+    const isEditableTarget = (target) =>
+      target instanceof Element
+      && Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+
+    const closeScenePanels = () => {
+      document.querySelectorAll("[data-scene-card]").forEach((card) => {
+        const panel = card.querySelector("[data-hotspot-panel]");
+
+        if (panel) {
+          panel.hidden = true;
+        }
+
+        card.querySelectorAll("[data-hotspot-button]").forEach((button) => {
+          button.setAttribute("aria-expanded", "false");
+          button.removeAttribute("data-active");
+        });
+      });
+    };
+
+    const closeArchiveEntries = () => {
+      document.querySelectorAll("[data-archive-entry]").forEach((entry) => {
+        entry.open = false;
+
+        const summary = entry.querySelector("[data-archive-summary]");
+
+        if (summary) {
+          summary.setAttribute("aria-expanded", "false");
+        }
+      });
+    };
+
+    const closeOpenInteractionPanels = () => {
+      closeScenePanels();
+      closeArchiveEntries();
+      setRouterOpen(false);
+      setRouterStatus("已收束现场热点与档案日志。");
+    };
+
+    const focusRoute = (id) => {
+      const section = document.getElementById(id);
+
+      if (!section) {
+        return;
+      }
+
+      const focusTarget = section.querySelector(routeFocusTargets[id] || "a, button, summary")
+        || section;
+
+      section.scrollIntoView({
+        block: "start",
+        behavior: reduceMotion.matches ? "auto" : "smooth"
+      });
+
+      if (!focusTarget.hasAttribute("tabindex") && focusTarget === section) {
+        focusTarget.setAttribute("tabindex", "-1");
+      }
+
+      window.setTimeout(() => {
+        focusTarget.focus({ preventScroll: true });
+      }, reduceMotion.matches ? 0 : 220);
+
+      const label = shortcutLinks.find((link) => link.dataset.shortcutJump === id)
+        ?.querySelector("span")
+        ?.textContent
+        ?.trim();
+
+      setRouterStatus(`${label || "目标"}频道已定位。`);
+    };
+
+    routerToggle?.addEventListener("click", () => {
+      setRouterOpen(routerPanel?.hidden ?? true, true);
+    });
+
+    routerClose?.addEventListener("click", () => {
+      closeOpenInteractionPanels();
+      routerToggle?.focus();
+    });
+
+    shortcutLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        setRouterOpen(false);
+        focusRoute(link.dataset.shortcutJump || "");
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeOpenInteractionPanels();
+        return;
+      }
+
+      if (event.key === "?" && !event.altKey && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        setRouterOpen(routerPanel?.hidden ?? true, true);
+        return;
+      }
+
+      if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+        return;
+      }
+
+      const routeByKey = {
+        "1": "home",
+        "2": "works",
+        "3": "blog",
+        "4": "contact"
+      };
+      const route = routeByKey[event.key];
+
+      if (!route) {
+        return;
+      }
+
+      event.preventDefault();
+      setRouterOpen(false);
+      focusRoute(route);
     });
   }
 </script>
