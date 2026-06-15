@@ -209,11 +209,23 @@ const transmissionSignals = [
 
 const archivePosts = [
   {
+    category: "visual",
+    code: "VIS-06",
     date: "2026-06-05",
     displayDate: "2026.06.05",
     tag: "视觉",
     title: "雨夜界面不能只靠黑色",
     body: "真正有层次的暗色页面，需要雾、反光、低对比纹理和非常节制的霓虹点缀。",
+    note: "色阶不能压死。黑色旁边要留雾面灰、湿反光和一格窗光，否则页面只剩一整块沉默的幕布。",
+    params: [
+      { label: "FOG", value: "低位" },
+      { label: "WINDOW", value: "18%" },
+      { label: "GRAIN", value: "保留" }
+    ],
+    archive: {
+      status: "VISUAL / LOW LIGHT",
+      detail: "桌面图切到低亮窗光，保留雾、反光和暗处纹理。"
+    },
     signal: {
       label: "LIGHT",
       value: "18%",
@@ -222,11 +234,23 @@ const archivePosts = [
     }
   },
   {
+    category: "interaction",
+    code: "INT-04",
     date: "2026-06-04",
     displayDate: "2026.06.04",
     tag: "交互",
     title: "动效应该像远处的灯",
     body: "它可以存在，但不能抢走阅读和停留。视差、微光、信号条都应该在鼠标离开后安静下来。",
+    note: "交互不是让所有东西都动起来。它只负责告诉用户：这里可以靠近、可以读取，然后立刻退回背景。",
+    params: [
+      { label: "MOTION", value: "24%" },
+      { label: "FOCUS", value: "可见" },
+      { label: "ESC", value: "收起" }
+    ],
+    archive: {
+      status: "INTERACTION / HOLD",
+      detail: "工作台进入交互记录模式，只保留展开、筛选和焦点反馈。"
+    },
     signal: {
       label: "MOTION",
       value: "24%",
@@ -235,17 +259,68 @@ const archivePosts = [
     }
   },
   {
+    category: "sound",
+    code: "AUD-03",
     date: "2026-06-03",
     displayDate: "2026.06.03",
     tag: "声音",
     title: "低保真不是粗糙，而是保留痕迹",
     body: "像磁带底噪、旧墙雨痕和未清理干净的反射，它们让页面从模板里脱离出来。",
+    note: "噪声要像底色，不像警报。保留一点磁带边缘和旧设备残响，页面会更像被使用过的工作台。",
+    params: [
+      { label: "NOISE", value: "41%" },
+      { label: "TAPE", value: "旧痕" },
+      { label: "ECHO", value: "短" }
+    ],
+    archive: {
+      status: "AUDIO / TAPE TRACE",
+      detail: "声场记录接入，底噪和短回声保持在可读范围。"
+    },
     signal: {
       label: "NOISE",
       value: "41%",
       detail: "底噪保留",
       level: "41%"
     }
+  }
+];
+
+const archiveCategories = [
+  {
+    id: "all",
+    label: "全部",
+    count: archivePosts.length,
+    status: "ARCHIVE / ALL",
+    title: "夜间工作台",
+    detail: "视觉、交互和声音记录全部接入，等待筛选。",
+    level: "76%"
+  },
+  {
+    id: "visual",
+    label: "视觉",
+    count: archivePosts.filter((post) => post.category === "visual").length,
+    status: "VISUAL / LOW LIGHT",
+    title: "低亮度记录",
+    detail: "只读取雾、窗光和雨面反射相关的界面笔记。",
+    level: "18%"
+  },
+  {
+    id: "interaction",
+    label: "交互",
+    count: archivePosts.filter((post) => post.category === "interaction").length,
+    status: "INTERACTION / HOLD",
+    title: "轻量交互记录",
+    detail: "筛出与展开、焦点和低频动效有关的实验说明。",
+    level: "24%"
+  },
+  {
+    id: "sound",
+    label: "声音",
+    count: archivePosts.filter((post) => post.category === "sound").length,
+    status: "AUDIO / TAPE TRACE",
+    title: "底噪采样记录",
+    detail: "只保留低保真、磁带痕迹和旧设备残响。",
+    level: "41%"
   }
 ];
 
@@ -482,32 +557,94 @@ const deskImageSize = { width: 1200, height: 900 };
             <h2>把资料、笔记和界面实验放进同一个夜间工作台。</h2>
           </div>
 
-          <div class="post-list">
-            {archivePosts.map((post) => (
-              <article class="post-row">
-                <time datetime={post.date}>{post.displayDate}</time>
-                <div>
-                  <p class="post-tag">{post.tag}</p>
-                  <h3>{post.title}</h3>
-                  <p>{post.body}</p>
-                  <div
-                    class="post-signal-strip"
-                    style={`--level: ${post.signal.level}`}
-                    aria-label={`${post.signal.label}：${post.signal.value}，${post.signal.detail}`}
+          <div class="archive-console" data-archive-panel>
+            <div class="archive-filter-toolbar" aria-label="档案分类筛选">
+              {archiveCategories.map((category) => (
+                <button
+                  type="button"
+                  class="archive-filter-button"
+                  data-archive-filter={category.id}
+                  data-archive-filter-label={category.label}
+                  data-archive-status={category.status}
+                  data-archive-title={category.title}
+                  data-archive-detail={category.detail}
+                  data-archive-level={category.level}
+                  data-archive-tone={category.id}
+                  aria-pressed={category.id === "all" ? "true" : "false"}
+                >
+                  <span>{category.label}</span>
+                  <small>{category.count} 条</small>
+                </button>
+              ))}
+            </div>
+
+            <p class="archive-filter-status" data-archive-filter-status aria-live="polite">
+              全部 {archivePosts.length} 条记录接入。
+            </p>
+
+            <div class="post-list">
+              {archivePosts.map((post, index) => {
+                const detailId = `archive-detail-${index + 1}`;
+
+                return (
+                  <details
+                    class="post-row"
+                    data-archive-entry
+                    data-category={post.category}
+                    data-archive-status={post.archive.status}
+                    data-archive-title={post.title}
+                    data-archive-detail={post.archive.detail}
+                    data-archive-level={post.signal.level}
+                    data-archive-tone={post.category}
                   >
-                    <span>{post.signal.label}</span>
-                    <i aria-hidden="true"></i>
-                    <strong>{post.signal.value}</strong>
-                    <small>{post.signal.detail}</small>
-                  </div>
-                </div>
-              </article>
-            ))}
+                    <summary
+                      class="post-summary"
+                      data-archive-summary
+                      aria-controls={detailId}
+                      aria-expanded="false"
+                    >
+                      <time datetime={post.date}>{post.displayDate}</time>
+                      <div>
+                        <p class="post-tag">{post.tag} / {post.code}</p>
+                        <h3>{post.title}</h3>
+                        <p>{post.body}</p>
+                        <div
+                          class="post-signal-strip"
+                          style={`--level: ${post.signal.level}`}
+                          aria-label={`${post.signal.label}：${post.signal.value}，${post.signal.detail}`}
+                        >
+                          <span>{post.signal.label}</span>
+                          <i aria-hidden="true"></i>
+                          <strong>{post.signal.value}</strong>
+                          <small>{post.signal.detail}</small>
+                        </div>
+                      </div>
+                      <span class="post-expand-indicator" aria-hidden="true">
+                        <span>读取日志</span>
+                        <b></b>
+                      </span>
+                    </summary>
+
+                    <div class="post-detail" id={detailId}>
+                      <p>{post.note}</p>
+                      <dl>
+                        {post.params.map((param) => (
+                          <div>
+                            <dt>{param.label}</dt>
+                            <dd>{param.value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         <div class="blog-media-column">
-          <div class="feature-photo-card">
+          <div class="feature-photo-card" data-archive-desk-card data-archive-tone="all">
             <img
               src={deskImage}
               alt="雨夜窗边的合成器、磁带机和耳机"
@@ -523,6 +660,12 @@ const deskImageSize = { width: 1200, height: 900 };
               <span></span>
               <span></span>
               <span></span>
+            </div>
+            <div class="desk-readout" data-archive-desk-readout aria-live="polite">
+              <span data-archive-desk-channel>{archiveCategories[0].status}</span>
+              <strong data-archive-desk-title>{archiveCategories[0].title}</strong>
+              <p data-archive-desk-detail>{archiveCategories[0].detail}</p>
+              <i style={`--level: ${archiveCategories[0].level}`} data-archive-desk-meter></i>
             </div>
           </div>
         </div>
@@ -721,5 +864,133 @@ const deskImageSize = { width: 1200, height: 900 };
     });
 
     updateDiscoveryStatus();
+  }
+
+  const archivePanel = document.querySelector("[data-archive-panel]");
+
+  if (archivePanel) {
+    const filterButtons = Array.from(archivePanel.querySelectorAll("[data-archive-filter]"));
+    const archiveEntries = Array.from(archivePanel.querySelectorAll("[data-archive-entry]"));
+    const filterStatus = archivePanel.querySelector("[data-archive-filter-status]");
+    const deskCard = document.querySelector("[data-archive-desk-card]");
+    const deskChannel = document.querySelector("[data-archive-desk-channel]");
+    const deskTitle = document.querySelector("[data-archive-desk-title]");
+    const deskDetail = document.querySelector("[data-archive-desk-detail]");
+    const deskMeter = document.querySelector("[data-archive-desk-meter]");
+
+    const setDeskReadout = (source) => {
+      if (deskCard && source.dataset.archiveTone) {
+        deskCard.dataset.archiveTone = source.dataset.archiveTone;
+      }
+
+      if (deskChannel) {
+        deskChannel.textContent = source.dataset.archiveStatus || "ARCHIVE / ALL";
+      }
+
+      if (deskTitle) {
+        deskTitle.textContent = source.dataset.archiveTitle || "夜间工作台";
+      }
+
+      if (deskDetail) {
+        deskDetail.textContent = source.dataset.archiveDetail || "记录已接入，等待筛选。";
+      }
+
+      if (deskMeter) {
+        deskMeter.style.setProperty("--level", source.dataset.archiveLevel || "76%");
+      }
+    };
+
+    const syncEntrySummary = (entry) => {
+      const summary = entry.querySelector("[data-archive-summary]");
+
+      if (summary) {
+        summary.setAttribute("aria-expanded", entry.open ? "true" : "false");
+      }
+    };
+
+    const closeEntry = (entry) => {
+      entry.open = false;
+      syncEntrySummary(entry);
+    };
+
+    const setFilter = (button) => {
+      const category = button.dataset.archiveFilter || "all";
+      const label = button.dataset.archiveFilterLabel || "全部";
+      let visibleCount = 0;
+
+      filterButtons.forEach((item) => {
+        item.setAttribute("aria-pressed", item === button ? "true" : "false");
+      });
+
+      archiveEntries.forEach((entry) => {
+        const shouldShow = category === "all" || entry.dataset.category === category;
+
+        entry.hidden = !shouldShow;
+
+        if (shouldShow) {
+          visibleCount += 1;
+        } else {
+          closeEntry(entry);
+        }
+      });
+
+      if (filterStatus) {
+        filterStatus.textContent = `${label}频道 ${visibleCount} 条记录接入。`;
+      }
+
+      setDeskReadout(button);
+    };
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setFilter(button);
+      });
+    });
+
+    archiveEntries.forEach((entry) => {
+      entry.addEventListener("toggle", () => {
+        syncEntrySummary(entry);
+
+        if (!entry.open) {
+          return;
+        }
+
+        archiveEntries.forEach((item) => {
+          if (item !== entry && !item.hidden) {
+            closeEntry(item);
+          }
+        });
+
+        setDeskReadout(entry);
+      });
+    });
+
+    archivePanel.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      const openEntry = archiveEntries.find((entry) => entry.open && !entry.hidden);
+
+      if (!openEntry) {
+        return;
+      }
+
+      closeEntry(openEntry);
+
+      const summary = openEntry.querySelector("[data-archive-summary]");
+
+      if (summary) {
+        summary.focus();
+      }
+    });
+
+    const initialFilter = filterButtons.find(
+      (button) => button.getAttribute("aria-pressed") === "true"
+    );
+
+    if (initialFilter) {
+      setFilter(initialFilter);
+    }
   }
 </script>
