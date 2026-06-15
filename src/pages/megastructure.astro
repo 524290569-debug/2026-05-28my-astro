@@ -733,21 +733,6 @@ const mapRoutes = nodes
             ))
           }
         </div>
-        <div class="mega-world-map-records" aria-label="发现记录">
-          {
-            scenes.map((scene) => (
-              <article
-                class={scene.id === firstScene.id ? "is-unlocked" : ""}
-                data-world-map-record={scene.id}
-              >
-                <span>{scene.label}</span>
-                <p data-world-map-record-text={scene.id}>
-                  {scene.id === firstScene.id ? scene.discovery : "未探索"}
-                </p>
-              </article>
-            ))
-          }
-        </div>
       </aside>
 
       <section class="mega-lab-title" aria-label="页面标题">
@@ -899,7 +884,6 @@ const mapRoutes = nodes
       const worldMapProgress = lab.querySelector("[data-world-map-progress]");
       const worldMapSceneButtons = Array.from(lab.querySelectorAll("[data-world-map-scene]"));
       const worldMapZoneBadges = Array.from(lab.querySelectorAll("[data-world-map-zone]"));
-      const worldMapRecordItems = Array.from(lab.querySelectorAll("[data-world-map-record]"));
       const modePhrase = lab.querySelector("[data-mode-phrase]");
       const modeCode = lab.querySelector("[data-mode-code]");
       const nodeCode = lab.querySelector("[data-node-code]");
@@ -1155,18 +1139,6 @@ const mapRoutes = nodes
           button.classList.toggle("is-unvisited", !isVisited);
         });
 
-        worldMapRecordItems.forEach((item) => {
-          const sceneId = item.dataset.worldMapRecord;
-          const recordScene = findScene(sceneId);
-          const isUnlocked = visitedSceneIds.has(sceneId);
-          const recordText = item.querySelector("[data-world-map-record-text]");
-
-          item.classList.toggle("is-unlocked", isUnlocked);
-          item.classList.toggle("is-locked", !isUnlocked);
-          if (recordText) {
-            recordText.textContent = isUnlocked ? recordScene.discovery || recordScene.description : "未探索";
-          }
-        });
       };
 
       const commentPageForScene = (sceneId = activeSceneId) => `megastructure:${findScene(sceneId).id}`;

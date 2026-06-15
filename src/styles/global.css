@@ -2603,10 +2603,10 @@ img {
   background:
     linear-gradient(
       90deg,
-      var(--scene-veil-side, rgba(0, 0, 0, 0.2)),
-      transparent 22%,
-      transparent 76%,
-      var(--scene-veil-side, rgba(0, 0, 0, 0.18))
+      var(--scene-veil-side, rgba(0, 0, 0, 0.16)),
+      transparent 18%,
+      transparent 84%,
+      rgba(0, 0, 0, 0.08)
     ),
     linear-gradient(
       180deg,
@@ -2625,10 +2625,10 @@ img {
 }
 
 .mega-lab-backdrop {
-  inset: -3%;
+  inset: -4.5% -5.5%;
   z-index: 0;
-  width: 106%;
-  height: 106%;
+  width: 111%;
+  height: 109%;
   object-fit: cover;
   object-position: var(--scene-position, center);
   opacity: 1;
