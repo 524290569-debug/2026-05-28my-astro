@@ -323,11 +323,52 @@ img {
 
 .cyberpunk-hero {
   position: relative;
+  --channel-accent: rgba(120, 233, 255, 0.78);
+  --channel-accent-soft: rgba(120, 233, 255, 0.14);
+  --channel-city-glow: rgba(126, 169, 188, 0.22);
+  --channel-fog-opacity: 1;
+  --channel-haze-opacity: 1;
+  --channel-rain-opacity: 0.13;
+  --channel-rain-speed: 10s;
+  --channel-readout-fill: rgba(120, 233, 255, 0.055);
   min-height: 720px;
   height: 100vh;
   overflow: hidden;
   isolation: isolate;
   background: var(--black);
+}
+
+.cyberpunk-hero[data-channel="rain"] {
+  --channel-accent: rgba(120, 233, 255, 0.82);
+  --channel-accent-soft: rgba(120, 233, 255, 0.16);
+  --channel-city-glow: rgba(126, 169, 188, 0.2);
+  --channel-fog-opacity: 1;
+  --channel-haze-opacity: 1;
+  --channel-rain-opacity: 0.17;
+  --channel-rain-speed: 8s;
+  --channel-readout-fill: rgba(120, 233, 255, 0.08);
+}
+
+.cyberpunk-hero[data-channel="band"] {
+  --channel-accent: rgba(240, 90, 157, 0.68);
+  --channel-accent-soft: rgba(240, 90, 157, 0.12);
+  --channel-city-glow: rgba(240, 90, 157, 0.16);
+  --channel-fog-opacity: 0.78;
+  --channel-haze-opacity: 0.84;
+  --channel-rain-opacity: 0.08;
+  --channel-rain-speed: 13s;
+  --channel-readout-fill: rgba(240, 90, 157, 0.07);
+}
+
+.cyberpunk-hero[data-channel="light"] {
+  --channel-accent: rgba(215, 182, 106, 0.72);
+  --channel-accent-soft: rgba(215, 182, 106, 0.13);
+  --channel-city-glow: rgba(215, 182, 106, 0.18);
+  --channel-fog-opacity: 0.86;
+  --channel-haze-opacity: 0.72;
+  --channel-rain-opacity: 0.11;
+  --channel-rain-speed: 11s;
+  --channel-readout-fill: rgba(215, 182, 106, 0.08);
 }
 
 .hero-stage,
@@ -388,7 +429,8 @@ img {
     brightness(0.98)
     saturate(0.74)
     contrast(1.04)
-    drop-shadow(0 0 2.5rem rgba(126, 169, 188, 0.22));
+    drop-shadow(0 0 2.5rem var(--channel-city-glow));
+  transition: filter 220ms ease;
 }
 
 /* Transparent generated rooftop layer: closest layer and largest parallax response. */
@@ -414,19 +456,22 @@ img {
 .city-haze-layer {
   inset: -8%;
   z-index: 4;
+  opacity: var(--channel-haze-opacity);
   pointer-events: none;
   background:
     linear-gradient(180deg, transparent 0 28%, rgba(148, 174, 184, 0.11) 48%, rgba(4, 11, 15, 0.22) 68%, transparent 82%),
     radial-gradient(ellipse at 58% 47%, rgba(167, 191, 201, 0.12), transparent 34%),
     radial-gradient(ellipse at 78% 58%, rgba(77, 105, 122, 0.13), transparent 28%);
   filter: blur(10px);
+  transition: opacity 220ms ease;
 }
 
 /* CSS rain on top, kept subtle so it does not become a game login screen. */
 .css-rain-layer {
   z-index: 9;
   overflow: hidden;
-  opacity: 0.13;
+  opacity: var(--channel-rain-opacity);
+  transition: opacity 220ms ease;
 }
 
 .css-rain-layer::before,
@@ -447,7 +492,7 @@ img {
     transparent 1.66rem 5.2rem
   );
   background-size: 12rem 15rem;
-  animation: rainSlide 10s linear infinite;
+  animation: rainSlide var(--channel-rain-speed) linear infinite;
 }
 
 .css-rain-layer::after {
@@ -457,12 +502,14 @@ img {
 /* CSS fog and dark glass gradients bind the generated layers into one scene. */
 .fog-gradient-layer {
   z-index: 10;
+  opacity: var(--channel-fog-opacity);
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(5, 11, 16, 0.08) 0, transparent 30%, rgba(118, 148, 162, 0.08) 58%, transparent 78%),
     radial-gradient(ellipse at 20% 50%, rgba(2, 7, 10, 0.38), transparent 34%),
     radial-gradient(ellipse at 80% 52%, rgba(116, 145, 165, 0.06), transparent 28%);
   filter: blur(4px);
+  transition: opacity 220ms ease;
 }
 
 .grain-layer {
@@ -747,8 +794,13 @@ img {
 .hero-signal span {
   display: block;
   height: 1px;
-  background: linear-gradient(90deg, rgba(120, 233, 255, 0.5), rgba(190, 223, 232, 0.14), transparent);
-  box-shadow: 0 0 1.2rem rgba(120, 233, 255, 0.1);
+  background: linear-gradient(90deg, var(--channel-accent), rgba(190, 223, 232, 0.14), transparent);
+  box-shadow: 0 0 1.2rem var(--channel-accent-soft);
+  opacity: 0.64;
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease,
+    opacity 220ms ease;
 }
 
 .hero-signal span:nth-child(2) {
@@ -828,10 +880,11 @@ img {
 }
 
 .station-panel-head strong {
-  color: rgba(215, 182, 106, 0.72);
+  color: var(--channel-accent);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.16em;
+  transition: color 220ms ease;
 }
 
 .station-panel-grid {
@@ -841,9 +894,64 @@ img {
 }
 
 .station-readout {
+  position: relative;
+  display: block;
+  min-height: 5.2rem;
+  width: 100%;
   min-width: 0;
+  border: 0;
   border-left: 1px solid rgba(120, 233, 255, 0.18);
-  padding-left: 0.75rem;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.32rem 0.55rem 0.32rem 0.75rem;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.station-readout::after {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.28rem;
+  left: 0.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--channel-accent), transparent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.32);
+  transform-origin: left;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.station-readout:hover,
+.station-readout:focus-visible,
+.station-readout[aria-pressed="true"] {
+  border-left-color: var(--channel-accent);
+  background:
+    linear-gradient(90deg, var(--channel-readout-fill), transparent 72%),
+    rgba(255, 255, 255, 0.018);
+}
+
+.station-readout:hover,
+.station-readout:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.station-readout:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--channel-accent-soft);
+}
+
+.station-readout[aria-pressed="true"]::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .station-readout strong {
@@ -862,6 +970,27 @@ img {
   font-weight: 300;
   line-height: 1.5;
   overflow-wrap: anywhere;
+}
+
+.station-transmission-log {
+  position: relative;
+  z-index: 1;
+  margin: 0.82rem 0 0;
+  border-top: 1px solid rgba(190, 223, 232, 0.09);
+  padding-top: 0.68rem;
+  color: rgba(190, 207, 213, 0.72);
+  font-size: 0.72rem;
+  font-weight: 300;
+  line-height: 1.55;
+}
+
+.station-transmission-log::before {
+  color: var(--channel-accent);
+  content: "LOG / ";
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  transition: color 220ms ease;
 }
 
 .visual-track div {
@@ -4959,12 +5088,18 @@ img {
   }
 
   .station-readout {
+    min-height: 4.8rem;
     padding-left: 0.62rem;
   }
 
   .station-readout p {
     font-size: 0.68rem;
     line-height: 1.42;
+  }
+
+  .station-transmission-log {
+    margin-top: 0.72rem;
+    padding-top: 0.58rem;
   }
 
   .distant-city-asset {
@@ -5157,12 +5292,21 @@ img {
     gap: 0.5rem;
   }
 
+  .station-readout {
+    min-height: 3.8rem;
+    padding: 0.28rem 0.35rem 0.28rem 0.58rem;
+  }
+
   .station-readout strong {
     font-size: 0.86rem;
   }
 
   .station-readout p {
     display: none;
+  }
+
+  .station-transmission-log {
+    font-size: 0.66rem;
   }
 
   .hero-kicker {
