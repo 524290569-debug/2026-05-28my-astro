@@ -101,7 +101,44 @@ img {
 .page-shell {
   min-height: 100vh;
   --rain-wall: none;
+  --ambient-accent: rgba(120, 233, 255, 0.72);
+  --ambient-accent-soft: rgba(120, 233, 255, 0.12);
+  --ambient-glow: rgba(120, 233, 255, 0.06);
+  --ambient-grid: rgba(120, 233, 255, 0.035);
+  --ambient-section-glow: rgba(79, 63, 93, 0.12);
   background: var(--black);
+}
+
+.page-shell[data-ambient-tone="about"] {
+  --ambient-accent: rgba(126, 169, 188, 0.78);
+  --ambient-accent-soft: rgba(126, 169, 188, 0.13);
+  --ambient-glow: rgba(126, 169, 188, 0.07);
+  --ambient-grid: rgba(126, 169, 188, 0.034);
+  --ambient-section-glow: rgba(74, 91, 105, 0.14);
+}
+
+.page-shell[data-ambient-tone="works"] {
+  --ambient-accent: rgba(120, 233, 255, 0.72);
+  --ambient-accent-soft: rgba(120, 233, 255, 0.14);
+  --ambient-glow: rgba(120, 233, 255, 0.07);
+  --ambient-grid: rgba(120, 233, 255, 0.04);
+  --ambient-section-glow: rgba(91, 128, 143, 0.15);
+}
+
+.page-shell[data-ambient-tone="blog"] {
+  --ambient-accent: rgba(215, 182, 106, 0.72);
+  --ambient-accent-soft: rgba(215, 182, 106, 0.13);
+  --ambient-glow: rgba(215, 182, 106, 0.06);
+  --ambient-grid: rgba(215, 182, 106, 0.032);
+  --ambient-section-glow: rgba(115, 92, 48, 0.13);
+}
+
+.page-shell[data-ambient-tone="contact"] {
+  --ambient-accent: rgba(240, 90, 157, 0.66);
+  --ambient-accent-soft: rgba(240, 90, 157, 0.11);
+  --ambient-glow: rgba(240, 90, 157, 0.052);
+  --ambient-grid: rgba(240, 90, 157, 0.03);
+  --ambient-section-glow: rgba(103, 54, 82, 0.13);
 }
 
 .page-shell-visual {
@@ -132,9 +169,10 @@ img {
 .page-shell-visual::after {
   opacity: 0.1;
   background:
-    radial-gradient(circle at 18% 24%, rgba(120, 233, 255, 0.06), transparent 22rem),
+    radial-gradient(circle at 18% 24%, var(--ambient-glow), transparent 22rem),
     radial-gradient(circle at 82% 72%, rgba(240, 90, 157, 0.045), transparent 20rem),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 5px);
+  transition: background 240ms ease;
 }
 
 .surface-brief {
@@ -158,8 +196,8 @@ img {
 .surface-brief::before {
   inset: 0;
   background:
-    linear-gradient(90deg, transparent, rgba(120, 233, 255, 0.1), transparent),
-    radial-gradient(ellipse at 48% 100%, rgba(120, 233, 255, 0.1), transparent 42rem);
+    linear-gradient(90deg, transparent, var(--ambient-accent-soft), transparent),
+    radial-gradient(ellipse at 48% 100%, var(--ambient-accent-soft), transparent 42rem);
   opacity: 0.42;
 }
 
@@ -231,7 +269,7 @@ img {
 .signal-tape::before {
   inset: 0;
   background:
-    radial-gradient(ellipse at 18% 0%, rgba(120, 233, 255, 0.08), transparent 24rem),
+    radial-gradient(ellipse at 18% 0%, var(--ambient-glow), transparent 24rem),
     radial-gradient(ellipse at 74% 100%, rgba(240, 90, 157, 0.045), transparent 18rem),
     repeating-linear-gradient(90deg, transparent 0 3.2rem, rgba(190, 223, 232, 0.035) 3.2rem 3.24rem);
   opacity: 0.58;
@@ -242,7 +280,7 @@ img {
   bottom: 0;
   left: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(120, 233, 255, 0.24), transparent);
+  background: linear-gradient(90deg, transparent, var(--ambient-accent), transparent);
 }
 
 .signal-tape-inner {
@@ -270,8 +308,8 @@ img {
   display: block;
   width: var(--level);
   height: 1px;
-  background: linear-gradient(90deg, rgba(120, 233, 255, 0.78), rgba(190, 223, 232, 0.18), transparent);
-  box-shadow: 0 0 1rem rgba(120, 233, 255, 0.12);
+  background: linear-gradient(90deg, var(--ambient-accent), rgba(190, 223, 232, 0.18), transparent);
+  box-shadow: 0 0 1rem var(--ambient-accent-soft);
 }
 
 .signal-tape-meter span:nth-child(3) {
@@ -329,6 +367,125 @@ img {
   color: rgba(166, 184, 190, 0.66);
   font-size: 0.76rem;
   line-height: 1.48;
+}
+
+.ambient-channel-strip {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  overflow: hidden;
+  border-top: 1px solid rgba(190, 223, 232, 0.08);
+  border-bottom: 1px solid rgba(190, 223, 232, 0.1);
+  background:
+    linear-gradient(90deg, rgba(3, 7, 10, 0.96), rgba(11, 24, 31, 0.86), rgba(3, 7, 10, 0.96)),
+    rgba(3, 7, 10, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.ambient-channel-strip::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, var(--ambient-accent-soft), transparent),
+    repeating-linear-gradient(90deg, transparent 0 4rem, var(--ambient-grid) 4rem 4.04rem);
+  content: "";
+  opacity: 0.64;
+}
+
+.ambient-channel-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(var(--content-max), calc(100% - 3rem));
+  grid-template-columns: minmax(7rem, 0.38fr) minmax(18rem, 1fr) minmax(16rem, 0.8fr);
+  gap: clamp(0.9rem, 2.4vw, 1.8rem);
+  align-items: center;
+  margin: 0 auto;
+  padding: 0.72rem 0;
+}
+
+.ambient-channel-meter {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.ambient-channel-meter span {
+  display: block;
+  width: var(--ambient-meter, 72%);
+  height: 1px;
+  background: linear-gradient(90deg, var(--ambient-accent), rgba(190, 223, 232, 0.14), transparent);
+  box-shadow: 0 0 1rem var(--ambient-accent-soft);
+}
+
+.ambient-channel-meter span:nth-child(2) {
+  width: 52%;
+  opacity: 0.72;
+}
+
+.ambient-channel-meter span:nth-child(3) {
+  width: 28%;
+  opacity: 0.42;
+}
+
+.ambient-channel-main {
+  min-width: 0;
+}
+
+.ambient-channel-main span,
+.ambient-channel-readouts small {
+  display: block;
+  color: var(--ambient-accent);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ambient-channel-main strong {
+  display: block;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  color: rgba(239, 247, 249, 0.92);
+  font-size: 0.88rem;
+  font-weight: 420;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ambient-channel-main p {
+  margin: 0.2rem 0 0;
+  overflow: hidden;
+  color: rgba(190, 207, 213, 0.68);
+  font-size: 0.74rem;
+  line-height: 1.46;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ambient-channel-readouts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+
+.ambient-channel-readouts span {
+  min-width: 0;
+  border-left: 1px solid rgba(190, 223, 232, 0.12);
+  padding-left: 0.72rem;
+}
+
+.ambient-channel-readouts b {
+  display: block;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  color: rgba(236, 246, 248, 0.84);
+  font-size: 0.78rem;
+  font-weight: 360;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cyberpunk-hero {
@@ -1037,8 +1194,9 @@ img {
   scroll-margin-top: var(--anchor-offset);
   border-top: 1px solid rgba(190, 223, 232, 0.08);
   background:
-    radial-gradient(circle at 78% 18%, rgba(79, 63, 93, 0.12), transparent 28rem),
+    radial-gradient(circle at 78% 18%, var(--ambient-section-glow), transparent 28rem),
     linear-gradient(180deg, rgba(4, 10, 14, 0.96), rgba(2, 5, 8, 0.98));
+  transition: background 240ms ease;
 }
 
 .content-section:target {
@@ -1052,8 +1210,8 @@ img {
   background:
     linear-gradient(rgba(3, 7, 10, 0.77), rgba(3, 7, 10, 0.9)),
     var(--rain-wall),
-    linear-gradient(90deg, rgba(120, 233, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(120, 233, 255, 0.024) 1px, transparent 1px);
+    linear-gradient(90deg, var(--ambient-grid) 1px, transparent 1px),
+    linear-gradient(180deg, var(--ambient-grid) 1px, transparent 1px);
   background-size:
     auto,
     34rem 34rem,
@@ -5660,6 +5818,14 @@ img {
     grid-column: 1 / -1;
   }
 
+  .ambient-channel-inner {
+    grid-template-columns: minmax(7rem, 0.42fr) minmax(0, 1fr);
+  }
+
+  .ambient-channel-readouts {
+    grid-column: 1 / -1;
+  }
+
   .reading-card {
     grid-column: auto;
   }
@@ -5923,6 +6089,29 @@ img {
 
   .signal-tape-card {
     min-height: auto;
+  }
+
+  .ambient-channel-inner {
+    width: min(100% - 2rem, var(--content-max));
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.62rem;
+    padding: 0.62rem 0;
+  }
+
+  .ambient-channel-meter {
+    display: none;
+  }
+
+  .ambient-channel-main p {
+    white-space: normal;
+  }
+
+  .ambient-channel-readouts {
+    gap: 0.48rem;
+  }
+
+  .ambient-channel-readouts span {
+    padding-left: 0.58rem;
   }
 
   .works-note {

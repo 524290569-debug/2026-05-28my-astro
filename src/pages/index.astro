@@ -412,7 +412,12 @@ const deskImageSize = { width: 1200, height: 900 };
     { href: "assets/hero/rooftop-v5.webp", type: "image/webp" }
   ]}
 >
-  <main class="page-shell page-shell-visual" style={`--rain-wall: url("${textureImage}")`}>
+  <main
+    class="page-shell page-shell-visual"
+    data-page-signal
+    data-ambient-tone="home"
+    style={`--rain-wall: url("${textureImage}")`}
+  >
     <CyberpunkHero />
 
     <section class="surface-brief" aria-label="频道状态">
@@ -462,7 +467,43 @@ const deskImageSize = { width: 1200, height: 900 };
       </div>
     </section>
 
-    <section id="about" class="content-section about-section" aria-label="宣言">
+    <aside class="ambient-channel-strip" data-ambient-readout aria-label="当前滚动频道">
+      <div class="ambient-channel-inner">
+        <div class="ambient-channel-meter" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="ambient-channel-main">
+          <span>SCROLL CHANNEL</span>
+          <strong data-ambient-channel-output>ROOF / RAIN</strong>
+          <p data-ambient-copy-output aria-live="polite">雨声压低了频道，屋顶天线保持在线。</p>
+        </div>
+        <div class="ambient-channel-readouts" aria-label="当前频道参数">
+          <span>
+            <small>AREA</small>
+            <b data-ambient-area-output>旧楼天台</b>
+          </span>
+          <span>
+            <small>SIGNAL</small>
+            <b data-ambient-signal-output>-72 dB</b>
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <section
+      id="about"
+      class="content-section about-section"
+      aria-label="宣言"
+      data-ambient-section
+      data-ambient-tone="about"
+      data-ambient-channel="MANIFEST / LOFI"
+      data-ambient-area="北向窗"
+      data-ambient-signal="03:17"
+      data-ambient-copy="低保真夜航接入，雾面灰和旧设备底噪保持低位。"
+      data-ambient-level="46%"
+    >
       <div class="section-shell about-grid">
         <div class="section-copy">
           <p class="section-label">宣言 / 低保真夜航</p>
@@ -524,7 +565,18 @@ const deskImageSize = { width: 1200, height: 900 };
       </div>
     </section>
 
-    <section id="works" class="content-section works-section image-section" aria-label="现场">
+    <section
+      id="works"
+      class="content-section works-section image-section"
+      aria-label="现场"
+      data-ambient-section
+      data-ambient-tone="works"
+      data-ambient-channel="FIELD / FRAGMENTS"
+      data-ambient-area="城市边缘"
+      data-ambient-signal={`${sceneHotspotTotal}/${sceneHotspotTotal}`}
+      data-ambient-copy="现场切片进入扫描，弱信号点等待读取。"
+      data-ambient-level="68%"
+    >
       <div class="section-shell">
         <div class="section-heading">
           <p class="section-label">现场 / 三段夜间切片</p>
@@ -623,7 +675,18 @@ const deskImageSize = { width: 1200, height: 900 };
       </div>
     </section>
 
-    <section id="blog" class="content-section blog-section archive-section" aria-label="档案">
+    <section
+      id="blog"
+      class="content-section blog-section archive-section"
+      aria-label="档案"
+      data-ambient-section
+      data-ambient-tone="blog"
+      data-ambient-channel="ARCHIVE / DESK"
+      data-ambient-area="夜间工作台"
+      data-ambient-signal={`${archivePosts.length} LOGS`}
+      data-ambient-copy="档案频道接入，筛选和展开保持待命。"
+      data-ambient-level="41%"
+    >
       <div class="section-shell blog-layout">
         <div class="blog-copy-column">
           <div class="section-heading">
@@ -772,7 +835,18 @@ const deskImageSize = { width: 1200, height: 900 };
       </div>
     </section>
 
-    <section id="contact" class="content-section contact-section" aria-label="联络">
+    <section
+      id="contact"
+      class="content-section contact-section"
+      aria-label="联络"
+      data-ambient-section
+      data-ambient-tone="contact"
+      data-ambient-channel="CONTACT / WEAK"
+      data-ambient-area="弱信号入口"
+      data-ambient-signal="OPEN"
+      data-ambient-copy="联络通道靠近，传输日志准备接管。"
+      data-ambient-level="82%"
+    >
       <div class="section-shell contact-grid">
         <div class="section-copy">
           <p class="section-label">联络 / 弱信号入口</p>
@@ -906,6 +980,95 @@ const deskImageSize = { width: 1200, height: 900 };
 </BaseLayout>
 
 <script>
+  const pageShell = document.querySelector("[data-page-signal]");
+  const ambientReadout = document.querySelector("[data-ambient-readout]");
+
+  if (pageShell && ambientReadout) {
+    const ambientSections = Array.from(document.querySelectorAll("[data-ambient-section]"));
+    const ambientChannel = ambientReadout.querySelector("[data-ambient-channel-output]");
+    const ambientArea = ambientReadout.querySelector("[data-ambient-area-output]");
+    const ambientSignal = ambientReadout.querySelector("[data-ambient-signal-output]");
+    const ambientCopy = ambientReadout.querySelector("[data-ambient-copy-output]");
+    let activeAmbientId = "";
+    let ambientFrame = 0;
+
+    const setAmbientState = (section) => {
+      if (!section || activeAmbientId === section.id) {
+        return;
+      }
+
+      activeAmbientId = section.id;
+      pageShell.dataset.ambientTone = section.dataset.ambientTone || "home";
+      ambientReadout.style.setProperty("--ambient-meter", section.dataset.ambientLevel || "72%");
+
+      if (ambientChannel) {
+        ambientChannel.textContent = section.dataset.ambientChannel || "ROOF / RAIN";
+      }
+
+      if (ambientArea) {
+        ambientArea.textContent = section.dataset.ambientArea || "旧楼天台";
+      }
+
+      if (ambientSignal) {
+        ambientSignal.textContent = section.dataset.ambientSignal || "-72 dB";
+      }
+
+      if (ambientCopy) {
+        ambientCopy.textContent = section.dataset.ambientCopy || "雨声压低了频道，屋顶天线保持在线。";
+      }
+    };
+
+    const pickAmbientSection = () => {
+      const anchorY = window.innerHeight * 0.42;
+      const visibleSections = ambientSections
+        .map((section) => {
+          const rect = section.getBoundingClientRect();
+          const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+
+          return {
+            section,
+            distance: Math.abs(rect.top - anchorY),
+            visible
+          };
+        })
+        .filter((item) => item.visible)
+        .sort((a, b) => a.distance - b.distance);
+
+      setAmbientState(visibleSections[0]?.section || ambientSections[0]);
+    };
+
+    const scheduleAmbientPick = () => {
+      if (ambientFrame) {
+        return;
+      }
+
+      ambientFrame = window.requestAnimationFrame(() => {
+        ambientFrame = 0;
+        pickAmbientSection();
+      });
+    };
+
+    if (ambientSections.length) {
+      setAmbientState(ambientSections[0]);
+
+      if ("IntersectionObserver" in window) {
+        const ambientObserver = new IntersectionObserver(scheduleAmbientPick, {
+          rootMargin: "-38% 0px -38% 0px",
+          threshold: [0, 0.01]
+        });
+
+        ambientSections.forEach((section) => {
+          ambientObserver.observe(section);
+        });
+
+        window.__grayRainAmbientObserver = ambientObserver;
+        window.setTimeout(pickAmbientSection, 120);
+      } else {
+        pickAmbientSection();
+      }
+    }
+  }
+
   const sceneDiscovery = document.querySelector("[data-scene-discovery]");
   const sceneStatus = document.querySelector("[data-scene-discovery-status]");
 
