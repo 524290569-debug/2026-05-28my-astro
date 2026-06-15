@@ -5,6 +5,7 @@ interface PreloadImage {
   href: string;
   type?: string;
   fetchPriority?: "high" | "low" | "auto";
+  media?: string;
 }
 
 interface Props {
@@ -43,7 +44,8 @@ const previewImage = absoluteAssetUrl(image);
 const headPreloadImages = preloadImages.map((item) => ({
   href: assetUrl(item.href),
   type: item.type ?? "image/webp",
-  fetchPriority: item.fetchPriority ?? "auto"
+  fetchPriority: item.fetchPriority ?? "auto",
+  media: item.media
 }));
 ---
 
@@ -65,6 +67,7 @@ const headPreloadImages = preloadImages.map((item) => ({
           href={item.href}
           type={item.type}
           fetchpriority={item.fetchPriority}
+          media={item.media}
         />
       ))
     }

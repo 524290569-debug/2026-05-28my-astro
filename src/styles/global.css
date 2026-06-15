@@ -679,6 +679,22 @@ img {
   transition: opacity 220ms ease;
 }
 
+@media (hover: none), (pointer: coarse), (update: slow) {
+  .css-rain-layer::before {
+    animation: none;
+    transform: rotate(11deg) translate3d(0, -2rem, 0);
+    will-change: auto;
+  }
+
+  .city-haze-layer {
+    filter: blur(4px);
+  }
+
+  .fog-gradient-layer {
+    filter: none;
+  }
+}
+
 .grain-layer {
   z-index: 11;
   opacity: 0.08;

@@ -19,7 +19,9 @@ const assetLayers = [
     width: 1600,
     height: 686,
     depth: 0.025,
-    className: "storm-sky-asset"
+    className: "storm-sky-asset",
+    loading: "eager",
+    fetchPriority: "low"
   },
   {
     name: "distant-city",
@@ -27,7 +29,9 @@ const assetLayers = [
     width: 1600,
     height: 556,
     depth: 0.14,
-    className: "distant-city-asset"
+    className: "distant-city-asset",
+    loading: "eager",
+    fetchPriority: "high"
   },
   {
     name: "foreground-rooftop",
@@ -35,7 +39,9 @@ const assetLayers = [
     width: 1600,
     height: 267,
     depth: 0.42,
-    className: "foreground-rooftop-asset"
+    className: "foreground-rooftop-asset",
+    loading: "eager",
+    fetchPriority: "auto"
   }
 ];
 
@@ -113,9 +119,9 @@ const stationReadouts = [
             alt=""
             width={layer.width}
             height={layer.height}
-            loading="eager"
+            loading={layer.loading}
             decoding="async"
-            fetchpriority={layer.name === "distant-city" ? "high" : "auto"}
+            fetchpriority={layer.fetchPriority}
             sizes="100vw"
             draggable="false"
           />
@@ -191,6 +197,7 @@ const stationReadouts = [
       })
       .filter(Boolean);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
@@ -212,6 +219,8 @@ const stationReadouts = [
         }
       ])
     );
+
+    const canUsePointerParallax = () => finePointer.matches && !reduceMotion.matches;
 
     const getStoredChannel = () => {
       try {
@@ -318,7 +327,7 @@ const stationReadouts = [
     };
 
     const keepParallaxLayerWarm = () => {
-      if (reduceMotion.matches) {
+      if (!canUsePointerParallax()) {
         return;
       }
 
@@ -352,7 +361,7 @@ const stationReadouts = [
     };
 
     const scheduleRender = () => {
-      if (frame || reduceMotion.matches) {
+      if (frame || !canUsePointerParallax()) {
         return;
       }
 
@@ -374,26 +383,36 @@ const stationReadouts = [
       }
     };
 
-    hero.addEventListener(
-      "pointermove",
-      (event) => {
-        keepParallaxLayerWarm();
-        setPointer(event.clientX, event.clientY);
-        scheduleRender();
-      },
-      { passive: true }
-    );
+    if (finePointer.matches) {
+      hero.addEventListener(
+        "pointermove",
+        (event) => {
+          if (!canUsePointerParallax()) {
+            return;
+          }
 
-    hero.addEventListener(
-      "pointerleave",
-      () => {
-        keepParallaxLayerWarm();
-        targetX = 0;
-        targetY = 0;
-        scheduleRender();
-      },
-      { passive: true }
-    );
+          keepParallaxLayerWarm();
+          setPointer(event.clientX, event.clientY);
+          scheduleRender();
+        },
+        { passive: true }
+      );
+
+      hero.addEventListener(
+        "pointerleave",
+        () => {
+          if (!canUsePointerParallax()) {
+            return;
+          }
+
+          keepParallaxLayerWarm();
+          targetX = 0;
+          targetY = 0;
+          scheduleRender();
+        },
+        { passive: true }
+      );
+    }
 
     if (channelButtons.length) {
       setChannel(getStoredChannel() || hero.dataset.channel || "rain");
