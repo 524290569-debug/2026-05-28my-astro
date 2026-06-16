@@ -169,59 +169,58 @@ const stationSignals = [
 
 const contactRoutes = [
   {
-    label: "发送邮件",
-    meta: "MAIL / DIRECT",
-    href: "mailto:hello@example.com",
-    tone: "mail",
-    status: "MAIL / DIRECT",
-    log: "邮件通道打开。外部客户端接管发送，雨声保持在低位。",
+    label: "读取现场切片",
+    meta: "FIELD / FRAGMENTS",
+    href: "#works",
+    tone: "field",
+    status: "FIELD / FRAGMENTS",
+    log: "现场切片通道接入。三段夜间图像和弱信号点等待读取。",
     signals: [
       {
         label: "CHANNEL",
-        value: "MAIL",
-        detail: "直接邮件入口待命",
-        level: "86%"
+        value: "FIELD",
+        detail: "跳转到夜间现场切片",
+        level: "68%"
       },
       {
-        label: "HANDOFF",
-        value: "LOCAL",
-        detail: "点击后由本机邮件客户端接管",
-        level: "62%"
+        label: "NODES",
+        value: "06",
+        detail: "图片弱信号点可逐个读取",
+        level: "60%"
       },
       {
-        label: "WINDOW",
+        label: "LIGHT",
         value: "LOW",
-        detail: "只保留一格暖黄窗光",
-        level: "38%"
+        detail: "现场图像保持低亮度",
+        level: "32%"
       }
     ]
   },
   {
-    label: "查看 GitHub",
-    meta: "REPO / PUBLIC",
-    href: "https://github.com/524290569-debug",
-    external: true,
-    tone: "repo",
-    status: "REPO / PUBLIC",
-    log: "公开仓库通道已对准。新标签页打开，不打断当前频段。",
+    label: "翻阅夜间档案",
+    meta: "ARCHIVE / NOTES",
+    href: "#blog",
+    tone: "archive",
+    status: "ARCHIVE / NOTES",
+    log: "档案通道接入。视觉、交互和声音记录会切换到工作台。",
     signals: [
       {
         label: "CHANNEL",
-        value: "GIT",
-        detail: "公开代码索引可读取",
-        level: "74%"
+        value: "NOTE",
+        detail: "跳转到夜间档案列表",
+        level: "76%"
       },
       {
-        label: "TRACE",
-        value: "PUBLIC",
-        detail: "外部链接将进入新窗口",
-        level: "68%"
+        label: "FILTER",
+        value: "03",
+        detail: "视觉、交互、声音记录可筛选",
+        level: "54%"
       },
       {
         label: "NOISE",
-        value: "12%",
-        detail: "仓库信号干扰保持低位",
-        level: "12%"
+        value: "LOW",
+        detail: "档案底噪保持低位",
+        level: "24%"
       }
     ]
   },
@@ -257,19 +256,19 @@ const contactRoutes = [
 
 const contactTransmissionDefault = {
   tone: "standby",
-  status: "STANDBY / CONTACT",
-  log: "弱信号入口保持在线。选择一个通道，右侧日志会切到对应状态。",
+  status: "STANDBY / LOCAL",
+  log: "站内信号入口保持在线。选择一个入口，右侧日志会切到对应状态。",
   signals: [
     {
       label: "CHANNEL",
       value: "OPEN",
-      detail: "弱信号入口保持在线",
+      detail: "站内入口保持在线",
       level: "82%"
     },
     {
-      label: "LATENCY",
-      value: "03 ms",
-      detail: "低频回声轻微延迟",
+      label: "ROUTES",
+      value: "03",
+      detail: "现场、档案和首页可直达",
       level: "54%"
     },
     {
@@ -836,31 +835,31 @@ const deskImageSize = { width: 1200, height: 900 };
     <section
       id="contact"
       class="content-section contact-section"
-      aria-label="联络"
+      aria-label="站内接入"
       data-ambient-section
       data-ambient-tone="contact"
-      data-ambient-channel="CONTACT / WEAK"
-      data-ambient-area="弱信号入口"
+      data-ambient-channel="LOCAL / ROUTES"
+      data-ambient-area="站内入口"
       data-ambient-signal="OPEN"
-      data-ambient-copy="联络通道靠近，传输日志准备接管。"
+      data-ambient-copy="站内通道靠近，传输日志准备接管。"
       data-ambient-level="82%"
     >
       <div class="section-shell contact-grid">
         <div class="section-copy">
-          <p class="section-label">联络 / 弱信号入口</p>
-          <h2>如果你也偏爱冷雨、低频和不那么明亮的界面，可以从这里接入。</h2>
+          <p class="section-label">接入 / 站内信号</p>
+          <h2>从这里继续读取冷雨、低频和不那么明亮的界面切片。</h2>
           <p>
-            这个站点会继续作为个人视觉和前端实验场更新。下一步可以加入作品详情、音乐播放组件、文章页和更完整的移动端体验。
+            这些入口只在站内移动：现场切片、夜间档案和屋顶电台都保留在同一个低亮度频道里。
           </p>
         </div>
 
         <div
           class="contact-panel"
-          aria-label="弱信号联络面板"
+          aria-label="弱信号站内面板"
           data-contact-panel
           data-contact-tone={contactTransmissionDefault.tone}
         >
-          <div class="contact-link-list" aria-label="联络入口">
+          <div class="contact-link-list" aria-label="站内入口">
             {contactRoutes.map((route) => (
               <a
                 href={route.href}
@@ -1172,6 +1171,12 @@ const deskImageSize = { width: 1200, height: 900 };
       const code = panel?.querySelector("[data-hotspot-panel-code]");
       const title = panel?.querySelector("[data-hotspot-panel-title]");
       const body = panel?.querySelector("[data-hotspot-panel-body]");
+      const isSameOpenHotspot = button.hasAttribute("data-active") && !panel?.hidden;
+
+      if (isSameOpenHotspot) {
+        closeSceneCard(card);
+        return;
+      }
 
       card.querySelectorAll("[data-hotspot-button]").forEach((item) => {
         const isActive = item === button;

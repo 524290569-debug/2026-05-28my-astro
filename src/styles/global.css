@@ -3055,13 +3055,13 @@ img {
   --contact-accent-trace: rgba(120, 233, 255, 0.18);
 }
 
-.contact-panel[data-contact-tone="mail"] {
+.contact-panel[data-contact-tone="field"] {
   --contact-accent: rgba(120, 233, 255, 0.82);
   --contact-accent-soft: rgba(120, 233, 255, 0.07);
   --contact-accent-trace: rgba(120, 233, 255, 0.26);
 }
 
-.contact-panel[data-contact-tone="repo"] {
+.contact-panel[data-contact-tone="archive"] {
   --contact-accent: rgba(240, 90, 157, 0.64);
   --contact-accent-soft: rgba(240, 90, 157, 0.06);
   --contact-accent-trace: rgba(240, 90, 157, 0.2);
