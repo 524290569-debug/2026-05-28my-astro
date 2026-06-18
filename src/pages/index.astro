@@ -167,6 +167,55 @@ const stationSignals = [
   }
 ];
 
+const cityBroadcasts = [
+  {
+    channel: "CH-04 / ROOFTOP WEATHER",
+    time: "02:17",
+    code: "WX-17",
+    title: "屋顶气象",
+    signal: "雨压 18 mm",
+    tone: "rain",
+    level: "72%",
+    detail: "蓝色霓虹管道并非照明设备。",
+    body: "第七区屋顶积水已经漫过旧广告牌底座。请不要靠近蓝色霓虹管道，它们今晚没有接入照明回路，只是在替某个无人监听的频段发热。若你看见水面反射出第二排窗光，那不是楼里又住进了人，只是远城服务器在雨幕里掉了一帧。"
+  },
+  {
+    channel: "CH-11 / LAST TRAIN",
+    time: "23:58",
+    code: "TR-02",
+    title: "末班车误差",
+    signal: "延迟 6 min",
+    tone: "rail",
+    level: "48%",
+    detail: "站台广播会重复同一句道歉。",
+    body: "北线末班车仍停在高架下方，车厢灯没有完全熄灭。广播系统每隔六分钟道歉一次，但没有说明列车到底要开往哪里。站台边缘贴着一张被雨泡软的便签：如果你已经错过今天，就不要急着追下一班。城市会把迟到的人暂时藏起来。"
+  },
+  {
+    channel: "CH-19 / LOST NOTICE",
+    time: "00:43",
+    code: "LF-09",
+    title: "失物招领",
+    signal: "回声 41%",
+    tone: "lost",
+    level: "41%",
+    detail: "无人认领的物件仍在便利店后门。",
+    body: "便利店后门的塑料箱里新增三件失物：一副没有左声道的耳机、一张写着旧楼门牌的车票、还有一枚温度偏低的钥匙。值班员说钥匙每到整点会轻轻震一下，像在提醒某扇门还没关上。认领时请报出你最后一次听见雨声的位置。"
+  },
+  {
+    channel: "CH-23 / SERVICE FAULT",
+    time: "03:31",
+    code: "SF-31",
+    title: "服务井故障",
+    signal: "低频 63%",
+    tone: "fault",
+    level: "63%",
+    detail: "地下回路向屋顶送回一段旧噪声。",
+    body: "南侧服务井检测到重复低频，疑似旧电梯井把地下回路的噪声送回了屋顶。维护记录显示，这段声音上一次出现是在一个没有日期的夜里。请不要把耳机贴近检修门，里面并没有人在敲门，只是城市还在反复播放一段忘记删除的告别。"
+  }
+];
+
+const firstCityBroadcast = cityBroadcasts[0];
+
 const contactRoutes = [
   {
     label: "读取现场切片",
@@ -460,6 +509,87 @@ const deskImageSize = { width: 1200, height: 900 };
               <p>{signal.detail}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="broadcast"
+      class="city-broadcast"
+      aria-labelledby="city-broadcast-title"
+      data-ambient-section
+      data-ambient-tone="broadcast"
+      data-ambient-channel="CITY / BROADCAST"
+      data-ambient-area="旧城频段"
+      data-ambient-signal={firstCityBroadcast.signal}
+      data-ambient-copy="城市广播接入，雨声里的残片可以重新调频。"
+      data-ambient-level={firstCityBroadcast.level}
+    >
+      <div class="city-broadcast-shell">
+        <div class="city-broadcast-copy">
+          <p class="section-label">城市广播 / 夜雨残片</p>
+          <h2 id="city-broadcast-title">旧城频段里还有一些会被雨水压扁的留言。</h2>
+          <p>
+            这不是新闻，也不是公告栏。它更像一台忘记关机的楼顶收音机，把末班车、服务井、便利店后门和无人认领的物件压进同一个低保真频道。
+          </p>
+        </div>
+
+        <div
+          class="broadcast-console"
+          data-broadcast-console
+          data-broadcast-tone={firstCityBroadcast.tone}
+          style={`--broadcast-level: ${firstCityBroadcast.level}`}
+        >
+          <div class="broadcast-status-line">
+            <span data-broadcast-channel>{firstCityBroadcast.channel}</span>
+            <strong data-broadcast-signal>{firstCityBroadcast.signal}</strong>
+          </div>
+
+          <div class="broadcast-body" id="city-broadcast-copy" aria-live="polite">
+            <small data-broadcast-time>{firstCityBroadcast.time} / {firstCityBroadcast.code}</small>
+            <strong data-broadcast-title>{firstCityBroadcast.title}</strong>
+            <p data-broadcast-body>{firstCityBroadcast.body}</p>
+          </div>
+
+          <div class="broadcast-meter" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="broadcast-detail">
+            <span>接收备注</span>
+            <p data-broadcast-detail>{firstCityBroadcast.detail}</p>
+          </div>
+
+          <div class="broadcast-actions">
+            <button type="button" data-broadcast-retune aria-controls="city-broadcast-copy">
+              重新调频
+            </button>
+
+            <div class="broadcast-channel-list" aria-label="广播频道选择">
+              {cityBroadcasts.map((broadcast, index) => (
+                <button
+                  type="button"
+                  data-broadcast-option
+                  data-broadcast-index={String(index)}
+                  data-broadcast-channel={broadcast.channel}
+                  data-broadcast-time={broadcast.time}
+                  data-broadcast-code={broadcast.code}
+                  data-broadcast-title={broadcast.title}
+                  data-broadcast-signal={broadcast.signal}
+                  data-broadcast-body={broadcast.body}
+                  data-broadcast-detail={broadcast.detail}
+                  data-broadcast-tone={broadcast.tone}
+                  data-broadcast-level={broadcast.level}
+                  aria-pressed={index === 0 ? "true" : "false"}
+                >
+                  <span>{broadcast.code}</span>
+                  <small>{broadcast.title}</small>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -979,6 +1109,74 @@ const deskImageSize = { width: 1200, height: 900 };
 <script>
   const pageShell = document.querySelector("[data-page-signal]");
   const ambientReadout = document.querySelector("[data-ambient-readout]");
+  const broadcastConsole = document.querySelector("[data-broadcast-console]");
+
+  if (broadcastConsole) {
+    const broadcastOptions = Array.from(broadcastConsole.querySelectorAll("[data-broadcast-option]"));
+    const retuneButton = broadcastConsole.querySelector("[data-broadcast-retune]");
+    const channelOutput = broadcastConsole.querySelector("[data-broadcast-channel]");
+    const signalOutput = broadcastConsole.querySelector("[data-broadcast-signal]");
+    const timeOutput = broadcastConsole.querySelector("[data-broadcast-time]");
+    const titleOutput = broadcastConsole.querySelector("[data-broadcast-title]");
+    const bodyOutput = broadcastConsole.querySelector("[data-broadcast-body]");
+    const detailOutput = broadcastConsole.querySelector("[data-broadcast-detail]");
+
+    const setBroadcastState = (button) => {
+      if (!button) {
+        return;
+      }
+
+      const index = Number(button.dataset.broadcastIndex || "0");
+      broadcastConsole.dataset.broadcastIndex = String(index);
+      broadcastConsole.dataset.broadcastTone = button.dataset.broadcastTone || "rain";
+      broadcastConsole.style.setProperty("--broadcast-level", button.dataset.broadcastLevel || "64%");
+
+      if (channelOutput) {
+        channelOutput.textContent = button.dataset.broadcastChannel || "";
+      }
+
+      if (signalOutput) {
+        signalOutput.textContent = button.dataset.broadcastSignal || "";
+      }
+
+      if (timeOutput) {
+        timeOutput.textContent = `${button.dataset.broadcastTime || ""} / ${button.dataset.broadcastCode || ""}`;
+      }
+
+      if (titleOutput) {
+        titleOutput.textContent = button.dataset.broadcastTitle || "";
+      }
+
+      if (bodyOutput) {
+        bodyOutput.textContent = button.dataset.broadcastBody || "";
+      }
+
+      if (detailOutput) {
+        detailOutput.textContent = button.dataset.broadcastDetail || "";
+      }
+
+      broadcastOptions.forEach((item) => {
+        item.setAttribute("aria-pressed", item === button ? "true" : "false");
+      });
+    };
+
+    broadcastOptions.forEach((button) => {
+      button.addEventListener("click", () => {
+        setBroadcastState(button);
+      });
+    });
+
+    retuneButton?.addEventListener("click", () => {
+      const currentIndex = Number(broadcastConsole.dataset.broadcastIndex || "0");
+      const nextButton = broadcastOptions[(currentIndex + 1) % broadcastOptions.length];
+      setBroadcastState(nextButton);
+    });
+
+    setBroadcastState(
+      broadcastOptions.find((button) => button.getAttribute("aria-pressed") === "true")
+        || broadcastOptions[0]
+    );
+  }
 
   if (pageShell && ambientReadout) {
     const ambientSections = Array.from(document.querySelectorAll("[data-ambient-section]"));
@@ -1066,7 +1264,7 @@ const deskImageSize = { width: 1200, height: 900 };
         : "";
       const target = hashId ? document.getElementById(hashId) : null;
 
-      if (target?.matches(".content-section")) {
+      if (target?.matches(".content-section, .city-broadcast")) {
         target.scrollIntoView({ block: "start", behavior: "auto" });
       }
     };
