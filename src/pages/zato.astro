@@ -1,0 +1,2485 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (path: string) => `${basePath}${path}`;
+const heroVideoParts = [1, 2, 3, 4].map((part) =>
+  assetPath(`assets/zato/video/op.webm.part${String(part).padStart(2, "0")}`)
+);
+
+const navItems = [
+  { label: "信号", href: "#signal" },
+  { label: "封闭城市", href: "#world" },
+  { label: "人物", href: "#characters" },
+  { label: "视觉语言", href: "#style" },
+  { label: "艺术窗口", href: "#gallery" }
+];
+
+const thesisCards = [
+  {
+    code: "01 / IMPROBABLE",
+    title: "世界不是理所当然",
+    body: "故事从恒星、雪与偶然谈起：生命得以存在，本身就是一串近乎荒谬的巧合。Z.A.T.O. 把这种惊叹与恐惧并置，让“爱世界”不再是轻飘飘的乐观，而是一种清醒后的选择。"
+  },
+  {
+    code: "02 / SIGNAL",
+    title: "被看见，才算存在吗",
+    body: "封闭城市、无线电、窗外的鸟和无人回应的独白共同追问：当一个人没有被理解、没有被认真倾听时，她的感受是否仍然真实？发出信号，本身就是对沉默的抵抗。"
+  },
+  {
+    code: "03 / EVERYTHING",
+    title: "把自己也算进万物",
+    body: "页面把游戏的情感核心理解为：若要爱世界与其中的一切，就不能永远把自己排除在外。接纳并不抹平伤口，而是承认破碎、矛盾和不完美也属于完整的人。"
+  }
+];
+
+const characters = [
+  {
+    id: "asya",
+    name: "阿莎雅·舒比娜",
+    en: "ASYA SHUBINA",
+    role: "观察者 / 信号发送者",
+    image: assetPath("assets/zato/images/characters/asya.png"),
+    color: "amber",
+    body: "安静、怯弱、被同龄人忽视的局外人。她会从太阳的亮点想到宇宙的善意，也会把别人的恶意解释成无伤大雅的玩笑。伊拉失踪后，只有她愿意继续追问。"
+  },
+  {
+    id: "ira",
+    name: "伊拉·格拉切夫斯卡娅",
+    en: "IRA GRACHEVSKAYA",
+    role: "失踪者 / 故事引力中心",
+    image: assetPath("assets/zato/images/characters/ira.png"),
+    color: "cyan",
+    body: "逃课、难以接近、名声糟糕的“问题学生”。她的失踪撕开了小城习以为常的冷漠，也迫使阿莎雅重新理解那些被传言和标签覆盖的人。"
+  },
+  {
+    id: "marina",
+    name: "玛丽娜",
+    en: "MARINA",
+    role: "同行者 / 明亮表象",
+    image: assetPath("assets/zato/images/characters/marina.png"),
+    color: "olive",
+    body: "外向、受欢迎、看起来总能把气氛带起来；但她对世界的判断远比笑容更冷。她让调查从孤独的执念，逐渐变成两个人共同确认现实的过程。"
+  },
+  {
+    id: "vadim",
+    name: "瓦季姆·加林",
+    en: "VADIM GARIN",
+    role: "同学 / 不可靠的噪声",
+    image: assetPath("assets/zato/images/characters/vadim.png"),
+    color: "violet",
+    body: "以挖苦和欺负弱者取乐的男生，尤其喜欢拿阿莎雅开玩笑。随着小城里的异常逐渐显形，他的家庭也成为另一段失真的信号。"
+  }
+];
+
+const styleNotes = [
+  {
+    number: "A",
+    title: "手绘人物 × 粗粝实景",
+    body: "可爱的高表情角色立绘被放进颗粒感强、近似旧照片的背景里。人物像仍在努力保持柔软，城市却早已变成一张冰冷而不可信的证据。"
+  },
+  {
+    number: "B",
+    title: "黑、洋红与苏联棕",
+    body: "主界面的黑与洋红木纹负责制造精神性的涡流；校服棕、旧纸白、雪夜蓝把故事重新压回 1986 年的日常。鲜亮色只在信号越界时突然爆发。"
+  },
+  {
+    number: "C",
+    title: "没有选项的线性叙事",
+    body: "游戏不提供选择，结局预先确定。失去“玩家控制权”不是功能缺失，而是形式的一部分：你只能陪阿莎雅继续看、继续听，直到信号抵达终点。"
+  },
+  {
+    number: "D",
+    title: "从生活切片滑向宇宙恐惧",
+    body: "咖啡、教室、楼道和雪地先建立亲密的日常，再由重复、闪烁、无线电与过曝意象慢慢扭曲现实。恐怖并非突然出现，它一直藏在熟悉事物的纹理里。"
+  }
+];
+
+const galleryItems = [
+  {
+    src: assetPath("assets/zato/images/backgrounds/polar-night.png"),
+    alt: "粉蓝颗粒质感的沃尔库塔极夜雪原",
+    code: "BG / POLAR NIGHT",
+    title: "极夜并不完全是黑色",
+    body: "粉蓝天空、雪粒与远处低伏的城市轮廓，让封闭感显得辽阔而不是狭窄。"
+  },
+  {
+    src: assetPath("assets/zato/images/backgrounds/nii.png"),
+    alt: "游戏中的封闭研究设施外景",
+    code: "BG / NII",
+    title: "研究设施",
+    body: "制度化空间被处理成低清、潮湿的摄影证据；真实感越强，异常就越难被解释。"
+  },
+  {
+    src: assetPath("assets/zato/images/gallery/mirror.png"),
+    alt: "阿莎雅面对镜头微笑的游戏插画",
+    code: "CG / MIRROR",
+    title: "镜面练习",
+    body: "角色直视画面时，玩家与人物之间安全的旁观距离会被短暂打破。"
+  },
+  {
+    src: assetPath("assets/zato/images/gallery/tea-time-cafe.png"),
+    alt: "伊拉与玛丽娜在咖啡馆的游戏插画",
+    code: "CG / TEA TIME",
+    title: "生活仍在发生",
+    body: "温暖的室内光没有消解不安，反而证明这群人曾经拥有普通、细小而具体的时刻。"
+  },
+  {
+    src: assetPath("assets/zato/images/artbook/smile.png"),
+    alt: "阿莎雅、伊拉与玛丽娜合影般的艺术集插画",
+    code: "ART PACK / SMILE",
+    title: "把三个人留在同一张照片里",
+    body: "艺术集以更松弛的笔触保留角色关系，让正篇之外的可能性继续存在。"
+  },
+  {
+    src: assetPath("assets/zato/images/backgrounds/signal-line.png"),
+    alt: "繁星与白色轨迹构成的宇宙信号画面",
+    code: "BG / SIGNAL LINE",
+    title: "向宇宙发送",
+    body: "白色轨迹切过繁星，把非常私人、非常微小的声音送往无法确认的接收者。"
+  }
+];
+
+const soundtrack = [
+  ["Ambient 9", "01-ambient-9.mp3"],
+  ["Clouds", "02-clouds.mp3"],
+  ["Let’s Have a Good Day", "03-lets-have-a-good-day.mp3"],
+  ["I Don’t Like You", "04-i-dont-like-you.ogg"],
+  ["Good Mood", "05-good-mood.mp3"],
+  ["Antics", "06-antics.ogg"],
+  ["Pray", "07-pray.mp3"],
+  ["A New Path", "08-a-new-path.mp3"],
+  ["Child", "09-child.ogg"],
+  ["Under a Canopy", "10-under-a-canopy.mp3"],
+  ["Comfort", "11-comfort.ogg"],
+  ["Machine", "12-machine.ogg"],
+  ["Lullaby", "13-lullaby.mp3"],
+  ["Cafe", "14-cafe.ogg"],
+  ["Hate Me", "15-hate-me.mp3"],
+  ["Slow Snow", "16-slow-snow.ogg"],
+  ["Smoke", "17-smoke.ogg"],
+  ["Dark", "18-dark.mp3"],
+  ["Swimming in the Clouds", "19-swimming-in-the-clouds.mp3"],
+  ["Everything Is Paradox", "20-everything-is-paradox.mp3"],
+  ["Tosya", "21-tosya.ogg"],
+  ["Mystery", "22-mystery.ogg"],
+  ["Film", "23-film.ogg"],
+  ["Tightrope", "24-tightrope.mp3"],
+  ["Signal", "25-signal.ogg"],
+  ["Step", "26-step.ogg"],
+  ["Concerto Grosso No. 1 — Segment", "27-concerto-grosso-segment.mp3"],
+  ["Kitchen", "28-kitchen.ogg"],
+  ["Light", "29-light.ogg"],
+  ["NII", "30-nii.ogg"],
+  ["Above the Mountains", "31-above-the-mountains.mp3"],
+  ["Menu", "32-menu.ogg"]
+].map(([title, file], index) => ({
+  index,
+  number: String(index + 1).padStart(2, "0"),
+  title,
+  src: assetPath(`assets/zato/music/${file}`)
+}));
+
+const initialTrack = soundtrack[31];
+---
+
+<BaseLayout
+  title="Z.A.T.O.｜我爱世界，以及其中的一切"
+  description="Z.A.T.O. // I Love the World and Everything In It 的无剧透概念展示：封闭城市、人物、主题、视觉语言与官方原声。"
+  image="assets/zato/images/artbook/title-screen.png"
+  imageAlt="Z.A.T.O. 主角阿莎雅躺在雪地中的标题画面"
+  imageWidth={998}
+  imageHeight={720}
+  imageType="image/png"
+  skipTarget="#zato-main"
+  preloadImages={[
+    { href: "assets/zato/images/artbook/title-screen.png", type: "image/png", fetchPriority: "high" }
+  ]}
+>
+  <div class="zato-page" data-zato-page>
+    <header class="zato-topbar" data-zato-topbar>
+      <a class="zato-home" href={basePath} aria-label="返回灰雨电台首页">
+        <span aria-hidden="true"></span>
+        灰雨电台
+      </a>
+      <nav class="zato-nav" aria-label="Z.A.T.O. 页面导航">
+        {navItems.map((item) => (
+          <a href={item.href} data-zato-nav-link>{item.label}</a>
+        ))}
+      </nav>
+      <a class="zato-mega-link" href={`${basePath}megastructure/`}>巨构主义</a>
+    </header>
+
+    <main id="zato-main">
+      <section class="zato-hero" aria-labelledby="zato-title">
+        <div class="zato-hero-media" aria-hidden="true">
+          <video
+            data-zato-hero-video
+            data-video-parts={JSON.stringify(heroVideoParts)}
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster={assetPath("assets/zato/images/artbook/title-screen.png")}
+          ></video>
+          <div class="zato-hero-veil"></div>
+          <div class="zato-scanlines"></div>
+        </div>
+
+        <div class="zato-hero-copy">
+          <p class="zato-eyebrow">CLOSED CITY / VORKUTA-5 / 1986</p>
+          <img
+            class="zato-logo"
+            src={assetPath("assets/zato/images/ui/zato-title.png")}
+            width="1280"
+            height="720"
+            alt="Z.A.T.O."
+            decoding="async"
+          />
+          <h1 id="zato-title">我爱世界，以及其中的一切</h1>
+          <p class="zato-hero-intro">
+            伊拉失踪了，没有人关心。阿莎雅决定继续寻找。案件只是入口——真正被追问的，是人在孤独、伤害与自我否定之间，是否仍能爱这个世界，并把自己也算进“万物”之中。
+          </p>
+          <div class="zato-hero-actions">
+            <a href="#signal">接收信号</a>
+            <button type="button" data-audio-hero-toggle>
+              <span data-audio-hero-icon aria-hidden="true">▶</span>
+              <span data-audio-hero-label>播放原声</span>
+            </button>
+          </div>
+        </div>
+
+        <aside class="zato-case-file" aria-label="游戏信息">
+          <span>CASE FILE / 1986-ЗАТО</span>
+          <dl>
+            <div><dt>地点</dt><dd>沃尔库塔-5</dd></div>
+            <div><dt>类型</dt><dd>线性视觉小说</dd></div>
+            <div><dt>时长</dt><dd>约 7–8 小时</dd></div>
+            <div><dt>选择</dt><dd>0 / 结局既定</dd></div>
+          </dl>
+        </aside>
+
+        <div class="zato-scroll-cue" aria-hidden="true">
+          <span></span>
+          KEEP RECEIVING
+        </div>
+      </section>
+
+      <section id="signal" class="zato-section zato-thesis" data-zato-section>
+        <div class="zato-section-head zato-reveal">
+          <p>01 / CENTRAL TRANSMISSION</p>
+          <h2>这不是一份失踪案摘要。<br /><em>这是一段关于如何继续去爱的信号。</em></h2>
+          <div class="zato-head-note">
+            <span>无关键剧情剧透</span>
+            <p>以下内容只整理游戏公开设定、开篇命题与视觉语言，不解释谜底。</p>
+          </div>
+        </div>
+
+        <div class="zato-thesis-grid">
+          {thesisCards.map((card) => (
+            <article class="zato-thesis-card zato-reveal">
+              <span>{card.code}</span>
+              <h3>{card.title}</h3>
+              <p>{card.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <blockquote class="zato-manifesto zato-reveal">
+          <span aria-hidden="true">“</span>
+          <p>爱世界并不等于否认它的残酷；它意味着看见残酷之后，仍愿意承认微小事物值得被珍惜——包括那个一直被自己遗漏的人。</p>
+          <footer>CONCEPT READING / NOT A DIRECT QUOTE</footer>
+        </blockquote>
+      </section>
+
+      <section id="world" class="zato-world" data-zato-section>
+        <div class="zato-world-image">
+          <img
+            src={assetPath("assets/zato/images/backgrounds/polar-night.png")}
+            width="1280"
+            height="720"
+            alt="粉蓝极夜中的雪原与远城"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="zato-world-coordinates" aria-hidden="true">
+            67°30′N<br />VORKUTA-5<br />SIGNAL: UNSTABLE
+          </div>
+        </div>
+        <div class="zato-world-copy zato-reveal">
+          <p class="zato-kicker">02 / A TOWN THAT DOESN'T EXIST</p>
+          <h2>封闭城市<br /><span>也是封闭的人。</span></h2>
+          <p>
+            1986 年，苏联北方的虚构封闭城市“沃尔库塔-5”。ZATO 原指封闭行政区：地图上的空白、被限制的出入、围绕敏感设施建立的生活共同体。游戏把这种制度性隔离转化为人物的心理地形。
+          </p>
+          <p>
+            教室、住宅楼、咖啡馆、研究设施与冻原都是真实可触的日常；但每个人似乎都困在自己的解释系统里。伊拉的失踪没有立刻打破秩序——更可怕的是，秩序选择继续运转。
+          </p>
+          <ul>
+            <li><span>气候</span>极夜 / 雪 / 低温颗粒</li>
+            <li><span>介质</span>无线电 / 电话 / 窗 / 传言</li>
+            <li><span>压力</span>沉默 / 标签 / 无人回应</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="characters" class="zato-section zato-characters" data-zato-section>
+        <div class="zato-section-head zato-reveal">
+          <p>03 / PEOPLE INSIDE THE SIGNAL</p>
+          <h2>不是“功能角色”，<br /><em>而是四种与世界相处的方式。</em></h2>
+        </div>
+
+        <div class="zato-character-grid">
+          {characters.map((character, index) => (
+            <article class={`zato-character-card is-${character.color} zato-reveal`}>
+              <div class="zato-character-visual">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <img
+                  src={character.image}
+                  width={character.id === "asya" ? "414" : "450"}
+                  height="720"
+                  alt={`${character.name}人物立绘`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="zato-character-copy">
+                <p>{character.en}</p>
+                <h3>{character.name}</h3>
+                <strong>{character.role}</strong>
+                <span></span>
+                <p>{character.body}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="style" class="zato-style" data-zato-section>
+        <div class="zato-style-backdrop" aria-hidden="true">
+          <img
+            src={assetPath("assets/zato/images/artbook/flower.png")}
+            width="2049"
+            height="3000"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="zato-style-copy">
+          <div class="zato-section-head zato-reveal">
+            <p>04 / VISUAL & NARRATIVE LANGUAGE</p>
+            <h2>柔软的线条，<br /><em>不可靠的现实。</em></h2>
+          </div>
+          <div class="zato-style-list">
+            {styleNotes.map((note) => (
+              <article class="zato-style-note zato-reveal">
+                <span>{note.number}</span>
+                <div>
+                  <h3>{note.title}</h3>
+                  <p>{note.body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="gallery" class="zato-section zato-gallery" data-zato-section>
+        <div class="zato-section-head zato-reveal">
+          <p>05 / WINDOWS FROM VORKUTA-5</p>
+          <h2>艺术窗口</h2>
+          <div class="zato-head-note">
+            <span>GAME + DIGITAL ART PACK</span>
+            <p>点击图像可放大。这里优先选择不暴露谜底、但能代表色彩与质感的画面。</p>
+          </div>
+        </div>
+
+        <div class="zato-gallery-grid">
+          {galleryItems.map((item, index) => (
+            <button
+              class={`zato-gallery-item zato-gallery-item-${index + 1} zato-reveal`}
+              type="button"
+              data-gallery-open
+              data-gallery-src={item.src}
+              data-gallery-alt={item.alt}
+              data-gallery-code={item.code}
+              data-gallery-title={item.title}
+              data-gallery-body={item.body}
+              aria-label={`放大查看：${item.title}`}
+            >
+              <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+              <span>
+                <small>{item.code}</small>
+                <strong>{item.title}</strong>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section class="zato-soundtrack-section" aria-labelledby="soundtrack-title">
+        <div class="zato-soundtrack-intro zato-reveal">
+          <p>06 / ROYALTY-FREE SOUNDTRACK</p>
+          <h2 id="soundtrack-title">32 段声音，<br /><em>同一座不存在的小城。</em></h2>
+          <p>
+            已从本地游戏资源中整理完整 32 曲原声。页面默认从 <strong>Menu</strong> 开始播放；底部播放器可暂停、切歌和调整音量。
+          </p>
+          <button type="button" data-tracklist-toggle aria-expanded="false" aria-controls="zato-tracklist">
+            查看完整曲目
+            <span aria-hidden="true">＋</span>
+          </button>
+        </div>
+        <div id="zato-tracklist" class="zato-tracklist" hidden>
+          {soundtrack.map((track) => (
+            <button
+              type="button"
+              data-track-option
+              data-track-index={track.index}
+              data-track-src={track.src}
+              data-track-title={track.title}
+              aria-pressed={track.index === initialTrack.index ? "true" : "false"}
+            >
+              <span>{track.number}</span>
+              <strong>{track.title}</strong>
+              <small>PLAY</small>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <footer class="zato-footer">
+        <div>
+          <img
+            src={assetPath("assets/zato/images/ui/zato-title.png")}
+            width="1280"
+            height="720"
+            alt="Z.A.T.O."
+            loading="lazy"
+            decoding="async"
+          />
+          <p>非官方概念展示页 / 页面素材来自本地正版游戏与 Digital Art Pack。</p>
+        </div>
+        <div class="zato-footer-links">
+          <a href="https://store.steampowered.com/app/4122860/ZATO__I_Love_the_World_and_Everything_In_It/" target="_blank" rel="noreferrer">STEAM ↗</a>
+          <a href="https://nopanamaman.itch.io/z-a-t-o-i-love-the-world-and-everything-in-it" target="_blank" rel="noreferrer">ITCH.IO ↗</a>
+          <a href={basePath}>返回灰雨电台</a>
+        </div>
+      </footer>
+    </main>
+
+    <audio
+      data-zato-audio
+      src={initialTrack.src}
+      preload="metadata"
+      autoplay
+    ></audio>
+
+    <aside class="zato-player" data-zato-player aria-label="Z.A.T.O. 原声播放器">
+      <div class="zato-player-signal" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="zato-player-meta">
+        <small data-audio-state>WAITING / AUTOPLAY</small>
+        <strong data-audio-title>{initialTrack.title}</strong>
+      </div>
+      <div class="zato-player-controls">
+        <button type="button" data-audio-prev aria-label="上一首">‹</button>
+        <button class="zato-player-play" type="button" data-audio-toggle aria-label="播放">
+          <span data-audio-play-icon aria-hidden="true">▶</span>
+        </button>
+        <button type="button" data-audio-next aria-label="下一首">›</button>
+      </div>
+      <div class="zato-player-timeline">
+        <span data-audio-current>00:00</span>
+        <input data-audio-progress type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度" />
+        <span data-audio-duration>00:00</span>
+      </div>
+      <div class="zato-player-volume">
+        <button type="button" data-audio-mute aria-label="静音">VOL</button>
+        <input data-audio-volume type="range" min="0" max="1" value="0.42" step="0.01" aria-label="音量" />
+      </div>
+    </aside>
+
+    <button class="zato-audio-unlock" type="button" data-audio-unlock hidden>
+      <span aria-hidden="true">▶</span>
+      浏览器拦截了有声自动播放，点击接入原声
+    </button>
+
+    <dialog class="zato-lightbox" data-gallery-dialog aria-labelledby="zato-lightbox-title">
+      <button class="zato-lightbox-close" type="button" data-gallery-close aria-label="关闭大图">×</button>
+      <div class="zato-lightbox-media">
+        <img
+          data-gallery-image
+          src={assetPath("assets/zato/images/artbook/title-screen.png")}
+          alt=""
+        />
+      </div>
+      <div class="zato-lightbox-copy">
+        <span data-gallery-dialog-code></span>
+        <h2 id="zato-lightbox-title" data-gallery-dialog-title></h2>
+        <p data-gallery-dialog-body></p>
+      </div>
+    </dialog>
+  </div>
+
+  <script>
+    const page = document.querySelector("[data-zato-page]");
+
+    if (page) {
+      const heroVideo = page.querySelector("[data-zato-hero-video]");
+      const audio = page.querySelector("[data-zato-audio]");
+      const player = page.querySelector("[data-zato-player]");
+      const playButtons = [
+        page.querySelector("[data-audio-toggle]"),
+        page.querySelector("[data-audio-hero-toggle]")
+      ].filter(Boolean);
+      const playIcon = page.querySelector("[data-audio-play-icon]");
+      const heroIcon = page.querySelector("[data-audio-hero-icon]");
+      const heroLabel = page.querySelector("[data-audio-hero-label]");
+      const titleOutput = page.querySelector("[data-audio-title]");
+      const stateOutput = page.querySelector("[data-audio-state]");
+      const currentOutput = page.querySelector("[data-audio-current]");
+      const durationOutput = page.querySelector("[data-audio-duration]");
+      const progress = page.querySelector("[data-audio-progress]");
+      const volume = page.querySelector("[data-audio-volume]");
+      const muteButton = page.querySelector("[data-audio-mute]");
+      const unlockButton = page.querySelector("[data-audio-unlock]");
+      const trackButtons = Array.from(page.querySelectorAll("[data-track-option]"));
+      const navLinks = Array.from(page.querySelectorAll("[data-zato-nav-link]"));
+      const revealItems = Array.from(page.querySelectorAll(".zato-reveal"));
+      let activeTrackIndex = 31;
+      let audioUnlocked = false;
+
+      const loadHeroVideo = async () => {
+        if (!heroVideo) return;
+
+        try {
+          const partUrls = JSON.parse(heroVideo.dataset.videoParts || "[]");
+          const responses = await Promise.all(partUrls.map((url) => fetch(url)));
+          if (responses.some((response) => !response.ok)) {
+            throw new Error("Video fragment request failed");
+          }
+
+          const fragments = await Promise.all(responses.map((response) => response.arrayBuffer()));
+          const objectUrl = URL.createObjectURL(new Blob(fragments, { type: "video/webm" }));
+          heroVideo.src = objectUrl;
+          await heroVideo.play().catch(() => {});
+          window.addEventListener("pagehide", () => URL.revokeObjectURL(objectUrl), { once: true });
+        } catch {
+          heroVideo.removeAttribute("src");
+        }
+      };
+
+      loadHeroVideo();
+
+      const formatTime = (value) => {
+        if (!Number.isFinite(value)) return "00:00";
+        const minutes = Math.floor(value / 60);
+        const seconds = Math.floor(value % 60);
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      };
+
+      const setPlayerState = () => {
+        if (!audio) return;
+        const playing = !audio.paused && !audio.ended;
+        page.dataset.audioPlaying = playing ? "true" : "false";
+        if (playIcon) playIcon.textContent = playing ? "Ⅱ" : "▶";
+        if (heroIcon) heroIcon.textContent = playing ? "Ⅱ" : "▶";
+        if (heroLabel) heroLabel.textContent = playing ? "暂停原声" : "播放原声";
+        if (stateOutput) {
+          stateOutput.textContent = playing
+            ? `PLAYING / ${String(activeTrackIndex + 1).padStart(2, "0")} OF ${String(trackButtons.length).padStart(2, "0")}`
+            : audioUnlocked
+              ? "PAUSED / LOCAL"
+              : "WAITING / AUTOPLAY";
+        }
+        playButtons.forEach((button) => {
+          button.setAttribute("aria-label", playing ? "暂停" : "播放");
+        });
+      };
+
+      const markTrack = (index) => {
+        trackButtons.forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            Number(button.dataset.trackIndex) === index ? "true" : "false"
+          );
+        });
+      };
+
+      const playCurrent = async () => {
+        if (!audio) return false;
+        try {
+          await audio.play();
+          audioUnlocked = true;
+          if (unlockButton) unlockButton.hidden = true;
+          setPlayerState();
+          return true;
+        } catch {
+          if (unlockButton) unlockButton.hidden = false;
+          setPlayerState();
+          return false;
+        }
+      };
+
+      const setTrack = async (index, shouldPlay = true) => {
+        if (!audio || !trackButtons.length) return;
+        const normalized = (index + trackButtons.length) % trackButtons.length;
+        const option = trackButtons.find(
+          (button) => Number(button.dataset.trackIndex) === normalized
+        );
+        if (!option) return;
+        activeTrackIndex = normalized;
+        audio.src = option.dataset.trackSrc || "";
+        if (titleOutput) titleOutput.textContent = option.dataset.trackTitle || "Z.A.T.O.";
+        markTrack(normalized);
+        audio.load();
+        if (shouldPlay) await playCurrent();
+      };
+
+      playButtons.forEach((button) => {
+        button.addEventListener("click", async () => {
+          if (!audio) return;
+          if (audio.paused) await playCurrent();
+          else audio.pause();
+          setPlayerState();
+        });
+      });
+
+      page.querySelector("[data-audio-prev]")?.addEventListener("click", () => {
+        setTrack(activeTrackIndex - 1);
+      });
+      page.querySelector("[data-audio-next]")?.addEventListener("click", () => {
+        setTrack(activeTrackIndex + 1);
+      });
+
+      trackButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setTrack(Number(button.dataset.trackIndex));
+        });
+      });
+
+      audio?.addEventListener("play", setPlayerState);
+      audio?.addEventListener("pause", setPlayerState);
+      audio?.addEventListener("ended", () => setTrack(activeTrackIndex + 1));
+      audio?.addEventListener("loadedmetadata", () => {
+        if (durationOutput) durationOutput.textContent = formatTime(audio.duration);
+      });
+      audio?.addEventListener("timeupdate", () => {
+        if (currentOutput) currentOutput.textContent = formatTime(audio.currentTime);
+        if (progress && Number.isFinite(audio.duration) && audio.duration > 0) {
+          progress.value = String((audio.currentTime / audio.duration) * 100);
+        }
+      });
+
+      progress?.addEventListener("input", () => {
+        if (!audio || !Number.isFinite(audio.duration)) return;
+        audio.currentTime = (Number(progress.value) / 100) * audio.duration;
+      });
+
+      const storedVolume = Number(window.localStorage.getItem("zato-audio-volume"));
+      if (audio && volume) {
+        const initialVolume = Number.isFinite(storedVolume) && storedVolume >= 0 && storedVolume <= 1
+          ? storedVolume
+          : Number(volume.value);
+        audio.volume = initialVolume;
+        volume.value = String(initialVolume);
+      }
+
+      volume?.addEventListener("input", () => {
+        if (!audio) return;
+        audio.volume = Number(volume.value);
+        audio.muted = false;
+        window.localStorage.setItem("zato-audio-volume", String(audio.volume));
+        if (muteButton) muteButton.textContent = "VOL";
+      });
+
+      muteButton?.addEventListener("click", () => {
+        if (!audio) return;
+        audio.muted = !audio.muted;
+        muteButton.textContent = audio.muted ? "MUTE" : "VOL";
+      });
+
+      const unlockAudio = async () => {
+        if (!audio || !audio.paused || audioUnlocked) return;
+        await playCurrent();
+      };
+
+      unlockButton?.addEventListener("click", playCurrent);
+      window.addEventListener("pointerdown", unlockAudio, { once: true });
+      window.addEventListener("keydown", unlockAudio, { once: true });
+      window.setTimeout(playCurrent, 120);
+
+      const tracklistToggle = page.querySelector("[data-tracklist-toggle]");
+      const tracklist = document.getElementById("zato-tracklist");
+      tracklistToggle?.addEventListener("click", () => {
+        if (!tracklist) return;
+        const willOpen = tracklist.hidden;
+        tracklist.hidden = !willOpen;
+        tracklistToggle.setAttribute("aria-expanded", String(willOpen));
+        const icon = tracklistToggle.querySelector("span");
+        if (icon) icon.textContent = willOpen ? "−" : "＋";
+      });
+
+      const dialog = page.querySelector("[data-gallery-dialog]");
+      const dialogImage = page.querySelector("[data-gallery-image]");
+      const dialogCode = page.querySelector("[data-gallery-dialog-code]");
+      const dialogTitle = page.querySelector("[data-gallery-dialog-title]");
+      const dialogBody = page.querySelector("[data-gallery-dialog-body]");
+
+      page.querySelectorAll("[data-gallery-open]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (!dialog || !dialogImage) return;
+          dialogImage.src = button.dataset.gallerySrc || "";
+          dialogImage.alt = button.dataset.galleryAlt || "";
+          if (dialogCode) dialogCode.textContent = button.dataset.galleryCode || "";
+          if (dialogTitle) dialogTitle.textContent = button.dataset.galleryTitle || "";
+          if (dialogBody) dialogBody.textContent = button.dataset.galleryBody || "";
+          dialog.showModal();
+        });
+      });
+      page.querySelector("[data-gallery-close]")?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      const sectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            navLinks.forEach((link) => {
+              if (link.hash === `#${id}`) link.setAttribute("aria-current", "location");
+              else link.removeAttribute("aria-current");
+            });
+          });
+        },
+        { rootMargin: "-30% 0px -62%", threshold: 0 }
+      );
+      page.querySelectorAll("[data-zato-section][id]").forEach((section) => sectionObserver.observe(section));
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        revealItems.forEach((item) => item.classList.add("is-visible"));
+      } else {
+        const revealObserver = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: "0px 0px -8%", threshold: 0.08 }
+        );
+        revealItems.forEach((item) => revealObserver.observe(item));
+      }
+
+      setPlayerState();
+      markTrack(activeTrackIndex);
+      if (player) player.dataset.ready = "true";
+    }
+  </script>
+
+  <style>
+    :global(html) {
+      background: #050405;
+      scroll-padding-top: 5.5rem;
+    }
+
+    :global(body) {
+      background: #050405;
+    }
+
+    :global(body::selection) {
+      background: #d33a88;
+      color: #fff8ee;
+    }
+
+    .zato-page {
+      --z-black: #050405;
+      --z-panel: #0b0809;
+      --z-paper: #f1ebe0;
+      --z-ink: #f5f0e8;
+      --z-muted: #b8aaa4;
+      --z-pink: #d33385;
+      --z-pink-bright: #f0529e;
+      --z-wine: #50132f;
+      --z-brown: #4a342d;
+      --z-gold: #c4a04d;
+      --z-cold: #99a9be;
+      position: relative;
+      min-width: 320px;
+      overflow: clip;
+      background:
+        radial-gradient(circle at 84% 8%, rgba(116, 23, 66, 0.22), transparent 28rem),
+        #050405;
+      color: var(--z-ink);
+      font-family: "Microsoft YaHei", "PingFang SC", Inter, system-ui, sans-serif;
+    }
+
+    .zato-page::before {
+      position: fixed;
+      z-index: 80;
+      inset: 0;
+      opacity: 0.055;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255, 255, 255, 0.12) 3px 4px),
+        repeating-linear-gradient(90deg, transparent 0 7px, rgba(211, 51, 133, 0.08) 7px 8px);
+      mix-blend-mode: soft-light;
+      content: "";
+    }
+
+    .zato-topbar {
+      position: fixed;
+      z-index: 70;
+      top: 0.85rem;
+      left: 50%;
+      display: grid;
+      width: min(90rem, calc(100% - 2rem));
+      min-height: 4rem;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid rgba(240, 232, 220, 0.2);
+      background: rgba(6, 4, 5, 0.82);
+      padding: 0.55rem 0.75rem;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.34);
+      transform: translateX(-50%);
+    }
+
+    .zato-home,
+    .zato-mega-link,
+    .zato-nav a {
+      color: rgba(245, 240, 232, 0.72);
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0.08em;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .zato-home {
+      display: inline-flex;
+      min-height: 2.7rem;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0 0.65rem;
+      white-space: nowrap;
+    }
+
+    .zato-home span {
+      width: 0.65rem;
+      height: 0.65rem;
+      border: 1px solid rgba(240, 232, 220, 0.6);
+      background: var(--z-pink);
+      box-shadow: 0 0 1.1rem rgba(211, 51, 133, 0.72);
+      transform: rotate(45deg);
+    }
+
+    .zato-nav {
+      display: flex;
+      min-width: 0;
+      justify-content: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .zato-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .zato-nav a {
+      position: relative;
+      display: inline-flex;
+      min-height: 2.7rem;
+      flex: 0 0 auto;
+      align-items: center;
+      padding: 0 0.7rem;
+      white-space: nowrap;
+    }
+
+    .zato-nav a::after {
+      position: absolute;
+      right: 0.7rem;
+      bottom: 0.28rem;
+      left: 0.7rem;
+      height: 2px;
+      background: var(--z-pink-bright);
+      content: "";
+      opacity: 0;
+      transform: scaleX(0.2);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .zato-nav a:hover,
+    .zato-nav a:focus-visible,
+    .zato-nav a[aria-current="location"],
+    .zato-home:hover,
+    .zato-home:focus-visible,
+    .zato-mega-link:hover,
+    .zato-mega-link:focus-visible {
+      color: #fff;
+      outline: none;
+    }
+
+    .zato-nav a[aria-current="location"]::after,
+    .zato-nav a:hover::after,
+    .zato-nav a:focus-visible::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .zato-mega-link {
+      display: inline-flex;
+      min-height: 2.7rem;
+      align-items: center;
+      border-left: 1px solid rgba(240, 232, 220, 0.16);
+      padding: 0 0.7rem 0 1rem;
+      white-space: nowrap;
+    }
+
+    .zato-hero {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      align-items: end;
+      padding: 9rem max(1.25rem, calc((100vw - 88rem) / 2)) 5.5rem;
+      isolation: isolate;
+    }
+
+    .zato-hero-media,
+    .zato-hero-media video,
+    .zato-hero-veil,
+    .zato-scanlines {
+      position: absolute;
+      inset: 0;
+    }
+
+    .zato-hero-media {
+      z-index: -2;
+      overflow: hidden;
+      background: #130a0f;
+    }
+
+    .zato-hero-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.72) contrast(1.14) brightness(0.68);
+    }
+
+    .zato-hero-veil {
+      background:
+        linear-gradient(90deg, rgba(4, 3, 4, 0.93) 0%, rgba(4, 3, 4, 0.68) 38%, rgba(4, 3, 4, 0.15) 72%),
+        linear-gradient(180deg, rgba(4, 3, 4, 0.56), transparent 24%, transparent 62%, #050405 98%),
+        radial-gradient(circle at 74% 42%, transparent 0 12rem, rgba(211, 51, 133, 0.12) 34rem, transparent 58rem);
+    }
+
+    .zato-scanlines {
+      opacity: 0.14;
+      background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(255, 255, 255, 0.11) 4px 5px);
+      mix-blend-mode: overlay;
+    }
+
+    .zato-hero-copy {
+      position: relative;
+      z-index: 2;
+      width: min(48rem, 67vw);
+      padding-left: clamp(1rem, 3vw, 2.5rem);
+      border-left: 1px solid rgba(240, 232, 220, 0.34);
+    }
+
+    .zato-eyebrow,
+    .zato-kicker,
+    .zato-section-head > p,
+    .zato-soundtrack-intro > p:first-child {
+      margin: 0 0 1.25rem;
+      color: var(--z-pink-bright);
+      font-family: "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .zato-logo {
+      width: min(38rem, 82%);
+      height: clamp(6rem, 11vw, 9rem);
+      margin-bottom: 0.6rem;
+      filter: drop-shadow(0 0 1.5rem rgba(0, 0, 0, 0.84));
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .zato-hero h1 {
+      max-width: 41rem;
+      margin: 0;
+      color: #fffaf1;
+      font-family: Impact, "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: clamp(2.25rem, 5.2vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.98;
+      text-shadow: 0 0.15rem 0 #070506, 0 1rem 3rem rgba(0, 0, 0, 0.92);
+    }
+
+    .zato-hero-intro {
+      max-width: 43rem;
+      margin: 1.6rem 0 0;
+      color: rgba(245, 240, 232, 0.8);
+      font-size: clamp(0.98rem, 1.45vw, 1.18rem);
+      font-weight: 350;
+      line-height: 1.9;
+      text-shadow: 0 0.3rem 1.4rem #000;
+    }
+
+    .zato-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .zato-hero-actions a,
+    .zato-hero-actions button {
+      display: inline-flex;
+      min-height: 3.2rem;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      border: 1px solid rgba(245, 240, 232, 0.34);
+      background: rgba(5, 4, 5, 0.72);
+      padding: 0 1.2rem;
+      color: #fff8ee;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 750;
+      letter-spacing: 0.09em;
+      cursor: pointer;
+      backdrop-filter: blur(9px);
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .zato-hero-actions a {
+      border-color: rgba(240, 82, 158, 0.72);
+      background: var(--z-pink);
+    }
+
+    .zato-hero-actions a:hover,
+    .zato-hero-actions button:hover,
+    .zato-hero-actions a:focus-visible,
+    .zato-hero-actions button:focus-visible {
+      border-color: #fff;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .zato-case-file {
+      position: absolute;
+      z-index: 2;
+      right: max(1.25rem, calc((100vw - 88rem) / 2));
+      bottom: 6rem;
+      width: min(18rem, 26vw);
+      border: 1px solid rgba(240, 232, 220, 0.22);
+      background: rgba(8, 5, 7, 0.72);
+      padding: 1rem;
+      backdrop-filter: blur(14px);
+    }
+
+    .zato-case-file > span {
+      display: block;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid rgba(240, 232, 220, 0.16);
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+    }
+
+    .zato-case-file dl {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+
+    .zato-case-file dl div {
+      display: grid;
+      grid-template-columns: 4.4rem 1fr;
+      gap: 0.7rem;
+      padding: 0.72rem 0;
+      border-bottom: 1px solid rgba(240, 232, 220, 0.1);
+    }
+
+    .zato-case-file dl div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .zato-case-file dt,
+    .zato-case-file dd {
+      margin: 0;
+      font-size: 0.74rem;
+      line-height: 1.45;
+    }
+
+    .zato-case-file dt {
+      color: rgba(245, 240, 232, 0.42);
+    }
+
+    .zato-case-file dd {
+      color: rgba(245, 240, 232, 0.86);
+    }
+
+    .zato-scroll-cue {
+      position: absolute;
+      right: 1.25rem;
+      bottom: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: rgba(245, 240, 232, 0.44);
+      font-family: "Courier New", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+    }
+
+    .zato-scroll-cue span {
+      width: 3.2rem;
+      height: 1px;
+      overflow: hidden;
+      background: rgba(245, 240, 232, 0.22);
+    }
+
+    .zato-scroll-cue span::after {
+      display: block;
+      width: 60%;
+      height: 1px;
+      background: var(--z-pink-bright);
+      content: "";
+      animation: zato-signal-scan 2s ease-in-out infinite;
+    }
+
+    .zato-section {
+      position: relative;
+      width: min(88rem, calc(100% - 3rem));
+      margin: 0 auto;
+      padding: clamp(6rem, 11vw, 10rem) 0;
+    }
+
+    .zato-section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+      gap: 2rem 4rem;
+      align-items: end;
+      margin-bottom: 3.5rem;
+    }
+
+    .zato-section-head > p {
+      grid-column: 1 / -1;
+      margin-bottom: -0.5rem;
+    }
+
+    .zato-section-head h2,
+    .zato-world-copy h2,
+    .zato-soundtrack-intro h2 {
+      margin: 0;
+      color: #fff8ef;
+      font-family: Impact, "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: clamp(2.5rem, 5.7vw, 6.5rem);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 0.98;
+    }
+
+    .zato-section-head h2 em,
+    .zato-soundtrack-intro h2 em {
+      color: var(--z-pink-bright);
+      font-style: normal;
+    }
+
+    .zato-head-note {
+      border-top: 1px solid rgba(240, 232, 220, 0.24);
+      padding-top: 1rem;
+    }
+
+    .zato-head-note span {
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+    }
+
+    .zato-head-note p {
+      margin: 0.7rem 0 0;
+      color: var(--z-muted);
+      font-size: 0.85rem;
+      line-height: 1.75;
+    }
+
+    .zato-thesis {
+      padding-bottom: 6rem;
+    }
+
+    .zato-thesis::before {
+      position: absolute;
+      z-index: -1;
+      top: 4rem;
+      right: -12rem;
+      width: 34rem;
+      height: 34rem;
+      border: 1px solid rgba(211, 51, 133, 0.12);
+      border-radius: 50%;
+      background: repeating-radial-gradient(circle, transparent 0 1.8rem, rgba(211, 51, 133, 0.04) 1.85rem 1.92rem);
+      content: "";
+      opacity: 0.8;
+    }
+
+    .zato-thesis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid rgba(240, 232, 220, 0.18);
+      border-bottom: 1px solid rgba(240, 232, 220, 0.18);
+    }
+
+    .zato-thesis-card {
+      min-height: 25rem;
+      padding: 2rem;
+      border-right: 1px solid rgba(240, 232, 220, 0.18);
+      background:
+        linear-gradient(180deg, rgba(211, 51, 133, 0.08), transparent 30%),
+        rgba(255, 255, 255, 0.012);
+    }
+
+    .zato-thesis-card:last-child {
+      border-right: 0;
+    }
+
+    .zato-thesis-card > span {
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.1em;
+    }
+
+    .zato-thesis-card h3 {
+      max-width: 12rem;
+      margin: 6rem 0 1.2rem;
+      color: #fff8ef;
+      font-size: clamp(1.35rem, 2.2vw, 2rem);
+      line-height: 1.25;
+    }
+
+    .zato-thesis-card p {
+      margin: 0;
+      color: var(--z-muted);
+      font-size: 0.9rem;
+      line-height: 1.9;
+    }
+
+    .zato-manifesto {
+      position: relative;
+      display: grid;
+      max-width: 67rem;
+      grid-template-columns: auto 1fr;
+      gap: 1rem 2rem;
+      margin: 7rem auto 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .zato-manifesto > span {
+      color: var(--z-pink);
+      font-family: Georgia, serif;
+      font-size: 8rem;
+      line-height: 0.72;
+    }
+
+    .zato-manifesto p {
+      margin: 0;
+      color: #f3ece2;
+      font-family: Georgia, "Songti SC", serif;
+      font-size: clamp(1.35rem, 2.7vw, 2.45rem);
+      line-height: 1.65;
+    }
+
+    .zato-manifesto footer {
+      grid-column: 2;
+      color: rgba(245, 240, 232, 0.34);
+      font-family: "Courier New", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+    }
+
+    .zato-world {
+      position: relative;
+      display: grid;
+      min-height: 54rem;
+      grid-template-columns: minmax(0, 1.35fr) minmax(25rem, 0.65fr);
+      background: var(--z-paper);
+      color: #171213;
+    }
+
+    .zato-world-image {
+      position: relative;
+      min-height: 54rem;
+      overflow: hidden;
+      background: #b7a9ba;
+    }
+
+    .zato-world-image::after {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 65%, rgba(241, 235, 224, 0.65)),
+        repeating-linear-gradient(0deg, transparent 0 4px, rgba(22, 18, 19, 0.05) 4px 5px);
+      content: "";
+    }
+
+    .zato-world-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(1.05) saturate(0.9);
+      transform: scale(1.08);
+    }
+
+    .zato-world-coordinates {
+      position: absolute;
+      z-index: 2;
+      bottom: 2rem;
+      left: 2rem;
+      border-left: 2px solid rgba(23, 18, 19, 0.82);
+      padding-left: 1rem;
+      color: rgba(23, 18, 19, 0.76);
+      font-family: "Courier New", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      line-height: 1.7;
+    }
+
+    .zato-world-copy {
+      position: relative;
+      z-index: 2;
+      align-self: center;
+      padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem) clamp(3rem, 6vw, 6rem) 0;
+    }
+
+    .zato-world-copy h2 {
+      color: #171213;
+      font-size: clamp(3rem, 5.4vw, 6rem);
+    }
+
+    .zato-world-copy h2 span {
+      color: #8e2155;
+    }
+
+    .zato-world-copy > p:not(.zato-kicker) {
+      margin: 1.5rem 0 0;
+      color: rgba(23, 18, 19, 0.72);
+      font-size: 0.92rem;
+      line-height: 1.95;
+    }
+
+    .zato-world-copy ul {
+      margin: 2rem 0 0;
+      padding: 0;
+      border-top: 1px solid rgba(23, 18, 19, 0.26);
+      list-style: none;
+    }
+
+    .zato-world-copy li {
+      display: grid;
+      grid-template-columns: 4.3rem 1fr;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid rgba(23, 18, 19, 0.18);
+      font-family: "Courier New", "Microsoft YaHei", monospace;
+      font-size: 0.76rem;
+    }
+
+    .zato-world-copy li span {
+      color: #9c225d;
+      font-weight: 800;
+    }
+
+    .zato-character-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .zato-character-card {
+      --card-accent: #bd9250;
+      position: relative;
+      display: grid;
+      min-height: 38rem;
+      grid-template-columns: minmax(13rem, 0.78fr) minmax(16rem, 1.22fr);
+      overflow: hidden;
+      border: 1px solid rgba(240, 232, 220, 0.18);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.028), transparent 42%),
+        #0b0809;
+    }
+
+    .zato-character-card.is-cyan { --card-accent: #6f9d9f; }
+    .zato-character-card.is-olive { --card-accent: #929050; }
+    .zato-character-card.is-violet { --card-accent: #777397; }
+
+    .zato-character-visual {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      align-items: end;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--card-accent) 38%, transparent), transparent 38%),
+        repeating-linear-gradient(108deg, transparent 0 2.8rem, rgba(255, 255, 255, 0.03) 2.85rem 2.92rem),
+        #100c0d;
+    }
+
+    .zato-character-visual::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 45%;
+      background: linear-gradient(transparent, #0b0809);
+      content: "";
+    }
+
+    .zato-character-visual > span {
+      position: absolute;
+      z-index: 2;
+      top: 1rem;
+      left: 1rem;
+      color: var(--card-accent);
+      font-family: Impact, sans-serif;
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .zato-character-visual img {
+      position: relative;
+      z-index: 1;
+      width: auto;
+      max-width: 118%;
+      height: 92%;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 1rem 1.5rem rgba(0, 0, 0, 0.68));
+      transform: translateY(1.5rem);
+      transition: transform 260ms ease;
+    }
+
+    .zato-character-card:hover .zato-character-visual img {
+      transform: translateY(0.7rem);
+    }
+
+    .zato-character-copy {
+      align-self: end;
+      padding: 2rem;
+    }
+
+    .zato-character-copy > p:first-child {
+      margin: 0;
+      color: var(--card-accent);
+      font-family: "Arial Narrow", sans-serif;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+    }
+
+    .zato-character-copy h3 {
+      margin: 0.55rem 0 0.35rem;
+      color: #fff8ef;
+      font-family: Impact, "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: clamp(2rem, 3.3vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .zato-character-copy strong {
+      color: rgba(245, 240, 232, 0.52);
+      font-size: 0.76rem;
+      font-weight: 500;
+    }
+
+    .zato-character-copy > span {
+      display: block;
+      width: 3rem;
+      height: 2px;
+      margin: 1.4rem 0;
+      background: var(--card-accent);
+    }
+
+    .zato-character-copy > p:last-child {
+      margin: 0;
+      color: var(--z-muted);
+      font-size: 0.88rem;
+      line-height: 1.9;
+    }
+
+    .zato-style {
+      position: relative;
+      display: grid;
+      min-height: 68rem;
+      grid-template-columns: minmax(22rem, 0.82fr) minmax(30rem, 1.18fr);
+      overflow: hidden;
+      background: #ebe5d9;
+      color: #181213;
+    }
+
+    .zato-style::before {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      opacity: 0.12;
+      background:
+        repeating-linear-gradient(112deg, transparent 0 4rem, #65133d 4.05rem 4.12rem),
+        repeating-radial-gradient(ellipse at 20% 50%, transparent 0 3rem, rgba(101, 19, 61, 0.24) 3.05rem 3.1rem);
+      content: "";
+      pointer-events: none;
+    }
+
+    .zato-style-backdrop {
+      position: relative;
+      z-index: 2;
+      min-height: 68rem;
+      overflow: hidden;
+      background: #a9b6cc;
+    }
+
+    .zato-style-backdrop::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 60%, #ebe5d9 100%);
+      content: "";
+    }
+
+    .zato-style-backdrop img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 28%;
+      filter: saturate(0.94) contrast(1.02);
+    }
+
+    .zato-style-copy {
+      position: relative;
+      z-index: 3;
+      padding: clamp(5rem, 9vw, 9rem) max(2rem, calc((100vw - 88rem) / 2)) 6rem clamp(2rem, 5vw, 5rem);
+    }
+
+    .zato-style .zato-section-head {
+      display: block;
+      margin-bottom: 4rem;
+    }
+
+    .zato-style .zato-section-head h2 {
+      color: #181213;
+    }
+
+    .zato-style .zato-section-head h2 em {
+      color: #9d225c;
+    }
+
+    .zato-style-list {
+      border-top: 2px solid rgba(24, 18, 19, 0.72);
+    }
+
+    .zato-style-note {
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.2rem;
+      padding: 1.65rem 0;
+      border-bottom: 1px solid rgba(24, 18, 19, 0.26);
+    }
+
+    .zato-style-note > span {
+      color: #9d225c;
+      font-family: Impact, sans-serif;
+      font-size: 2rem;
+    }
+
+    .zato-style-note h3 {
+      margin: 0;
+      color: #181213;
+      font-size: 1.1rem;
+    }
+
+    .zato-style-note p {
+      margin: 0.55rem 0 0;
+      color: rgba(24, 18, 19, 0.67);
+      font-size: 0.84rem;
+      line-height: 1.8;
+    }
+
+    .zato-gallery-grid {
+      display: grid;
+      grid-auto-rows: 15rem;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .zato-gallery-item {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(240, 232, 220, 0.18);
+      background: #0c090a;
+      padding: 0;
+      color: inherit;
+      cursor: zoom-in;
+    }
+
+    .zato-gallery-item-1 { grid-column: span 7; grid-row: span 2; }
+    .zato-gallery-item-2 { grid-column: span 5; }
+    .zato-gallery-item-3 { grid-column: span 5; }
+    .zato-gallery-item-4 { grid-column: span 5; grid-row: span 2; }
+    .zato-gallery-item-5 { grid-column: span 4; grid-row: span 2; }
+    .zato-gallery-item-6 { grid-column: span 3; grid-row: span 2; }
+
+    .zato-gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.82) contrast(1.04) brightness(0.84);
+      transition: filter 240ms ease, transform 360ms ease;
+    }
+
+    .zato-gallery-item-1 img { object-position: center; }
+    .zato-gallery-item-5 img { object-position: center 24%; }
+
+    .zato-gallery-item::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 42%, rgba(4, 3, 4, 0.9));
+      content: "";
+    }
+
+    .zato-gallery-item > span {
+      position: absolute;
+      z-index: 2;
+      right: 1rem;
+      bottom: 1rem;
+      left: 1rem;
+      text-align: left;
+    }
+
+    .zato-gallery-item small {
+      display: block;
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.09em;
+    }
+
+    .zato-gallery-item strong {
+      display: block;
+      margin-top: 0.35rem;
+      color: #fff8ee;
+      font-size: 1rem;
+    }
+
+    .zato-gallery-item:hover img,
+    .zato-gallery-item:focus-visible img {
+      filter: saturate(1) contrast(1.04) brightness(0.98);
+      transform: scale(1.035);
+    }
+
+    .zato-gallery-item:focus-visible {
+      outline: 2px solid var(--z-pink-bright);
+      outline-offset: 2px;
+    }
+
+    .zato-soundtrack-section {
+      display: grid;
+      width: min(88rem, calc(100% - 3rem));
+      grid-template-columns: minmax(22rem, 0.72fr) minmax(30rem, 1.28fr);
+      gap: 5rem;
+      margin: 0 auto;
+      padding: 5rem 0 11rem;
+      border-top: 1px solid rgba(240, 232, 220, 0.18);
+    }
+
+    .zato-soundtrack-intro {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+
+    .zato-soundtrack-intro h2 {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+    }
+
+    .zato-soundtrack-intro > p:not(:first-child) {
+      max-width: 34rem;
+      margin: 1.6rem 0 0;
+      color: var(--z-muted);
+      font-size: 0.9rem;
+      line-height: 1.9;
+    }
+
+    .zato-soundtrack-intro > p strong {
+      color: var(--z-pink-bright);
+    }
+
+    [data-tracklist-toggle] {
+      display: inline-flex;
+      min-height: 3rem;
+      align-items: center;
+      gap: 1.4rem;
+      margin-top: 1.8rem;
+      border: 1px solid rgba(240, 232, 220, 0.22);
+      background: transparent;
+      padding: 0 1rem;
+      color: #fff5eb;
+      font: inherit;
+      font-size: 0.76rem;
+      cursor: pointer;
+    }
+
+    [data-tracklist-toggle] span {
+      color: var(--z-pink-bright);
+      font-size: 1.1rem;
+    }
+
+    .zato-tracklist {
+      display: grid;
+      align-self: start;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid rgba(240, 232, 220, 0.18);
+    }
+
+    .zato-tracklist[hidden] {
+      display: none;
+    }
+
+    .zato-tracklist button {
+      display: grid;
+      min-height: 3.6rem;
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: center;
+      border: 0;
+      border-right: 1px solid rgba(240, 232, 220, 0.12);
+      border-bottom: 1px solid rgba(240, 232, 220, 0.12);
+      background: rgba(255, 255, 255, 0.012);
+      padding: 0.65rem 0.8rem;
+      color: var(--z-muted);
+      text-align: left;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .zato-tracklist button:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .zato-tracklist button span,
+    .zato-tracklist button small {
+      color: rgba(245, 240, 232, 0.34);
+      font-family: "Courier New", monospace;
+      font-size: 0.62rem;
+    }
+
+    .zato-tracklist button strong {
+      overflow: hidden;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .zato-tracklist button:hover,
+    .zato-tracklist button:focus-visible,
+    .zato-tracklist button[aria-pressed="true"] {
+      background: rgba(211, 51, 133, 0.12);
+      color: #fff8ef;
+      outline: none;
+    }
+
+    .zato-tracklist button[aria-pressed="true"] span,
+    .zato-tracklist button[aria-pressed="true"] small {
+      color: var(--z-pink-bright);
+    }
+
+    .zato-footer {
+      display: flex;
+      width: min(88rem, calc(100% - 3rem));
+      justify-content: space-between;
+      gap: 3rem;
+      align-items: end;
+      margin: 0 auto;
+      padding: 3rem 0 10rem;
+      border-top: 1px solid rgba(240, 232, 220, 0.18);
+    }
+
+    .zato-footer img {
+      width: min(18rem, 60vw);
+      height: 4.5rem;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .zato-footer p {
+      margin: 1rem 0 0;
+      color: rgba(245, 240, 232, 0.4);
+      font-size: 0.7rem;
+    }
+
+    .zato-footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem 1.2rem;
+      justify-content: flex-end;
+    }
+
+    .zato-footer-links a {
+      color: rgba(245, 240, 232, 0.6);
+      font-family: "Courier New", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+    }
+
+    .zato-footer-links a:hover,
+    .zato-footer-links a:focus-visible {
+      color: var(--z-pink-bright);
+      outline: none;
+    }
+
+    .zato-player {
+      position: fixed;
+      z-index: 75;
+      right: 1rem;
+      bottom: 1rem;
+      left: 1rem;
+      display: grid;
+      width: min(64rem, calc(100% - 2rem));
+      min-height: 4.4rem;
+      grid-template-columns: 4rem minmax(10rem, 0.9fr) auto minmax(13rem, 1.2fr) minmax(8rem, 0.5fr);
+      gap: 1rem;
+      align-items: center;
+      margin: 0 auto;
+      border: 1px solid rgba(240, 232, 220, 0.24);
+      background: rgba(7, 4, 6, 0.94);
+      padding: 0.6rem 0.8rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.52);
+      opacity: 0;
+      transform: translateY(1rem);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .zato-player[data-ready="true"] {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .zato-player-signal {
+      display: flex;
+      height: 2rem;
+      align-items: center;
+      justify-content: center;
+      gap: 0.24rem;
+      border-right: 1px solid rgba(240, 232, 220, 0.16);
+    }
+
+    .zato-player-signal span {
+      width: 2px;
+      height: 22%;
+      background: var(--z-pink-bright);
+      transform-origin: center;
+    }
+
+    .zato-page[data-audio-playing="true"] .zato-player-signal span {
+      animation: zato-wave 0.78s ease-in-out infinite alternate;
+    }
+
+    .zato-player-signal span:nth-child(2) { animation-delay: -0.32s !important; }
+    .zato-player-signal span:nth-child(3) { animation-delay: -0.58s !important; }
+    .zato-player-signal span:nth-child(4) { animation-delay: -0.18s !important; }
+    .zato-player-signal span:nth-child(5) { animation-delay: -0.46s !important; }
+
+    .zato-player-meta {
+      min-width: 0;
+    }
+
+    .zato-player-meta small {
+      display: block;
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.57rem;
+      letter-spacing: 0.08em;
+    }
+
+    .zato-player-meta strong {
+      display: block;
+      overflow: hidden;
+      margin-top: 0.25rem;
+      color: #fff8ef;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .zato-player-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .zato-player-controls button,
+    .zato-player-volume button {
+      display: inline-flex;
+      width: 2.2rem;
+      height: 2.2rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(240, 232, 220, 0.18);
+      background: transparent;
+      color: rgba(245, 240, 232, 0.74);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .zato-player-controls .zato-player-play {
+      border-color: rgba(240, 82, 158, 0.62);
+      background: var(--z-pink);
+      color: #fff;
+    }
+
+    .zato-player-controls button:hover,
+    .zato-player-controls button:focus-visible,
+    .zato-player-volume button:hover,
+    .zato-player-volume button:focus-visible {
+      border-color: #fff;
+      outline: none;
+    }
+
+    .zato-player-timeline,
+    .zato-player-volume {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .zato-player-timeline span {
+      color: rgba(245, 240, 232, 0.4);
+      font-family: "Courier New", monospace;
+      font-size: 0.58rem;
+    }
+
+    .zato-player input[type="range"] {
+      min-width: 0;
+      height: 2px;
+      flex: 1;
+      appearance: none;
+      background: rgba(240, 232, 220, 0.22);
+      cursor: pointer;
+    }
+
+    .zato-player input[type="range"]::-webkit-slider-thumb {
+      width: 0.68rem;
+      height: 0.68rem;
+      border: 0;
+      border-radius: 0;
+      appearance: none;
+      background: var(--z-pink-bright);
+      transform: rotate(45deg);
+    }
+
+    .zato-player input[type="range"]::-moz-range-thumb {
+      width: 0.68rem;
+      height: 0.68rem;
+      border: 0;
+      border-radius: 0;
+      background: var(--z-pink-bright);
+      transform: rotate(45deg);
+    }
+
+    .zato-player-volume button {
+      width: 2.8rem;
+      font-family: "Courier New", monospace;
+      font-size: 0.56rem;
+    }
+
+    .zato-audio-unlock {
+      position: fixed;
+      z-index: 76;
+      top: 5.6rem;
+      left: 50%;
+      display: inline-flex;
+      min-height: 3rem;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(240, 82, 158, 0.7);
+      background: rgba(88, 16, 49, 0.94);
+      padding: 0 1rem;
+      color: #fff8ef;
+      font: inherit;
+      font-size: 0.72rem;
+      cursor: pointer;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+      transform: translateX(-50%);
+    }
+
+    .zato-audio-unlock[hidden] {
+      display: none;
+    }
+
+    .zato-lightbox {
+      width: min(78rem, calc(100% - 2rem));
+      max-width: none;
+      max-height: calc(100svh - 2rem);
+      grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.4fr);
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid rgba(240, 232, 220, 0.28);
+      background: #090607;
+      padding: 0;
+      color: var(--z-ink);
+    }
+
+    .zato-lightbox[open] {
+      display: grid;
+    }
+
+    .zato-lightbox::backdrop {
+      background: rgba(3, 2, 3, 0.88);
+      backdrop-filter: blur(12px);
+    }
+
+    .zato-lightbox-close {
+      position: absolute;
+      z-index: 2;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: inline-flex;
+      width: 2.6rem;
+      height: 2.6rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(240, 232, 220, 0.28);
+      background: rgba(5, 4, 5, 0.82);
+      color: #fff;
+      font-size: 1.35rem;
+      cursor: pointer;
+    }
+
+    .zato-lightbox-media {
+      display: flex;
+      min-height: min(76svh, 46rem);
+      align-items: center;
+      justify-content: center;
+      background: #030203;
+    }
+
+    .zato-lightbox-media img {
+      width: 100%;
+      height: 100%;
+      max-height: min(82svh, 52rem);
+      object-fit: contain;
+    }
+
+    .zato-lightbox-copy {
+      align-self: end;
+      padding: 2rem;
+    }
+
+    .zato-lightbox-copy span {
+      color: var(--z-pink-bright);
+      font-family: "Courier New", monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+    }
+
+    .zato-lightbox-copy h2 {
+      margin: 0.7rem 0 0;
+      color: #fff8ef;
+      font-family: Impact, "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: 2.2rem;
+      line-height: 1.05;
+    }
+
+    .zato-lightbox-copy p {
+      margin: 1rem 0 0;
+      color: var(--z-muted);
+      font-size: 0.84rem;
+      line-height: 1.8;
+    }
+
+    .zato-reveal {
+      opacity: 0;
+      transform: translateY(1.4rem);
+      transition: opacity 560ms ease, transform 560ms ease;
+    }
+
+    .zato-reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes zato-signal-scan {
+      0%, 100% { transform: translateX(-110%); }
+      50% { transform: translateX(170%); }
+    }
+
+    @keyframes zato-wave {
+      from { height: 18%; opacity: 0.52; }
+      to { height: 90%; opacity: 1; }
+    }
+
+    @media (max-width: 1080px) {
+      .zato-topbar {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .zato-mega-link {
+        display: none;
+      }
+
+      .zato-case-file {
+        width: 18rem;
+      }
+
+      .zato-character-card {
+        min-height: 34rem;
+        grid-template-columns: minmax(11rem, 0.72fr) minmax(14rem, 1.28fr);
+      }
+
+      .zato-style {
+        grid-template-columns: minmax(18rem, 0.65fr) minmax(30rem, 1.35fr);
+      }
+
+      .zato-player {
+        grid-template-columns: minmax(9rem, 0.9fr) auto minmax(12rem, 1.1fr) minmax(7rem, 0.5fr);
+      }
+
+      .zato-player-signal {
+        display: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      :global(html) {
+        scroll-padding-top: 5rem;
+      }
+
+      .zato-topbar {
+        top: 0.5rem;
+        width: calc(100% - 1rem);
+        gap: 0.45rem;
+        padding: 0.35rem 0.45rem;
+      }
+
+      .zato-home {
+        padding: 0 0.35rem;
+        font-size: 0.68rem;
+      }
+
+      .zato-nav {
+        justify-content: flex-start;
+        mask-image: linear-gradient(90deg, transparent, #000 0.75rem, #000 calc(100% - 0.75rem), transparent);
+      }
+
+      .zato-nav a {
+        padding: 0 0.55rem;
+        font-size: 0.66rem;
+      }
+
+      .zato-hero {
+        min-height: 53rem;
+        align-items: center;
+        padding: 7rem 1.25rem 9rem;
+      }
+
+      .zato-hero-media video {
+        object-position: 60% center;
+      }
+
+      .zato-hero-veil {
+        background:
+          linear-gradient(180deg, rgba(4, 3, 4, 0.64), rgba(4, 3, 4, 0.42) 32%, rgba(4, 3, 4, 0.88) 82%, #050405),
+          linear-gradient(90deg, rgba(4, 3, 4, 0.82), rgba(4, 3, 4, 0.18));
+      }
+
+      .zato-hero-copy {
+        width: 100%;
+      }
+
+      .zato-case-file {
+        right: 1.25rem;
+        bottom: 3.2rem;
+        left: 1.25rem;
+        display: none;
+        width: auto;
+      }
+
+      .zato-scroll-cue {
+        right: auto;
+        bottom: 7rem;
+        left: 2.25rem;
+      }
+
+      .zato-section {
+        width: min(100% - 2rem, 88rem);
+      }
+
+      .zato-section-head {
+        grid-template-columns: 1fr;
+      }
+
+      .zato-thesis-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .zato-thesis-card {
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(240, 232, 220, 0.18);
+        padding: 1.5rem;
+      }
+
+      .zato-thesis-card:last-child {
+        border-bottom: 0;
+      }
+
+      .zato-thesis-card h3 {
+        margin-top: 3rem;
+      }
+
+      .zato-manifesto {
+        grid-template-columns: 1fr;
+        margin-top: 5rem;
+      }
+
+      .zato-manifesto > span {
+        font-size: 5rem;
+      }
+
+      .zato-manifesto footer {
+        grid-column: 1;
+      }
+
+      .zato-world {
+        min-height: 0;
+        grid-template-columns: 1fr;
+      }
+
+      .zato-world-image {
+        min-height: 32rem;
+      }
+
+      .zato-world-image::after {
+        background: linear-gradient(180deg, transparent 64%, #f1ebe0);
+      }
+
+      .zato-world-copy {
+        padding: 0 1.25rem 5rem;
+      }
+
+      .zato-character-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .zato-character-card {
+        min-height: 35rem;
+      }
+
+      .zato-style {
+        grid-template-columns: 1fr;
+      }
+
+      .zato-style-backdrop {
+        min-height: 38rem;
+      }
+
+      .zato-style-backdrop::after {
+        background: linear-gradient(180deg, transparent 65%, #ebe5d9);
+      }
+
+      .zato-style-copy {
+        margin-top: -4rem;
+        padding: 0 1.25rem 5rem;
+      }
+
+      .zato-gallery-grid {
+        grid-auto-rows: 13rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .zato-gallery-item-1,
+      .zato-gallery-item-2,
+      .zato-gallery-item-3,
+      .zato-gallery-item-4,
+      .zato-gallery-item-5,
+      .zato-gallery-item-6 {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+
+      .zato-gallery-item-1,
+      .zato-gallery-item-6 {
+        grid-column: 1 / -1;
+      }
+
+      .zato-soundtrack-section {
+        width: min(100% - 2rem, 88rem);
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .zato-soundtrack-intro {
+        position: static;
+      }
+
+      .zato-lightbox[open] {
+        display: block;
+      }
+
+      .zato-lightbox-media {
+        min-height: 58svh;
+      }
+
+      .zato-player {
+        right: 0.5rem;
+        bottom: 0.5rem;
+        left: 0.5rem;
+        width: calc(100% - 1rem);
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.65rem;
+      }
+
+      .zato-player-timeline {
+        grid-column: 1 / -1;
+      }
+
+      .zato-player-volume {
+        display: none;
+      }
+
+      .zato-footer {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .zato-footer-links {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .zato-home {
+        width: 2.3rem;
+        justify-content: center;
+        padding: 0;
+        font-size: 0;
+      }
+
+      .zato-hero {
+        min-height: 49rem;
+      }
+
+      .zato-logo {
+        width: 94%;
+      }
+
+      .zato-hero-copy {
+        padding-left: 1rem;
+      }
+
+      .zato-hero-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .zato-hero-actions a,
+      .zato-hero-actions button {
+        padding: 0 0.6rem;
+        font-size: 0.68rem;
+      }
+
+      .zato-world-image {
+        min-height: 25rem;
+      }
+
+      .zato-character-card {
+        min-height: 46rem;
+        grid-template-columns: 1fr;
+        grid-template-rows: 25rem auto;
+      }
+
+      .zato-character-visual img {
+        height: 110%;
+      }
+
+      .zato-style-backdrop {
+        min-height: 31rem;
+      }
+
+      .zato-gallery-grid {
+        grid-auto-rows: 15rem;
+        grid-template-columns: 1fr;
+      }
+
+      .zato-gallery-item-1,
+      .zato-gallery-item-2,
+      .zato-gallery-item-3,
+      .zato-gallery-item-4,
+      .zato-gallery-item-5,
+      .zato-gallery-item-6 {
+        grid-column: 1;
+      }
+
+      .zato-tracklist {
+        grid-template-columns: 1fr;
+      }
+
+      .zato-tracklist button,
+      .zato-tracklist button:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .zato-audio-unlock {
+        top: 5.2rem;
+        width: calc(100% - 1rem);
+        justify-content: center;
+        text-align: center;
+      }
+
+      .zato-lightbox-copy {
+        padding: 1.25rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .zato-scroll-cue span::after,
+      .zato-page[data-audio-playing="true"] .zato-player-signal span {
+        animation: none;
+      }
+
+      .zato-hero-media video {
+        display: none;
+      }
+
+      .zato-hero-media {
+        background:
+          linear-gradient(90deg, rgba(4, 3, 4, 0.82), rgba(4, 3, 4, 0.18)),
+          url("/assets/zato/images/artbook/title-screen.png") center / cover;
+      }
+
+      .zato-reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</BaseLayout>
