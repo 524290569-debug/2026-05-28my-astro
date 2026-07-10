@@ -5,6 +5,9 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const assetPath = (path: string) => `${basePath}${path}`;
+const heroVideoParts = [1, 2, 3, 4].map((part) =>
+  assetPath(`assets/zato/video/op.webm.part${String(part).padStart(2, "0")}`)
+);
 
 const navItems = [
   { label: "信号", href: "#signal" },
@@ -213,15 +216,15 @@ const initialTrack = soundtrack[31];
       <section class="zato-hero" aria-labelledby="zato-title">
         <div class="zato-hero-media" aria-hidden="true">
           <video
+            data-zato-hero-video
+            data-video-parts={JSON.stringify(heroVideoParts)}
             autoplay
             muted
             loop
             playsinline
-            preload="metadata"
+            preload="none"
             poster={assetPath("assets/zato/images/artbook/title-screen.png")}
-          >
-            <source src={assetPath("assets/zato/video/op.webm")} type="video/webm" />
-          </video>
+          ></video>
           <div class="zato-hero-veil"></div>
           <div class="zato-scanlines"></div>
         </div>
@@ -527,6 +530,7 @@ const initialTrack = soundtrack[31];
     const page = document.querySelector("[data-zato-page]");
 
     if (page) {
+      const heroVideo = page.querySelector("[data-zato-hero-video]");
       const audio = page.querySelector("[data-zato-audio]");
       const player = page.querySelector("[data-zato-player]");
       const playButtons = [
@@ -549,6 +553,28 @@ const initialTrack = soundtrack[31];
       const revealItems = Array.from(page.querySelectorAll(".zato-reveal"));
       let activeTrackIndex = 31;
       let audioUnlocked = false;
+
+      const loadHeroVideo = async () => {
+        if (!heroVideo) return;
+
+        try {
+          const partUrls = JSON.parse(heroVideo.dataset.videoParts || "[]");
+          const responses = await Promise.all(partUrls.map((url) => fetch(url)));
+          if (responses.some((response) => !response.ok)) {
+            throw new Error("Video fragment request failed");
+          }
+
+          const fragments = await Promise.all(responses.map((response) => response.arrayBuffer()));
+          const objectUrl = URL.createObjectURL(new Blob(fragments, { type: "video/webm" }));
+          heroVideo.src = objectUrl;
+          await heroVideo.play().catch(() => {});
+          window.addEventListener("pagehide", () => URL.revokeObjectURL(objectUrl), { once: true });
+        } catch {
+          heroVideo.removeAttribute("src");
+        }
+      };
+
+      loadHeroVideo();
 
       const formatTime = (value) => {
         if (!Number.isFinite(value)) return "00:00";
