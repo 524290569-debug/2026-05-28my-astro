@@ -1,0 +1,523 @@
+﻿---
+import "../styles/home.css";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (path: string) => `${basePath}${path}`;
+
+const channels = [
+  {
+    id: "rain",
+    label: "RAIN",
+    frequency: "88.3",
+    unit: "MHz",
+    status: "降雨信号稳定",
+    title: "让雨声成为页面的底噪。",
+    copy: "天线收拢旧城上空的湿冷频段。远处的灯没有变亮，只是被雨水拉成了更长的回声。",
+    meta: "18 MM / NORTH ROOF",
+  },
+  {
+    id: "city",
+    label: "CITY",
+    frequency: "101.7",
+    unit: "MHz",
+    status: "城市回路接入",
+    title: "沿着高架，听见无人值守的城市。",
+    copy: "末班车、便利店灯箱与远处机房的低鸣被压进同一条频带，像一份仍在更新的夜间地图。",
+    meta: "04 NODES / EAST LOOP",
+  },
+  {
+    id: "static",
+    label: "STATIC",
+    frequency: "—72",
+    unit: "dB",
+    status: "弱信号等待识别",
+    title: "失真不是故障，是这座站点的纹理。",
+    copy: "在空白与噪点之间，未被命名的消息短暂浮现。你不必理解全部，只需要确认它曾经抵达。",
+    meta: "NOISE 04% / OPEN BAND",
+  },
+];
+
+const scenes = [
+  {
+    id: "rooftop",
+    number: "01",
+    code: "ANT-03",
+    title: "屋顶回声",
+    meta: "北区天线 / 雨压 18 mm / 02:17",
+    image: assetPath("assets/works/postpunk-rooftop.webp"),
+    alt: "灰雨中的旧楼屋顶与远处城市灯光",
+    note: "风从广告牌背面穿过，天线把同一段低频重复了三次。水面上的第二排窗光并不属于这栋楼。",
+    hotspots: [
+      { x: 72, y: 27, code: "R-1", title: "背风面", body: "雨线在这里突然变细，像频段被向下拧了一格。" },
+      { x: 36, y: 63, code: "R-2", title: "积水反射", body: "远城只剩一格暖光，悬在水面上，没有对应的窗。" },
+    ],
+  },
+  {
+    id: "passage",
+    number: "02",
+    code: "SUB-11",
+    title: "地下通道",
+    meta: "南侧回路 / 底噪 —6 dB / 00:43",
+    image: assetPath("assets/works/postpunk-passage.webp"),
+    alt: "冷白灯照亮的潮湿地下通道",
+    note: "白光被瓷砖拆成碎片。脚步声比广播更清楚，出口标识却一直指向刚刚走过的方向。",
+    hotspots: [
+      { x: 73, y: 31, code: "S-1", title: "灯管残响", body: "电流声每七秒断开一次，黑暗总比计时更短。" },
+      { x: 43, y: 57, code: "S-2", title: "断讯边界", body: "信号到这里开始掉帧，墙后的脚步仍保持连续。" },
+    ],
+  },
+  {
+    id: "bridge",
+    number: "03",
+    code: "TRK-07",
+    title: "高架余光",
+    meta: "东环轨道 / 反射 41% / 23:58",
+    image: assetPath("assets/works/postpunk-bridge.webp"),
+    alt: "雨夜高架桥与冷蓝色远城反光",
+    note: "车流被雨雾削平，轮廓还在，声音却像从另一座城市延迟送达。末班车仍停在高架下面。",
+    hotspots: [
+      { x: 64, y: 28, code: "B-1", title: "高架余光", body: "亮度没有上来，雨幕只留下车灯移动过的空壳。" },
+      { x: 29, y: 54, code: "B-2", title: "轨道低线", body: "冷蓝反射贴着铁轨滑走，像一条即将断开的信号线。" },
+    ],
+  },
+];
+
+const logs = [
+  {
+    index: "A-017",
+    time: "02:44",
+    frequency: "88.3 MHz",
+    title: "屋顶的电信号",
+    tag: "FIELD NOTE",
+    body: "北区天线在没有风的三分钟里偏转了十二度。录音里没有人声，只有雨落在铁皮上的节拍，以及一段很轻的呼吸。它可能来自麦克风，也可能来自这座楼。",
+  },
+  {
+    index: "B-031",
+    time: "23:58",
+    frequency: "101.7 MHz",
+    title: "末班车仍未离站",
+    tag: "CITY LOOP",
+    body: "站台广播每隔六分钟道歉一次，却没有说明列车将开往哪里。灯光熄灭后，车窗仍然映出一排并不存在的乘客。",
+  },
+  {
+    index: "C-009",
+    time: "00:43",
+    frequency: "—72 dB",
+    title: "便利店后门的失物",
+    tag: "LOST SIGNAL",
+    body: "塑料箱里有一副缺少左声道的耳机、一张写着旧楼门牌的车票，以及一枚温度偏低的钥匙。整点时，它会轻轻震动一下。",
+  },
+  {
+    index: "D-063",
+    time: "03:31",
+    frequency: "63.0 Hz",
+    title: "服务井里的告别",
+    tag: "LOW FREQ",
+    body: "地下回路把一段旧噪声重新送回屋顶。维护记录没有日期，只写着：不要靠近检修门，里面没有人在敲门。",
+  },
+];
+
+const waveBars = Array.from({ length: 42 });
+---
+
+<div class="gr-home" data-gr-home data-channel="rain">
+  <div class="gr-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+  <div class="gr-pointer-glow" aria-hidden="true"></div>
+  <div class="gr-crt" aria-hidden="true"></div>
+
+  <header class="gr-nav" data-gr-nav>
+    <a class="gr-brand" href="#station" aria-label="返回灰雨电台入口">
+      <i aria-hidden="true"></i>
+      <span><b>GRR—04</b> 灰雨电台</span>
+    </a>
+    <nav aria-label="首页导航">
+      <a href="#field">现场</a>
+      <a href="#archive">夜航日志</a>
+      <a href="#routes">线路</a>
+    </nav>
+    <div class="gr-nav-routes" aria-label="独立专题页">
+      <a href={`${basePath}megastructure/`}>巨构主义 ↗</a>
+      <a href={`${basePath}zato/`}>Z.A.T.O. ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="station" class="gr-hero" data-section-name="ROOFTOP STATION">
+      <div class="gr-hero-scene" aria-hidden="true" data-parallax-scene>
+        <img class="gr-sky" src={assetPath("assets/hero/sky-v5.webp")} width="1600" height="686" alt="" data-depth="0.08" />
+        <img class="gr-city" src={assetPath("assets/hero/city-v5.webp")} width="1600" height="556" alt="" data-depth="0.18" />
+        <div class="gr-haze" data-depth="0.1"></div>
+        <img class="gr-rooftop" src={assetPath("assets/hero/rooftop-v5.webp")} width="1600" height="267" alt="" data-depth="0.34" />
+        <div class="gr-rain"></div>
+        <div class="gr-hero-veil"></div>
+      </div>
+
+      <div class="gr-hero-grid">
+        <div class="gr-hero-copy" data-reveal>
+          <p class="gr-kicker"><span>ON AIR</span> / POST-PUNK WEATHER STATION</p>
+          <h1><span>灰雨</span><span>电台</span></h1>
+          <p class="gr-en-title">GRAY RAIN RADIO</p>
+          <p class="gr-manifesto">在高架与旧楼之间，<br />捕捉那些差一点消失的波段。</p>
+          <a class="gr-enter" href="#field">
+            <span>进入夜间频段</span><i aria-hidden="true">↓</i>
+          </a>
+        </div>
+
+        <aside class="gr-tuner" aria-labelledby="tuner-title" data-tuner data-reveal>
+          <div class="gr-tuner-head">
+            <p id="tuner-title">TUNER / ACTIVE CHANNEL</p>
+            <span><i></i><b data-channel-status>{channels[0].status}</b></span>
+          </div>
+          <div class="gr-frequency" aria-live="polite">
+            <strong data-frequency>{channels[0].frequency}</strong>
+            <span data-frequency-unit>{channels[0].unit}</span>
+          </div>
+          <div class="gr-wave" aria-hidden="true">
+            {waveBars.map((_, index) => <i style={`--i:${index}`}></i>)}
+            <span></span>
+          </div>
+          <div class="gr-scale" aria-hidden="true">
+            <span>80</span><i></i><span>90</span><i></i><span>100</span><i></i><span>110</span>
+          </div>
+          <div class="gr-channel-switch" role="group" aria-label="切换频道">
+            {channels.map((channel, index) => (
+              <button
+                type="button"
+                data-channel-button={channel.id}
+                data-channel-index={index}
+                aria-pressed={index === 0 ? "true" : "false"}
+              >
+                <small>0{index + 1}</small>{channel.label}
+              </button>
+            ))}
+          </div>
+          <div class="gr-channel-copy">
+            <p data-channel-meta>{channels[0].meta}</p>
+            <h2 data-channel-title>{channels[0].title}</h2>
+            <div data-channel-copy>{channels[0].copy}</div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="gr-hero-foot" aria-hidden="true">
+        <span>LOCATION / 41°N — NORTH ROOF</span>
+        <span>SCROLL TO SEARCH SIGNAL</span>
+        <span>LOCAL TIME / <b data-local-time>00:00:00</b></span>
+      </div>
+    </section>
+
+    <section id="field" class="gr-field" data-section-name="FIELD FRAGMENTS">
+      <div class="gr-section-head" data-reveal>
+        <div><span>01</span><p>FIELD / FRAGMENTS</p></div>
+        <h2>现场切片</h2>
+        <p>拖动视线，不必急着抵达结论。图像里的琥珀色节点保存着城市遗漏的细节。</p>
+      </div>
+
+      <div class="gr-scene-console" data-scene-console data-reveal>
+        <div class="gr-scene-topline">
+          <p><span data-scene-code>{scenes[0].code}</span> / <b data-scene-count>01 — 03</b></p>
+          <div>
+            <button type="button" data-scene-prev aria-label="上一处现场">← PREV</button>
+            <button type="button" data-scene-next aria-label="下一处现场">NEXT →</button>
+          </div>
+        </div>
+
+        <div class="gr-scene-viewport">
+          {scenes.map((scene, sceneIndex) => (
+            <article class="gr-scene" data-scene={scene.id} hidden={sceneIndex !== 0}>
+              <img src={scene.image} width="1280" height="720" alt={scene.alt} loading={sceneIndex === 0 ? "eager" : "lazy"} />
+              <div class="gr-scene-shade"></div>
+              {scene.hotspots.map((hotspot, hotspotIndex) => (
+                <button
+                  type="button"
+                  class="gr-hotspot"
+                  style={`--x:${hotspot.x}%;--y:${hotspot.y}%`}
+                  data-hotspot
+                  data-hotspot-code={hotspot.code}
+                  data-hotspot-title={hotspot.title}
+                  data-hotspot-body={hotspot.body}
+                  aria-label={`读取 ${hotspot.title}`}
+                  aria-pressed="false"
+                >
+                  <i></i><span>0{hotspotIndex + 1}</span>
+                </button>
+              ))}
+              <div class="gr-scene-title">
+                <span>{scene.number}</span>
+                <div><p>{scene.meta}</p><h3>{scene.title}</h3></div>
+              </div>
+            </article>
+          ))}
+          <aside class="gr-hotspot-readout" data-hotspot-readout aria-live="polite">
+            <span data-hotspot-code>{scenes[0].code}</span>
+            <strong data-hotspot-title>等待读取信号点</strong>
+            <p data-hotspot-body>点击画面中的琥珀色节点，现场细节会在这里显影。</p>
+          </aside>
+        </div>
+
+        <div class="gr-scene-index" role="tablist" aria-label="现场切片列表">
+          {scenes.map((scene, index) => (
+            <button
+              type="button"
+              role="tab"
+              data-scene-tab={index}
+              aria-selected={index === 0 ? "true" : "false"}
+            >
+              <span>{scene.number}</span>
+              <div><b>{scene.title}</b><small>{scene.meta}</small></div>
+              <i aria-hidden="true"></i>
+            </button>
+          ))}
+        </div>
+        <p class="gr-scene-note" data-scene-note>{scenes[0].note}</p>
+      </div>
+    </section>
+
+    <section id="archive" class="gr-archive" data-section-name="NIGHT LOG ARCHIVE">
+      <div class="gr-section-head gr-section-head-light" data-reveal>
+        <div><span>02</span><p>ARCHIVE / NIGHT LOG</p></div>
+        <h2>夜航日志</h2>
+        <p>不是文章列表，而是还没完成归档的磁带索引。展开一条记录，读取它被噪声遮住的部分。</p>
+      </div>
+
+      <div class="gr-log-shell" data-reveal>
+        <div class="gr-log-columns" aria-hidden="true">
+          <span>INDEX</span><span>TIME</span><span>FREQUENCY</span><span>TRANSMISSION</span><span>STATE</span>
+        </div>
+        <div class="gr-log-list">
+          {logs.map((log, index) => (
+            <details class="gr-log" name="night-log" open={index === 0}>
+              <summary>
+                <span>{log.index}</span><time>{log.time}</time><b>{log.frequency}</b>
+                <h3>{log.title}</h3><i>{index === 0 ? "CLOSE" : "OPEN"}</i>
+              </summary>
+              <div class="gr-log-body">
+                <p>{log.body}</p>
+                <div><span>{log.tag}</span><b>READ / {String(index + 1).padStart(2, "0")}</b></div>
+              </div>
+            </details>
+          ))}
+        </div>
+        <div class="gr-tape-footer">
+          <span>GRR / TAPE SET 04</span>
+          <i aria-hidden="true"></i>
+          <span>{logs.length} RECORDS / AUTO REWIND</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="routes" class="gr-routes" data-section-name="ROUTE SELECT">
+      <div class="gr-route-intro" data-reveal>
+        <span>03 / ROUTE SELECT</span>
+        <p>本次接收结束</p>
+        <h2>选择下一条线路</h2>
+      </div>
+      <nav class="gr-route-list" aria-label="下一条线路" data-reveal>
+        <a href="#field"><small>01 / LIVE</small><span>现场</span><i>继续扫描城市边缘</i><b>↘</b></a>
+        <a href="#archive"><small>02 / ARCHIVE</small><span>档案</span><i>回到夜航磁带索引</i><b>↘</b></a>
+        <a href={`${basePath}megastructure/`}><small>03 / EXTERNAL ROUTE</small><span>巨构主义</span><i>进入无人建筑体</i><b>↗</b></a>
+        <a href={`${basePath}zato/`}><small>04 / EXTERNAL ROUTE</small><span>Z.A.T.O.</span><i>接收封闭城市信号</i><b>↗</b></a>
+      </nav>
+      <footer class="gr-footer">
+        <p>GRAY RAIN RADIO © 2026</p>
+        <p>BUILT IN RAIN / KEPT IN LOW FREQUENCY</p>
+        <a href="#station">BACK TO SIGNAL ↑</a>
+      </footer>
+    </section>
+  </main>
+
+  <aside class="gr-floating-status" data-floating-status aria-label="当前接收状态">
+    <span><i></i> RECEIVING</span>
+    <b data-floating-section>ROOFTOP STATION</b>
+    <small><em data-floating-frequency>{channels[0].frequency}</em> {channels[0].unit}</small>
+  </aside>
+</div>
+
+<script define:vars={{ channels, scenes }}>
+  const page = document.querySelector("[data-gr-home]");
+
+  if (page) {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const channelButtons = [...page.querySelectorAll("[data-channel-button]")];
+    const frequency = page.querySelector("[data-frequency]");
+    const frequencyUnit = page.querySelector("[data-frequency-unit]");
+    const channelStatus = page.querySelector("[data-channel-status]");
+    const channelTitle = page.querySelector("[data-channel-title]");
+    const channelCopy = page.querySelector("[data-channel-copy]");
+    const channelMeta = page.querySelector("[data-channel-meta]");
+    const floatingFrequency = page.querySelector("[data-floating-frequency]");
+    const timeOutput = page.querySelector("[data-local-time]");
+    const scrollProgress = page.querySelector("[data-scroll-progress]");
+    const nav = page.querySelector("[data-gr-nav]");
+    let activeChannel = 0;
+    let channelTimer = 0;
+    let scrollFrame = 0;
+
+    const setChannel = (index, userInitiated = false) => {
+      activeChannel = (index + channels.length) % channels.length;
+      const channel = channels[activeChannel];
+      page.dataset.channel = channel.id;
+      channelButtons.forEach((button, buttonIndex) => {
+        button.setAttribute("aria-pressed", buttonIndex === activeChannel ? "true" : "false");
+      });
+      if (frequency) frequency.textContent = channel.frequency;
+      if (frequencyUnit) frequencyUnit.textContent = channel.unit;
+      if (channelStatus) channelStatus.textContent = channel.status;
+      if (channelTitle) channelTitle.textContent = channel.title;
+      if (channelCopy) channelCopy.textContent = channel.copy;
+      if (channelMeta) channelMeta.textContent = channel.meta;
+      if (floatingFrequency) floatingFrequency.textContent = channel.frequency;
+      if (userInitiated) restartChannelTimer();
+    };
+
+    const restartChannelTimer = () => {
+      window.clearInterval(channelTimer);
+      if (!reduceMotion.matches && !document.hidden) {
+        channelTimer = window.setInterval(() => setChannel(activeChannel + 1), 9000);
+      }
+    };
+
+    channelButtons.forEach((button, index) => {
+      button.addEventListener("click", () => setChannel(index, true));
+    });
+    reduceMotion.addEventListener("change", restartChannelTimer);
+    document.addEventListener("visibilitychange", restartChannelTimer);
+    restartChannelTimer();
+
+    const updateTime = () => {
+      if (timeOutput) {
+        timeOutput.textContent = new Intl.DateTimeFormat("zh-CN", {
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+        }).format(new Date());
+      }
+    };
+    updateTime();
+    window.setInterval(updateTime, 1000);
+
+    const parallaxScene = page.querySelector("[data-parallax-scene]");
+    const parallaxLayers = parallaxScene ? [...parallaxScene.querySelectorAll("[data-depth]")] : [];
+    if (parallaxScene && finePointer.matches && !reduceMotion.matches) {
+      parallaxScene.addEventListener("pointermove", (event) => {
+        const rect = parallaxScene.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        parallaxLayers.forEach((layer) => {
+          const depth = Number(layer.dataset.depth || 0);
+          layer.style.transform = `translate3d(${x * depth * -80}px, ${y * depth * -45}px, 0) scale(1.06)`;
+        });
+      });
+      parallaxScene.addEventListener("pointerleave", () => {
+        parallaxLayers.forEach((layer) => { layer.style.transform = "translate3d(0,0,0) scale(1.06)"; });
+      });
+    }
+
+    if (finePointer.matches) {
+      window.addEventListener("pointermove", (event) => {
+        page.style.setProperty("--pointer-x", `${event.clientX}px`);
+        page.style.setProperty("--pointer-y", `${event.clientY}px`);
+      }, { passive: true });
+    }
+
+    const updateScroll = () => {
+      scrollFrame = 0;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(1, window.scrollY / scrollable) : 0;
+      if (scrollProgress) scrollProgress.style.transform = `scaleX(${progress})`;
+      nav?.toggleAttribute("data-scrolled", window.scrollY > 40);
+    };
+    window.addEventListener("scroll", () => {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
+    }, { passive: true });
+    updateScroll();
+
+    const revealItems = [...page.querySelectorAll("[data-reveal]")];
+    if ("IntersectionObserver" in window && !reduceMotion.matches) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.setAttribute("data-visible", "");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealItems.forEach((item) => revealObserver.observe(item));
+    } else {
+      revealItems.forEach((item) => item.setAttribute("data-visible", ""));
+    }
+
+    const sections = [...page.querySelectorAll("[data-section-name]")];
+    const floatingSection = page.querySelector("[data-floating-section]");
+    if ("IntersectionObserver" in window && floatingSection) {
+      const sectionObserver = new IntersectionObserver((entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) floatingSection.textContent = visible.target.dataset.sectionName || "ON AIR";
+      }, { rootMargin: "-20% 0px -55%", threshold: [0.05, 0.3, 0.6] });
+      sections.forEach((section) => sectionObserver.observe(section));
+    }
+
+    const sceneConsole = page.querySelector("[data-scene-console]");
+    if (sceneConsole) {
+      const scenePanels = [...sceneConsole.querySelectorAll("[data-scene]")];
+      const sceneTabs = [...sceneConsole.querySelectorAll("[data-scene-tab]")];
+      const sceneCode = sceneConsole.querySelector("[data-scene-code]");
+      const sceneCount = sceneConsole.querySelector("[data-scene-count]");
+      const sceneNote = sceneConsole.querySelector("[data-scene-note]");
+      const hotspotReadout = sceneConsole.querySelector("[data-hotspot-readout]");
+      const hotspotCode = hotspotReadout?.querySelector("[data-hotspot-code]");
+      const hotspotTitle = hotspotReadout?.querySelector("[data-hotspot-title]");
+      const hotspotBody = hotspotReadout?.querySelector("[data-hotspot-body]");
+      let activeScene = 0;
+
+      const resetHotspot = () => {
+        sceneConsole.querySelectorAll("[data-hotspot]").forEach((button) => {
+          button.setAttribute("aria-pressed", "false");
+        });
+        if (hotspotReadout) hotspotReadout.removeAttribute("data-active");
+        if (hotspotCode) hotspotCode.textContent = scenes[activeScene].code;
+        if (hotspotTitle) hotspotTitle.textContent = "等待读取信号点";
+        if (hotspotBody) hotspotBody.textContent = "点击画面中的琥珀色节点，现场细节会在这里显影。";
+      };
+
+      const setScene = (index) => {
+        activeScene = (index + scenes.length) % scenes.length;
+        scenePanels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== activeScene; });
+        sceneTabs.forEach((tab, tabIndex) => tab.setAttribute("aria-selected", tabIndex === activeScene ? "true" : "false"));
+        if (sceneCode) sceneCode.textContent = scenes[activeScene].code;
+        if (sceneCount) sceneCount.textContent = `${String(activeScene + 1).padStart(2, "0")} — ${String(scenes.length).padStart(2, "0")}`;
+        if (sceneNote) sceneNote.textContent = scenes[activeScene].note;
+        resetHotspot();
+      };
+
+      sceneTabs.forEach((tab, index) => tab.addEventListener("click", () => setScene(index)));
+      sceneConsole.querySelector("[data-scene-prev]")?.addEventListener("click", () => setScene(activeScene - 1));
+      sceneConsole.querySelector("[data-scene-next]")?.addEventListener("click", () => setScene(activeScene + 1));
+      sceneConsole.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") setScene(activeScene - 1);
+        if (event.key === "ArrowRight") setScene(activeScene + 1);
+      });
+      sceneConsole.addEventListener("click", (event) => {
+        const button = event.target.closest?.("[data-hotspot]");
+        if (!button) return;
+        const isActive = button.getAttribute("aria-pressed") === "true";
+        sceneConsole.querySelectorAll("[data-hotspot]").forEach((item) => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", isActive ? "false" : "true");
+        hotspotReadout?.toggleAttribute("data-active", !isActive);
+        if (hotspotCode) hotspotCode.textContent = isActive ? scenes[activeScene].code : button.dataset.hotspotCode;
+        if (hotspotTitle) hotspotTitle.textContent = isActive ? "等待读取信号点" : button.dataset.hotspotTitle;
+        if (hotspotBody) hotspotBody.textContent = isActive ? "点击画面中的琥珀色节点，现场细节会在这里显影。" : button.dataset.hotspotBody;
+      });
+    }
+
+    page.querySelectorAll(".gr-log").forEach((detail) => {
+      detail.addEventListener("toggle", () => {
+        const state = detail.querySelector("summary i");
+        if (state) state.textContent = detail.open ? "CLOSE" : "OPEN";
+      });
+    });
+  }
+</script>
+
