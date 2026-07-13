@@ -1,0 +1,1247 @@
+/* Megastructure refresh: page-scoped structural overrides. */
+.mega-lab {
+  --mega-coal: #080909;
+  --mega-concrete: #87908e;
+  --mega-cyan: #a9ced0;
+  --mega-rust: #b45a22;
+  --mega-line: rgba(202, 219, 217, 0.22);
+  --mega-line-strong: rgba(202, 219, 217, 0.46);
+  --mega-plate: rgba(8, 11, 11, 0.9);
+  min-height: 100svh;
+  background: var(--mega-coal);
+  color: #e2e5e1;
+  font-family: "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+}
+
+.mega-lab *,
+.mega-lab *::before,
+.mega-lab *::after {
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+.mega-lab-stage {
+  min-height: 100svh;
+  isolation: isolate;
+  background: #080909;
+}
+
+.mega-lab-stage::before {
+  z-index: 3;
+  background:
+    linear-gradient(90deg, rgba(4, 5, 5, 0.86), transparent 22%, transparent 72%, rgba(4, 5, 5, 0.58)),
+    linear-gradient(180deg, rgba(2, 3, 3, 0.54), transparent 27%, transparent 67%, rgba(2, 3, 3, 0.88));
+}
+
+.mega-lab-stage::after {
+  z-index: 6;
+  opacity: 0.18;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(222, 231, 227, 0.035) 4px 5px),
+    repeating-linear-gradient(90deg, transparent 0 calc(8.333vw - 1px), rgba(202, 219, 217, 0.08) calc(8.333vw - 1px) 8.333vw);
+  mix-blend-mode: screen;
+}
+
+.mega-lab .mega-lab-backdrop {
+  inset: -3%;
+  width: 106%;
+  height: 106%;
+  filter:
+    grayscale(0.18)
+    brightness(calc(var(--scene-brightness, 0.82) * 0.74))
+    contrast(calc(var(--scene-contrast, 1.12) * 1.14))
+    saturate(calc(var(--scene-saturation, 0.86) * 0.68));
+  transform: translate3d(var(--drift-x, 0), var(--drift-y, 0), 0) scale(var(--stage-scale, 1.025));
+  transition: filter 900ms ease, opacity 600ms ease;
+}
+
+.mega-lab.is-node-unfocused .mega-lab-backdrop {
+  filter: grayscale(0.42) brightness(0.5) contrast(1.3) saturate(0.52);
+}
+
+.mega-lab .mega-lab-grid {
+  z-index: 2;
+  opacity: 0.32;
+  background:
+    linear-gradient(90deg, transparent 0 8.25%, rgba(190, 213, 212, 0.12) 8.3% 8.36%, transparent 8.42%),
+    linear-gradient(90deg, transparent 0 50%, rgba(190, 213, 212, 0.1) 50.04% 50.09%, transparent 50.14%),
+    linear-gradient(180deg, transparent 0 20%, rgba(190, 213, 212, 0.08) 20.06% 20.12%, transparent 20.18%),
+    linear-gradient(180deg, transparent 0 75%, rgba(190, 213, 212, 0.08) 75.06% 75.12%, transparent 75.18%);
+}
+
+.mega-lab .mega-lab-haze {
+  z-index: 4;
+  opacity: calc(var(--scene-haze-opacity, 0.58) * 1.18);
+  background:
+    linear-gradient(180deg, transparent 10%, var(--scene-haze-band, rgba(174, 194, 193, 0.12)) 56%, transparent 78%),
+    radial-gradient(ellipse at 18% 62%, var(--scene-haze-left, rgba(151, 177, 177, 0.14)), transparent 34rem),
+    radial-gradient(ellipse at 78% 38%, var(--scene-haze-right, rgba(138, 166, 169, 0.16)), transparent 38rem);
+  filter: blur(7px);
+}
+
+.mega-lab .mega-depth-field {
+  display: block;
+  z-index: 5;
+  opacity: 0.38;
+}
+
+.mega-lab .mega-depth-slab {
+  border: 1px solid rgba(199, 216, 214, 0.14);
+  background: linear-gradient(180deg, rgba(200, 217, 214, 0.08), rgba(4, 5, 5, 0.02));
+  box-shadow: none;
+}
+
+.mega-lab .mega-depth-slab-1 {
+  top: 26%;
+  left: 5%;
+  width: 22rem;
+  height: 38rem;
+  transform: perspective(900px) rotateY(28deg) skewY(-3deg);
+}
+
+.mega-lab .mega-depth-slab-2 {
+  top: 12%;
+  right: 20%;
+  width: 14rem;
+  height: 45rem;
+  transform: perspective(900px) rotateY(-22deg) skewY(2deg);
+}
+
+.mega-lab .mega-depth-slab-3 {
+  right: 28%;
+  bottom: 4%;
+  width: 35rem;
+  height: 12rem;
+  transform: perspective(900px) rotateX(42deg);
+}
+
+.mega-lab .mega-ground-sheen {
+  z-index: 5;
+  height: 38%;
+  opacity: calc(var(--scene-ground-opacity, 0.34) * 0.9);
+  background:
+    linear-gradient(180deg, transparent, var(--scene-ground-glow, rgba(180, 207, 205, 0.08)) 35%, rgba(2, 3, 3, 0.48)),
+    repeating-linear-gradient(168deg, transparent 0 4.5rem, rgba(202, 219, 217, 0.055) 4.55rem 4.62rem);
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+}
+
+/* top structural bar */
+.mega-lab .mega-lab-topbar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 30;
+  width: 100%;
+  min-height: 72px;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(300px, 1fr) minmax(420px, auto);
+  gap: 0;
+  border: 0;
+  border-bottom: 2px solid var(--mega-line-strong);
+  background: rgba(7, 9, 9, 0.93);
+  padding: 0 28px;
+  backdrop-filter: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.mega-lab .mega-topbar-home {
+  justify-content: flex-start;
+  gap: 12px;
+  color: #d8ddda;
+  font: 700 11px/1 Consolas, monospace;
+  letter-spacing: 0.11em;
+}
+
+.mega-lab .mega-topbar-home i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--mega-cyan);
+  background: rgba(169, 206, 208, 0.14);
+  transform: rotate(45deg);
+}
+
+.mega-lab .mega-topbar-home span {
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.mega-topbar-ident {
+  height: 72px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: end;
+  gap: 0 16px;
+  border-inline: 1px solid var(--mega-line);
+  padding: 14px 22px 12px;
+}
+
+.mega-lab .mega-topbar-ident b {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--mega-rust);
+  font: 700 20px/1 Consolas, monospace;
+  letter-spacing: -0.03em;
+}
+
+.mega-lab .mega-topbar-ident span,
+.mega-lab .mega-topbar-ident small {
+  color: #d3dad7;
+  font: 700 10px/1 Consolas, monospace;
+  letter-spacing: 0.14em;
+  text-align: left;
+}
+
+.mega-lab .mega-topbar-ident small {
+  align-self: start;
+  color: #657271;
+  font-size: 8px;
+}
+
+.mega-lab .mega-topbar-actions {
+  height: 72px;
+  gap: 0;
+}
+
+.mega-lab .mega-lab-topbar button {
+  min-width: 116px;
+  height: 72px;
+  gap: 10px;
+  border: 0;
+  border-right: 1px solid var(--mega-line);
+  padding: 0 17px;
+  color: #cdd4d1;
+  background: transparent;
+  font: 700 11px/1 Consolas, monospace;
+  letter-spacing: 0.08em;
+  clip-path: none;
+}
+
+.mega-lab .mega-lab-topbar .mega-comment-toggle {
+  position: static;
+  z-index: auto;
+  display: inline-flex;
+  width: auto;
+  min-height: 72px;
+  place-items: unset;
+  backdrop-filter: none;
+}
+
+.mega-lab .mega-lab-topbar button:first-child {
+  border-left: 1px solid var(--mega-line);
+}
+
+.mega-lab .mega-lab-topbar button small {
+  color: #677371;
+  font: 700 8px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-lab-topbar button span {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.mega-lab .mega-lab-topbar button:hover,
+.mega-lab .mega-lab-topbar button:focus-visible,
+.mega-lab .mega-lab-topbar button[aria-expanded="true"],
+.mega-lab .mega-lab-topbar button[aria-pressed="true"] {
+  border-color: var(--mega-cyan);
+  background: var(--mega-cyan);
+  color: #091011;
+  outline: 0;
+}
+
+.mega-lab .mega-lab-topbar button:hover small,
+.mega-lab .mega-lab-topbar button[aria-expanded="true"] small,
+.mega-lab .mega-lab-topbar button[aria-pressed="true"] small {
+  color: #294244;
+}
+
+.mega-lab .mega-admin-comment-button[hidden] {
+  display: none;
+}
+
+/* monolithic title */
+.mega-lab .mega-lab-title {
+  position: absolute;
+  z-index: 10;
+  top: clamp(112px, 15vh, 150px);
+  left: clamp(74px, 6.5vw, 118px);
+  width: min(46rem, 51vw);
+  padding: 0;
+  pointer-events: none;
+}
+
+.mega-title-code {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  color: var(--mega-cyan);
+  font: 700 9px/1 Consolas, monospace;
+  letter-spacing: 0.13em;
+}
+
+.mega-title-code span {
+  display: grid;
+  min-width: 72px;
+  min-height: 30px;
+  place-items: center;
+  border: 1px solid var(--mega-cyan);
+}
+
+.mega-title-code b {
+  color: #879391;
+  font-weight: 500;
+}
+
+.mega-lab .mega-lab-title p {
+  max-width: 46rem;
+  margin: 0 0 12px;
+  color: #94a19f;
+  font: 700 9px/1.5 Consolas, monospace;
+  letter-spacing: 0.14em;
+}
+
+.mega-lab .mega-lab-title h1 {
+  margin: 0;
+  color: rgba(225, 229, 224, 0.96);
+  font-family: Impact, "Arial Narrow", "Microsoft YaHei UI", sans-serif;
+  font-size: clamp(72px, 9.8vw, 166px);
+  font-weight: 900;
+  line-height: 0.78;
+  letter-spacing: -0.09em;
+  text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.38);
+}
+
+.mega-lab .mega-lab-title > strong {
+  display: block;
+  margin: 18px 0 16px 24%;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(204, 218, 214, 0.76);
+  font-family: Impact, "Arial Narrow", "Microsoft YaHei UI", sans-serif;
+  font-size: clamp(42px, 5.6vw, 92px);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: -0.06em;
+}
+
+.mega-lab .mega-lab-title > small {
+  display: block;
+  max-width: 35rem;
+  margin-left: 24%;
+  padding: 12px 0 12px 18px;
+  border-left: 3px solid var(--mega-rust);
+  color: #aab4b1;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.03em;
+}
+
+.mega-scale-rail {
+  position: absolute;
+  z-index: 9;
+  top: 112px;
+  bottom: 132px;
+  left: 22px;
+  width: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-right: 1px solid var(--mega-line);
+  color: #687573;
+  font: 700 7px/1 Consolas, monospace;
+  letter-spacing: 0.1em;
+  writing-mode: vertical-rl;
+}
+
+.mega-scale-rail b {
+  color: #a4afac;
+  font-weight: 500;
+}
+
+.mega-scale-rail i {
+  flex: 1;
+  width: 8px;
+  min-height: 40px;
+  background: repeating-linear-gradient(180deg, var(--mega-line-strong) 0 1px, transparent 1px 8px);
+}
+
+/* route markers */
+.mega-lab .mega-node-plane {
+  z-index: 11;
+}
+
+.mega-lab .mega-node-plane::before {
+  border-color: rgba(190, 210, 208, 0.09);
+}
+
+.mega-lab .mega-lab-node {
+  width: 52px;
+  height: 52px;
+  color: var(--mega-cyan);
+}
+
+.mega-lab .mega-lab-node::before {
+  background: rgba(8, 11, 11, 0.72);
+  border: 1px solid var(--mega-line-strong);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.mega-lab .mega-node-cross {
+  width: 17px;
+  height: 17px;
+  border: 2px solid currentColor;
+  background: rgba(4, 6, 6, 0.88);
+  box-shadow: 0 0 0 8px rgba(169, 206, 208, 0.07);
+  transform: rotate(45deg);
+}
+
+.mega-lab .mega-node-text {
+  min-width: 150px;
+  padding: 10px 14px;
+  border: 1px solid var(--mega-line);
+  background: rgba(6, 8, 8, 0.84);
+  color: #d6dcda;
+  font: 700 11px/1 Consolas, monospace;
+  letter-spacing: 0.1em;
+  backdrop-filter: none;
+}
+
+.mega-lab .mega-node-text::before {
+  width: 54px;
+  background: var(--mega-cyan);
+}
+
+.mega-lab .mega-lab-node:hover .mega-node-text,
+.mega-lab .mega-lab-node:focus-visible .mega-node-text,
+.mega-lab .mega-lab-node.is-active .mega-node-text {
+  border-color: var(--mega-cyan);
+  background: var(--mega-cyan);
+  color: #081011;
+}
+
+.mega-lab .mega-lab-node.is-active .mega-node-cross {
+  background: var(--mega-rust);
+  border-color: #e9b18b;
+  box-shadow: 0 0 0 10px rgba(180, 90, 34, 0.12);
+}
+
+/* route history / bottom relation */
+.mega-lab .mega-route-console {
+  z-index: 18;
+  bottom: 116px;
+  left: clamp(74px, 6.5vw, 118px);
+  width: min(41rem, 48vw);
+  min-height: 68px;
+  grid-template-columns: 0.9fr 1.1fr;
+  border: 2px solid var(--mega-line-strong);
+  background: rgba(5, 7, 7, 0.88);
+  box-shadow: none;
+  backdrop-filter: none;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.mega-lab .mega-route-status,
+.mega-lab .mega-route-back {
+  min-height: 64px;
+  border: 0;
+  padding: 12px 16px;
+}
+
+.mega-lab .mega-route-status {
+  border-right: 1px solid var(--mega-line);
+}
+
+.mega-lab .mega-route-status span,
+.mega-lab .mega-route-back strong {
+  color: #d7dcd9;
+  font-size: 14px;
+}
+
+.mega-lab .mega-route-status b,
+.mega-lab .mega-route-back small,
+.mega-lab .mega-route-back span {
+  color: #6f7b79;
+  font: 700 8px/1.4 Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.mega-lab .mega-route-back:not(:disabled):hover,
+.mega-lab .mega-route-back:not(:disabled):focus-visible {
+  background: var(--mega-cyan);
+  color: #081011;
+}
+
+/* engineering observer */
+.mega-lab .mega-observer-panel {
+  z-index: 20;
+  right: 28px;
+  bottom: 116px;
+  width: min(400px, 34vw);
+  min-width: 330px;
+  min-height: 0;
+  max-width: calc(100% - 56px);
+  max-height: calc(100svh - 210px);
+  overflow: auto;
+  border: 2px solid var(--mega-line-strong);
+  background: rgba(6, 9, 9, 0.94);
+  box-shadow: none;
+  padding: 12px;
+  backdrop-filter: none;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.mega-lab .mega-observer-panel::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 8px solid rgba(174, 195, 193, 0.025);
+  pointer-events: none;
+  content: "";
+}
+
+.mega-lab .mega-panel-head {
+  min-height: 34px;
+  margin: 0 0 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--mega-line);
+}
+
+.mega-lab .mega-panel-head > span {
+  color: #8a9895;
+  font: 700 8px/1 Consolas, monospace;
+  letter-spacing: 0.11em;
+}
+
+.mega-lab .mega-panel-head > span b {
+  color: var(--mega-cyan);
+  font-weight: 500;
+}
+
+.mega-lab .mega-panel-head button {
+  min-height: 28px;
+  border: 1px solid var(--mega-line);
+  background: transparent;
+  color: #abb5b2;
+  font: 700 8px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-panel-head button:hover,
+.mega-lab .mega-panel-head button:focus-visible,
+.mega-lab .mega-panel-head button[aria-pressed="true"] {
+  border-color: var(--mega-cyan);
+  background: var(--mega-cyan);
+  color: #081011;
+}
+
+.mega-lab .mega-panel-screen {
+  aspect-ratio: 16 / 7.8;
+  border: 1px solid var(--mega-line-strong);
+  filter: grayscale(0.24) saturate(0.7) contrast(1.18);
+}
+
+.mega-lab .mega-panel-screen::before {
+  opacity: 0.62;
+}
+
+.mega-lab .mega-panel-frame-code {
+  color: #d7dfdc;
+  font-family: Consolas, monospace;
+}
+
+.mega-panel-copy-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.mega-lab .mega-panel-copy {
+  gap: 5px;
+  padding-top: 10px;
+}
+
+.mega-lab .mega-panel-copy small,
+.mega-lab .mega-panel-copy span {
+  color: var(--mega-rust);
+  font: 700 8px/1 Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.mega-lab .mega-panel-copy strong {
+  color: #ecf0ec;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.mega-lab .mega-panel-copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #909c99;
+  font-size: 11px;
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mega-lab .mega-signal-readout {
+  margin-top: 10px;
+  border: 1px solid var(--mega-line);
+  background: var(--mega-line);
+}
+
+.mega-lab .mega-signal-readout span {
+  background: #0b0e0e;
+  padding: 8px;
+}
+
+.mega-lab .mega-signal-readout small {
+  font: 700 7px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-signal-readout b {
+  color: #d7ddda;
+  font: 700 11px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-signal-readout em {
+  color: var(--mega-cyan);
+  font-style: normal;
+}
+
+.mega-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 10px;
+  border: 1px solid var(--mega-line);
+}
+
+.mega-mode-switch button {
+  min-height: 42px;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  border: 0;
+  border-right: 1px solid var(--mega-line);
+  background: #0b0e0e;
+  color: #909b98;
+  cursor: pointer;
+}
+
+.mega-mode-switch button:last-child {
+  border-right: 0;
+}
+
+.mega-mode-switch button small {
+  color: #65716f;
+  font: 700 6px/1 Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.mega-mode-switch button span {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mega-mode-switch button:hover,
+.mega-mode-switch button:focus-visible,
+.mega-mode-switch button[aria-pressed="true"] {
+  background: var(--mega-cyan);
+  color: #071011;
+  outline: 0;
+}
+
+.mega-mode-switch button[aria-pressed="true"] small {
+  color: #315052;
+}
+
+.mega-lab .mega-scale-control {
+  grid-template-columns: 76px 1fr 28px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-color: var(--mega-line);
+}
+
+.mega-lab .mega-scale-control span,
+.mega-lab .mega-scale-control b {
+  color: #71807d;
+  font: 700 8px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-scale-control input {
+  accent-color: var(--mega-rust);
+}
+
+.mega-lab .mega-panel-reopen {
+  z-index: 21;
+  right: 28px;
+  bottom: 116px;
+  border: 2px solid var(--mega-cyan);
+  background: #0a0d0d;
+  box-shadow: none;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+}
+
+/* comments as engineering annotations */
+.mega-comment-instruction {
+  position: absolute;
+  z-index: 17;
+  right: 30px;
+  bottom: 86px;
+  margin: 0;
+  color: #6e7b78;
+  font: 700 8px/1 Consolas, monospace;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+.mega-lab .mega-comment-layer {
+  z-index: 15;
+}
+
+.mega-lab .mega-comment-pin {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--mega-rust);
+  background: rgba(9, 11, 11, 0.9);
+  color: #e49a68;
+  box-shadow: 0 0 0 6px rgba(180, 90, 34, 0.09);
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+}
+
+.mega-lab .mega-comment-pin::before,
+.mega-lab .mega-comment-pin::after {
+  background: var(--mega-rust);
+}
+
+.mega-lab .mega-comment-popover,
+.mega-lab .mega-comment-admin-dialog {
+  z-index: 40;
+  border: 2px solid var(--mega-line-strong);
+  background: #0a0d0d;
+  box-shadow: none;
+  backdrop-filter: none;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.mega-lab .mega-comment-popover {
+  width: min(340px, calc(100% - 32px));
+}
+
+.mega-lab .mega-comment-head {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--mega-line);
+}
+
+.mega-lab .mega-comment-head span,
+.mega-lab .mega-comment-position,
+.mega-lab .mega-comment-session span,
+.mega-lab .mega-comment-list > span,
+.mega-lab .mega-comment-review > span,
+.mega-lab .mega-comment-row span,
+.mega-lab .mega-comment-detail span {
+  font-family: Consolas, monospace;
+}
+
+.mega-lab .mega-comment-auth input,
+.mega-lab .mega-comment-form textarea {
+  border: 0;
+  border-bottom: 2px solid var(--mega-line);
+  background: #0d1111;
+  color: #d8deda;
+}
+
+.mega-lab .mega-comment-auth input:focus,
+.mega-lab .mega-comment-form textarea:focus {
+  border-color: var(--mega-cyan);
+  outline: 0;
+}
+
+.mega-lab .mega-comment-popover button,
+.mega-lab .mega-comment-admin-dialog button {
+  border: 1px solid var(--mega-line);
+  background: #0c1010;
+  color: #aab4b1;
+}
+
+.mega-lab .mega-comment-popover button:hover,
+.mega-lab .mega-comment-popover button:focus-visible,
+.mega-lab .mega-comment-admin-dialog button:hover,
+.mega-lab .mega-comment-admin-dialog button:focus-visible {
+  border-color: var(--mega-cyan);
+  background: var(--mega-cyan);
+  color: #071011;
+}
+
+/* full topology map */
+.mega-lab .mega-world-map {
+  position: absolute;
+  z-index: 50;
+  inset: 88px 28px 116px;
+  width: auto;
+  max-height: none;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  border: 2px solid var(--mega-line-strong);
+  background:
+    linear-gradient(90deg, rgba(169, 206, 208, 0.025) 1px, transparent 1px),
+    linear-gradient(rgba(169, 206, 208, 0.025) 1px, transparent 1px),
+    rgba(6, 9, 9, 0.97);
+  background-size: 72px 72px;
+  box-shadow: none;
+  backdrop-filter: none;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
+.mega-lab .mega-world-map[hidden] {
+  display: none;
+}
+
+.mega-lab .mega-world-map-head {
+  min-height: 76px;
+  grid-template-columns: 1fr auto 44px;
+  gap: 24px;
+  border-bottom: 2px solid var(--mega-line-strong);
+  padding: 14px 20px;
+}
+
+.mega-lab .mega-world-map-head span {
+  color: var(--mega-rust);
+  font: 700 8px/1 Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.mega-lab .mega-world-map-head strong {
+  color: #edf1ed;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.mega-lab .mega-world-map-head p {
+  color: var(--mega-cyan);
+  font: 700 10px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-world-map-head button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--mega-line-strong);
+  background: transparent;
+  color: #d4dbd8;
+}
+
+.mega-lab .mega-world-map-zones {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--mega-line);
+}
+
+.mega-lab .mega-world-map-zones span {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-right: 1px solid var(--mega-line);
+  background: rgba(10, 13, 13, 0.92);
+  color: #667471;
+  font: 700 9px/1 Consolas, monospace;
+}
+
+.mega-lab .mega-world-map-zones span:last-child {
+  border-right: 0;
+}
+
+.mega-lab .mega-world-map-zones span.is-active {
+  background: var(--mega-cyan);
+  color: #071011;
+}
+
+.mega-lab .mega-world-map-canvas {
+  min-height: 0;
+  border: 0;
+  background:
+    linear-gradient(90deg, transparent 49.95%, rgba(169, 206, 208, 0.12) 50%, transparent 50.05%),
+    linear-gradient(transparent 49.95%, rgba(169, 206, 208, 0.12) 50%, transparent 50.05%);
+}
+
+.mega-lab .mega-world-map-canvas svg {
+  inset: 6%;
+  width: 88%;
+  height: 88%;
+}
+
+.mega-lab .mega-world-map-canvas line {
+  stroke: rgba(169, 206, 208, 0.28);
+  stroke-width: 0.34;
+  stroke-dasharray: 1 1.5;
+}
+
+.mega-lab .mega-world-map-node {
+  min-width: 106px;
+  padding: 9px 12px;
+  border: 1px solid var(--mega-line-strong);
+  background: rgba(7, 10, 10, 0.94);
+  color: #8f9d9a;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+
+.mega-lab .mega-world-map-node strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.mega-lab .mega-world-map-node:hover,
+.mega-lab .mega-world-map-node:focus-visible,
+.mega-lab .mega-world-map-node.is-active {
+  border-color: var(--mega-cyan);
+  background: var(--mega-cyan);
+  color: #071011;
+  outline: 0;
+}
+
+.mega-lab .mega-world-map-node.is-active {
+  box-shadow: 8px 8px 0 rgba(180, 90, 34, 0.78);
+}
+
+/* hard-edged status foundation */
+.mega-lab .mega-design-strip {
+  position: relative;
+  z-index: 25;
+  grid-template-columns: 0.7fr 1fr 1.5fr 1fr;
+  min-height: 104px;
+  border-top: 2px solid var(--mega-line-strong);
+  background: var(--mega-line-strong);
+}
+
+.mega-lab .mega-design-strip article {
+  min-height: 104px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  background: #0a0d0d;
+  padding: 16px 22px;
+}
+
+.mega-lab .mega-design-strip span {
+  color: var(--mega-rust);
+  font: 700 8px/1 Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.mega-lab .mega-design-strip p,
+.mega-lab .mega-design-strip b {
+  color: #c9d0cd;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mega-lab .mega-design-strip small {
+  color: #687572;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@keyframes megaRefreshTitleIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.mega-lab[data-ready="true"] .mega-lab-title,
+.mega-lab[data-ready="true"] .mega-observer-panel,
+.mega-lab[data-ready="true"] .mega-route-console {
+  animation: megaRefreshTitleIn 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.mega-lab[data-ready="true"] .mega-observer-panel { animation-delay: 120ms; }
+.mega-lab[data-ready="true"] .mega-route-console { animation-delay: 220ms; }
+
+@media (max-width: 1080px) {
+  .mega-lab .mega-lab-topbar {
+    grid-template-columns: 170px 1fr auto;
+    padding-inline: 18px;
+  }
+
+  .mega-lab .mega-topbar-ident small {
+    display: none;
+  }
+
+  .mega-lab .mega-lab-topbar button {
+    min-width: 92px;
+    padding-inline: 12px;
+  }
+
+  .mega-lab .mega-lab-title {
+    width: 54vw;
+  }
+
+  .mega-lab .mega-observer-panel {
+    width: min(360px, 38vw);
+    min-width: 300px;
+  }
+
+  .mega-lab .mega-route-console {
+    width: 45vw;
+  }
+}
+
+@media (max-width: 760px) {
+  .mega-lab-stage {
+    min-height: 100svh;
+  }
+
+  .mega-lab-stage::after {
+    background:
+      repeating-linear-gradient(0deg, transparent 0 4px, rgba(222, 231, 227, 0.03) 4px 5px),
+      repeating-linear-gradient(90deg, transparent 0 calc(25vw - 1px), rgba(202, 219, 217, 0.07) calc(25vw - 1px) 25vw);
+  }
+
+  .mega-lab .mega-lab-topbar {
+    min-height: 58px;
+    grid-template-columns: 104px 1fr;
+    padding: 0 10px;
+  }
+
+  .mega-lab .mega-topbar-home {
+    gap: 7px;
+    font-size: 8px;
+  }
+
+  .mega-lab .mega-lab-topbar .mega-comment-toggle {
+    min-height: 58px;
+  }
+
+  .mega-lab .mega-topbar-home span {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mega-topbar-ident {
+    display: none;
+  }
+
+  .mega-lab .mega-topbar-actions {
+    height: 58px;
+  }
+
+  .mega-lab .mega-lab-topbar button {
+    min-width: 0;
+    height: 58px;
+    flex: 1;
+    padding: 0 9px;
+    font-size: 8px;
+  }
+
+  .mega-lab .mega-lab-topbar button small {
+    display: none;
+  }
+
+  .mega-lab .mega-lab-topbar button span {
+    display: inline !important;
+    color: inherit !important;
+    font: 700 8px/1 Consolas, monospace !important;
+    white-space: nowrap;
+  }
+
+  .mega-lab .mega-lab-title {
+    top: 88px;
+    left: 16px;
+    width: calc(100% - 32px);
+  }
+
+  .mega-title-code {
+    margin-bottom: 14px;
+  }
+
+  .mega-lab .mega-lab-title h1 {
+    font-size: clamp(56px, 20vw, 82px);
+  }
+
+  .mega-lab .mega-lab-title > strong {
+    margin: 14px 0 10px 13%;
+    font-size: clamp(42px, 15vw, 66px);
+  }
+
+  .mega-lab .mega-lab-title > small {
+    max-width: 90%;
+    margin-left: 13%;
+    font-size: 10px;
+  }
+
+  .mega-scale-rail,
+  .mega-comment-instruction {
+    display: none;
+  }
+
+  .mega-lab .mega-node-plane {
+    top: 47%;
+    bottom: 38%;
+  }
+
+  .mega-lab .mega-lab-node {
+    width: 42px;
+    height: 42px;
+  }
+
+  .mega-lab .mega-node-text {
+    min-width: 105px;
+    padding: 8px 10px;
+    font-size: 9px;
+  }
+
+  .mega-lab .mega-route-console {
+    right: 12px;
+    bottom: 300px;
+    left: 12px;
+    width: auto;
+    min-height: 58px;
+  }
+
+  .mega-lab .mega-route-status,
+  .mega-lab .mega-route-back {
+    min-height: 56px;
+    padding: 9px 10px;
+  }
+
+  .mega-lab .mega-route-status span,
+  .mega-lab .mega-route-back strong {
+    font-size: 11px;
+  }
+
+  .mega-lab .mega-observer-panel {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: 280px;
+    overflow: auto;
+    padding: 9px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .mega-lab .mega-panel-screen {
+    float: left;
+    width: 39%;
+    margin: 0 10px 7px 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .mega-lab .mega-panel-copy {
+    min-height: 98px;
+    padding-top: 0;
+  }
+
+  .mega-lab .mega-panel-copy strong {
+    font-size: 19px;
+  }
+
+  .mega-lab .mega-panel-copy p {
+    -webkit-line-clamp: 3;
+  }
+
+  .mega-lab .mega-signal-readout,
+  .mega-mode-switch,
+  .mega-lab .mega-scale-control {
+    clear: both;
+  }
+
+  .mega-lab .mega-mode-switch button {
+    min-height: 36px;
+  }
+
+  .mega-lab .mega-panel-reopen {
+    right: 10px;
+    bottom: 12px;
+  }
+
+  .mega-lab .mega-world-map {
+    inset: 66px 8px 10px;
+  }
+
+  .mega-lab .mega-world-map-head {
+    min-height: 66px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .mega-lab .mega-world-map-head strong {
+    font-size: 20px;
+  }
+
+  .mega-lab .mega-world-map-head p {
+    font-size: 8px;
+  }
+
+  .mega-lab .mega-world-map-zones {
+    grid-template-columns: repeat(5, minmax(78px, 1fr));
+    overflow-x: auto;
+  }
+
+  .mega-lab .mega-world-map-zones span {
+    min-height: 42px;
+    font-size: 7px;
+  }
+
+  .mega-lab .mega-world-map-canvas {
+    min-height: 420px;
+  }
+
+  .mega-lab .mega-world-map-node {
+    min-width: 76px;
+    padding: 6px 8px;
+  }
+
+  .mega-lab .mega-world-map-node strong {
+    font-size: 11px;
+  }
+
+  .mega-lab .mega-world-map-node small {
+    display: none;
+  }
+
+  .mega-lab .mega-comment-popover {
+    position: fixed !important;
+    inset: auto 8px 8px !important;
+    width: auto;
+    max-height: 66svh;
+    overflow: auto;
+  }
+
+  .mega-lab .mega-comment-admin-dialog {
+    inset: 66px 8px 8px;
+    width: auto;
+  }
+
+  .mega-lab .mega-design-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mega-lab .mega-design-strip article {
+    min-height: 88px;
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mega-lab *,
+  .mega-lab *::before,
+  .mega-lab *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

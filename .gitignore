@@ -6,6 +6,7 @@ dist/
 screenshots/
 hatch-pet-runs/
 .tmp/
+zato/
 
 # Private/local automation, reports, source references, and helper tools
 .codex/

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/megastructure-refresh.css";
 
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
@@ -672,11 +673,24 @@ const mapRoutes = nodes
       <div class="mega-ground-sheen" aria-hidden="true"></div>
 
       <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
-        <a href={basePath}>灰雨电台</a>
-        <span>MEGASTRUCTURE OBSERVER</span>
+        <a class="mega-topbar-home" href={basePath}>
+          <i aria-hidden="true"></i>
+          <span>返回 / 灰雨电台</span>
+        </a>
+        <div class="mega-topbar-ident">
+          <b>MS—04</b>
+          <span>MEGASTRUCTURE OBSERVER</span>
+          <small>STRUCTURAL SURVEY TERMINAL</small>
+        </div>
         <div class="mega-topbar-actions">
           <button class="mega-world-map-button" type="button" data-world-map-toggle aria-expanded="false">
-            地图
+            <small>01</small>空间地图
+          </button>
+          <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">
+            <small>02</small><span data-comment-toggle-label>标记 ON</span>
+          </button>
+          <button class="mega-audio-button" type="button" data-audio-toggle aria-pressed="false">
+            <small>03</small><span data-audio-label>低频</span>
           </button>
           <button class="mega-admin-comment-button" type="button" data-comment-admin-open hidden>
             评论
@@ -736,9 +750,26 @@ const mapRoutes = nodes
       </aside>
 
       <section class="mega-lab-title" aria-label="页面标题">
+        <div class="mega-title-code">
+          <span data-scene-ordinal>01 / {String(scenes.length).padStart(2, "0")}</span>
+          <b data-scene-code>{firstScene.code}</b>
+        </div>
         <p data-scene-kicker>{firstScene.kicker}</p>
+        <h1>巨构主义</h1>
+        <strong data-scene-display>{firstScene.label}</strong>
         <small data-mode-phrase>{firstNodeDescription}</small>
       </section>
+
+      <aside class="mega-scale-rail" aria-label="空间比例数据">
+        <span>SCALE</span>
+        <b>001:4000</b>
+        <i aria-hidden="true"></i>
+        <span>ALT</span>
+        <b>+0280 M</b>
+        <i aria-hidden="true"></i>
+        <span>CONCRETE</span>
+        <b>C80 / W12</b>
+      </aside>
 
       <div class="mega-node-plane" aria-label="空间节点">
         {
@@ -773,8 +804,87 @@ const mapRoutes = nodes
         </button>
       </div>
 
+      <aside class="mega-observer-panel" aria-label="工程观察屏">
+        <button
+          class="mega-panel-resize"
+          type="button"
+          data-panel-resize
+          aria-label="调整观察屏大小"
+        ></button>
+        <div class="mega-panel-head" data-panel-drag>
+          <span>ENGINEERING VIEW / <b data-panel-frame-code>{firstNode.viewport.frame}</b></span>
+          <div class="mega-panel-actions">
+            <button type="button" data-audio-toggle aria-pressed="false"><span data-audio-label>低频</span></button>
+            <button class="mega-panel-collapse" type="button" data-panel-collapse aria-label="收起观察屏"></button>
+          </div>
+        </div>
+        <div
+          class="mega-panel-screen"
+          data-panel-screen
+          style={`--node-image: url("${firstNode.image}"); --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
+        >
+          <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
+          <span class="mega-panel-condensation"></span>
+          <span class="mega-panel-faults"></span>
+          <span class="mega-panel-locator">
+            <i class="mega-locator-trace"></i>
+            <i class="mega-locator-mark"></i>
+            <b data-locator-code>{firstNode.code}</b>
+          </span>
+          <i></i>
+        </div>
+        <div class="mega-panel-copy">
+          <div class="mega-panel-copy-head">
+            <small data-node-code>{firstNode.code}</small>
+            <span data-node-signal>{firstNode.signal}</span>
+          </div>
+          <strong data-node-title>{firstNode.label}</strong>
+          <p data-node-sentence>{firstNodeDescription}</p>
+        </div>
+        <div class="mega-signal-readout" aria-label="节点信号质量">
+          <span>
+            <small>INTEGRITY</small>
+            <b><em data-quality-integrity>{firstNode.quality.integrity}</em>%</b>
+            <i data-quality-meter-integrity role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow={firstNode.quality.integrity}></i>
+          </span>
+          <span>
+            <small>NOISE</small>
+            <b><em data-quality-noise>{firstNode.quality.noise}</em>%</b>
+            <i data-quality-meter-noise role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow={firstNode.quality.noise}></i>
+          </span>
+          <span>
+            <small>DRIFT</small>
+            <b data-quality-drift>{firstNode.quality.drift}</b>
+            <i data-quality-drift-line></i>
+          </span>
+        </div>
+        <div class="mega-mode-switch" role="group" aria-label="观察模式">
+          {
+            modes.map((mode, index) => (
+              <button
+                type="button"
+                data-mode-button={mode.id}
+                aria-pressed={index === 0 ? "true" : "false"}
+              >
+                <small>{mode.code}</small>
+                <span>{mode.label}</span>
+              </button>
+            ))
+          }
+        </div>
+        <label class="mega-scale-control">
+          <span>PRESSURE</span>
+          <input type="range" min="0" max="80" value="12" step="1" data-scale-range />
+          <b data-scale-value>12</b>
+        </label>
+      </aside>
+      <button class="mega-panel-reopen" type="button" data-panel-reopen>
+        <span>OBS</span>
+        <strong data-reopen-code>{firstNode.code}</strong>
+      </button>
+
       <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
-      <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">隐藏标记</button>
+      <p class="mega-comment-instruction">长按场景 / 创建坐标评论</p>
       <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
         <div class="mega-comment-head">
           <span data-comment-title>评论</span>
@@ -862,7 +972,8 @@ const mapRoutes = nodes
       if (lab) {
         const modeButtons = Array.from(lab.querySelectorAll("[data-mode-button]"));
         const nodeButtons = Array.from(lab.querySelectorAll("[data-node-button]"));
-      const audioButton = lab.querySelector("[data-audio-toggle]");
+      const audioButtons = Array.from(lab.querySelectorAll("[data-audio-toggle]"));
+      const audioButton = audioButtons[0] || null;
       const panelCollapseButton = lab.querySelector("[data-panel-collapse]");
       const panelReopenButton = lab.querySelector("[data-panel-reopen]");
       const panelDragHandle = lab.querySelector("[data-panel-drag]");
@@ -871,6 +982,9 @@ const mapRoutes = nodes
       const scaleValue = lab.querySelector("[data-scale-value]");
       const sceneBackdrop = lab.querySelector("[data-scene-backdrop]");
       const sceneKicker = lab.querySelector("[data-scene-kicker]");
+      const sceneDisplay = lab.querySelector("[data-scene-display]");
+      const sceneOrdinal = lab.querySelector("[data-scene-ordinal]");
+      const sceneCodeDisplay = lab.querySelector("[data-scene-code]");
       const routeBackButton = lab.querySelector("[data-route-back]");
       const routeBackContext = lab.querySelector("[data-route-back-context]");
       const routeBackLabel = lab.querySelector("[data-route-back-label]");
@@ -892,7 +1006,7 @@ const mapRoutes = nodes
       const nodeSignal = lab.querySelector("[data-node-signal]");
       const reopenCode = lab.querySelector("[data-reopen-code]");
       const panelScreen = lab.querySelector("[data-panel-screen]");
-      const panelFrameCode = lab.querySelector("[data-panel-frame-code]");
+      const panelFrameCodes = Array.from(lab.querySelectorAll("[data-panel-frame-code]"));
       const locatorCode = lab.querySelector("[data-locator-code]");
       const qualityIntegrity = lab.querySelector("[data-quality-integrity]");
       const qualityNoise = lab.querySelector("[data-quality-noise]");
@@ -903,6 +1017,7 @@ const mapRoutes = nodes
       const labStage = lab.querySelector(".mega-lab-stage");
       const commentLayer = lab.querySelector("[data-comment-layer]");
       const commentToggleButton = lab.querySelector("[data-comment-toggle]");
+      const commentToggleLabel = lab.querySelector("[data-comment-toggle-label]");
       const commentAdminOpenButton = lab.querySelector("[data-comment-admin-open]");
       const commentPendingCount = lab.querySelector("[data-comment-pending-count]");
       const commentAdminDialog = lab.querySelector("[data-comment-admin-dialog]");
@@ -1220,6 +1335,12 @@ const mapRoutes = nodes
         setSceneBackdrop(scene);
 
         if (sceneKicker) sceneKicker.textContent = scene.kicker;
+        if (sceneDisplay) sceneDisplay.textContent = scene.label;
+        if (sceneCodeDisplay) sceneCodeDisplay.textContent = scene.code;
+        if (sceneOrdinal) {
+          const sceneIndex = Math.max(0, scenes.findIndex((item) => item.id === scene.id));
+          sceneOrdinal.textContent = `${String(sceneIndex + 1).padStart(2, "0")} / ${String(scenes.length).padStart(2, "0")}`;
+        }
         if (modePhrase) modePhrase.textContent = scene.description || scene.status;
         updateWorldMapUi();
         nodeButtons.forEach((button) => {
@@ -1261,7 +1382,9 @@ const mapRoutes = nodes
         const viewport = node.viewport || { frame: node.code, x: 50, y: 50, slit: 28 };
         const nodeImage = node.image || nodes[0].image;
 
-        if (panelFrameCode) panelFrameCode.textContent = viewport.frame;
+        panelFrameCodes.forEach((item) => {
+          item.textContent = viewport.frame;
+        });
         if (nodeImage) lab.style.setProperty("--node-image", `url("${nodeImage}")`);
 
         if (panelScreen) {
@@ -1415,7 +1538,9 @@ const mapRoutes = nodes
           return;
         }
 
-        commentToggleButton.textContent = areCommentsVisible ? "隐藏标记" : "显示标记";
+        if (commentToggleLabel) {
+          commentToggleLabel.textContent = areCommentsVisible ? "标记 ON" : "标记 OFF";
+        }
         commentToggleButton.setAttribute("aria-pressed", String(areCommentsVisible));
         commentToggleButton.setAttribute(
           "aria-label",
@@ -2822,8 +2947,11 @@ const mapRoutes = nodes
         }
 
         const isOn = audioButton.getAttribute("aria-pressed") !== "true";
-        audioButton.setAttribute("aria-pressed", String(isOn));
-        audioButton.textContent = isOn ? "静音" : "低频";
+        audioButtons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(isOn));
+          const label = button.querySelector("[data-audio-label]");
+          if (label) label.textContent = isOn ? "静音" : "低频";
+        });
         gain.gain.setTargetAtTime(isOn ? 0.036 : 0.0001, audioContext.currentTime, 0.08);
         lab.dataset.audioState = isOn ? "on" : "off";
 
@@ -2866,8 +2994,10 @@ const mapRoutes = nodes
         });
       });
 
-      audioButton?.addEventListener("click", () => {
-        toggleAudio();
+      audioButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          toggleAudio();
+        });
       });
 
       panelCollapseButton?.addEventListener("click", () => {
