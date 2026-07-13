@@ -5,7 +5,7 @@ import "../styles/megastructure-refresh.css";
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
-const assetPath = (path: string) => `${basePath}${path}`;
+
 const supabaseConfig = {
   url:
     import.meta.env.PUBLIC_SUPABASE_URL ||
@@ -17,606 +17,415 @@ const supabaseConfig = {
     "sb_publishable_3XfkcJuOqqFKjLcWIyaB_g_5B5mmZGR"
 };
 
-const sceneImagePaths = {
-  atrium: "assets/megastructure/scene-atrium-interior-v2.webp",
-  highland: "assets/megastructure/scene-highland-towers-v2.webp",
-  "ring-city": "assets/megastructure/scene-ring-city-v1.webp",
-  "cooling-vault": "assets/megastructure/scene-cooling-vault-v1.webp",
-  lightwell: "assets/megastructure/scene-lightwell-core-v2.webp",
-  "far-towers": "assets/megastructure/scene-far-tower-boundary-v2.webp"
-} as const;
-const sceneImagePathFor = (sceneId: keyof typeof sceneImagePaths) =>
-  sceneImagePaths[sceneId] ?? sceneImagePaths.atrium;
-const sceneImageFor = (sceneId: keyof typeof sceneImagePaths) => assetPath(sceneImagePathFor(sceneId));
-const nodeImagePaths = {
-  "atrium-to-highland": sceneImagePaths.highland,
-  "atrium-to-cooling": sceneImagePaths["cooling-vault"],
-  "atrium-to-lightwell": sceneImagePaths.lightwell,
-  "highland-to-atrium": sceneImagePaths.atrium,
-  "highland-to-ring": sceneImagePaths["ring-city"],
-  "highland-to-far": sceneImagePaths["far-towers"],
-  "ring-to-lightwell": sceneImagePaths.lightwell,
-  "ring-to-highland": sceneImagePaths.highland,
-  "cooling-to-lightwell": sceneImagePaths.lightwell,
-  "cooling-to-atrium": sceneImagePaths.atrium,
-  "lightwell-to-atrium": sceneImagePaths.atrium,
-  "lightwell-to-ring": sceneImagePaths["ring-city"],
-  "lightwell-to-cooling": sceneImagePaths["cooling-vault"],
-  "far-to-highland": sceneImagePaths.highland
-} as const;
-const nodeImagePathFor = (nodeId: keyof typeof nodeImagePaths) =>
-  nodeImagePaths[nodeId] ?? nodeImagePaths["atrium-to-highland"];
-const nodeImageFor = (nodeId: keyof typeof nodeImagePaths) => assetPath(nodeImagePathFor(nodeId));
-
+// Scene ids intentionally stay unchanged so existing comments and exploration state remain valid.
 const sceneZones = {
-  core: {
-    id: "core",
-    code: "CORE",
-    label: "内部核心",
-    detail: "中庭和光井维持回路与垂直动线。"
+  hub: {
+    id: "hub",
+    code: "HUB",
+    label: "入口与索引",
+    detail: "从这里确认方向，也从这里重新偏航。"
   },
-  surface: {
-    id: "surface",
-    code: "SURFACE",
-    label: "外部地表",
-    detail: "高原把尺度拉远，塔群从湿冷地表升起。"
+  motion: {
+    id: "motion",
+    code: "MOTION",
+    label: "运动实验",
+    detail: "为风场、轨迹与实时物理模拟预留的开放区域。"
   },
-  city: {
-    id: "city",
-    code: "RING",
-    label: "城市环线",
-    detail: "环城显示巨构的交通骨架和工程秩序。"
+  chaos: {
+    id: "chaos",
+    code: "CHAOS",
+    label: "非线性系统",
+    detail: "微小的初始差异会在这里长成完全不同的路径。"
   },
-  sublevel: {
-    id: "sublevel",
-    code: "SUB",
-    label: "地下服务层",
-    detail: "冷却层负责向下的压迫感和工业湿度。"
+  signal: {
+    id: "signal",
+    code: "SIGNAL",
+    label: "信号与视觉",
+    detail: "光、声音、数据和生成图形在这里互相翻译。"
   },
   edge: {
     id: "edge",
     code: "EDGE",
-    label: "世界边界",
-    detail: "远塔群是探索终端，也是回望整个空间的边界。"
+    label: "边界与草稿",
+    detail: "尚未命名的想法先停靠在这里，之后再决定形状。"
   }
 } as const;
+
 const sceneZoneList = Object.values(sceneZones);
 
 const scenes = [
   {
     id: "atrium",
-    label: "中庭",
-    code: "SCENE 01",
+    label: "入口庭",
+    code: "FIELD 01",
     primaryNode: "atrium-to-highland",
-    kicker: "冷灰混凝土 / 内部空腔 / 回路入口",
-    status: "ATRIUM / INTERNAL VOID",
-    description: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    imagePath: sceneImagePathFor("atrium"),
-    image: sceneImageFor("atrium"),
+    kicker: "SITE INDEX / OPEN ACCESS / LIVE MAP",
+    status: "当前网站的导航中枢",
+    description: "这不是终点页，而是一张会继续生长的实验地图。点击漂浮坐标，进入不同区域。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 36, y: 58, layer: "内部核心" },
-    zone: "core",
-    discovery: "湿冷中庭把入口和出口折叠到同一片反光地面。",
-    ambience: {
-      brightness: "0.83",
-      contrast: "1.12",
-      saturation: "0.86",
-      unfocusedBrightness: "0.77",
-      unfocusedContrast: "1.14",
-      unfocusedSaturation: "0.82",
-      veilSide: "rgba(0, 0, 0, 0.2)",
-      veilTop: "rgba(0, 0, 0, 0.08)",
-      veilBottom: "rgba(0, 0, 0, 0.18)",
-      scanOpacity: "0.055",
-      gridOpacity: "0.24",
-      hazeOpacity: "0.58",
-      hazeBand: "rgba(204, 216, 216, 0.08)",
-      hazeLeft: "rgba(178, 194, 196, 0.09)",
-      hazeRight: "rgba(154, 170, 170, 0.18)",
-      groundOpacity: "0.34",
-      groundUnfocusedOpacity: "0.42",
-      groundGlow: "rgba(206, 220, 218, 0.05)",
-      groundShadow: "rgba(8, 10, 10, 0.2)"
-    }
+    map: { x: 47, y: 52, layer: "入口与索引" },
+    zone: "hub",
+    discovery: "入口庭记录已经开放的页面，也为尚未完成的实验保留空位。"
   },
   {
     id: "highland",
-    label: "高原",
-    code: "SCENE 02",
+    label: "风场坡",
+    code: "FIELD 02",
     primaryNode: "highland-to-ring",
-    kicker: "高原盆地 / 远距塔群 / 无人地表",
-    status: "HIGHLAND / OUTER CITY",
-    description: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
-    imagePath: sceneImagePathFor("highland"),
-    image: sceneImageFor("highland"),
+    kicker: "FLOW / PRESSURE / PARTICLE TRACE",
+    status: "流体与空间模拟预留区",
+    description: "空气看不见，但路径、压力和涡流可以被画出来。这里将容纳模拟风道一类实验。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 42, y: 28, layer: "外部高原" },
-    zone: "surface",
-    discovery: "高原盆地把观察距离拉开，塔群像从地表被垂直抽出。",
-    ambience: {
-      brightness: "0.9",
-      contrast: "1.08",
-      saturation: "0.92",
-      unfocusedBrightness: "0.84",
-      unfocusedContrast: "1.1",
-      unfocusedSaturation: "0.88",
-      veilSide: "rgba(7, 18, 22, 0.16)",
-      veilTop: "rgba(18, 38, 44, 0.03)",
-      veilBottom: "rgba(4, 8, 8, 0.12)",
-      scanOpacity: "0.035",
-      gridOpacity: "0.16",
-      hazeOpacity: "0.68",
-      hazeBand: "rgba(194, 220, 226, 0.14)",
-      hazeLeft: "rgba(105, 150, 160, 0.16)",
-      hazeRight: "rgba(210, 228, 224, 0.18)",
-      groundOpacity: "0.25",
-      groundUnfocusedOpacity: "0.32",
-      groundGlow: "rgba(152, 190, 176, 0.09)",
-      groundShadow: "rgba(7, 16, 17, 0.14)"
-    }
+    map: { x: 25, y: 27, layer: "运动实验" },
+    zone: "motion",
+    discovery: "风场坡把不可见的流动变成可以观察、拖动和比较的图层。"
   },
   {
     id: "ring-city",
-    label: "环城",
-    code: "SCENE 03",
+    label: "轨道岛",
+    code: "FIELD 03",
     primaryNode: "ring-to-lightwell",
-    kicker: "环形城市 / 中央水域 / 工程秩序",
-    status: "RING CITY / CIRCULAR GRID",
-    description: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
-    imagePath: sceneImagePathFor("ring-city"),
-    image: sceneImageFor("ring-city"),
+    kicker: "ORBIT / LOOP / INTERACTIVE SYSTEM",
+    status: "循环、轨迹与交互系统",
+    description: "所有循环运动都可以从一条简单轨道开始，再逐渐加入阻尼、碰撞与控制变量。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 68, y: 40, layer: "城市环线" },
-    zone: "city",
-    discovery: "环城不是道路，而是一圈被放大的城市骨架。",
-    ambience: {
-      brightness: "0.86",
-      contrast: "1.16",
-      saturation: "0.88",
-      unfocusedBrightness: "0.8",
-      unfocusedContrast: "1.18",
-      unfocusedSaturation: "0.84",
-      veilSide: "rgba(2, 6, 7, 0.18)",
-      veilTop: "rgba(0, 0, 0, 0.06)",
-      veilBottom: "rgba(0, 0, 0, 0.16)",
-      scanOpacity: "0.066",
-      gridOpacity: "0.3",
-      hazeOpacity: "0.5",
-      hazeBand: "rgba(206, 218, 216, 0.06)",
-      hazeLeft: "rgba(176, 204, 202, 0.08)",
-      hazeRight: "rgba(184, 198, 190, 0.12)",
-      groundOpacity: "0.3",
-      groundUnfocusedOpacity: "0.36",
-      groundGlow: "rgba(208, 224, 220, 0.04)",
-      groundShadow: "rgba(3, 6, 7, 0.18)"
-    }
+    map: { x: 76, y: 31, layer: "运动实验" },
+    zone: "motion",
+    discovery: "轨道岛关注重复运动：每一次回到原点，都可能携带不同的数据。"
   },
   {
     id: "cooling-vault",
-    label: "冷却层",
-    code: "SCENE 04",
+    label: "混沌舱",
+    code: "FIELD 04",
     primaryNode: "cooling-to-lightwell",
-    kicker: "地下冷却 / 服务管廊 / 湿冷蒸汽",
-    status: "COOLING VAULT / SUBLEVEL",
-    description: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
-    imagePath: sceneImagePathFor("cooling-vault"),
-    image: sceneImageFor("cooling-vault"),
+    kicker: "DOUBLE PENDULUM / CHAOS / SENSITIVE STATE",
+    status: "非线性动力学预留区",
+    description: "双摆、吸引子和敏感初值会在这里留下轨迹。以后可以把网页版混沌摆直接接入这个区域。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 30, y: 80, layer: "地下服务层" },
-    zone: "sublevel",
-    discovery: "冷却层把空间压低，水汽和管线暴露出巨构的内脏。",
-    ambience: {
-      brightness: "0.76",
-      contrast: "1.18",
-      saturation: "0.78",
-      unfocusedBrightness: "0.7",
-      unfocusedContrast: "1.2",
-      unfocusedSaturation: "0.74",
-      veilSide: "rgba(0, 0, 0, 0.24)",
-      veilTop: "rgba(0, 0, 0, 0.12)",
-      veilBottom: "rgba(0, 0, 0, 0.24)",
-      scanOpacity: "0.05",
-      gridOpacity: "0.2",
-      hazeOpacity: "0.74",
-      hazeBand: "rgba(156, 196, 198, 0.12)",
-      hazeLeft: "rgba(98, 144, 146, 0.16)",
-      hazeRight: "rgba(118, 156, 154, 0.2)",
-      groundOpacity: "0.48",
-      groundUnfocusedOpacity: "0.56",
-      groundGlow: "rgba(136, 182, 180, 0.08)",
-      groundShadow: "rgba(0, 0, 0, 0.28)"
-    }
+    map: { x: 23, y: 76, layer: "非线性系统" },
+    zone: "chaos",
+    discovery: "混沌不是随机；它只是对最初那一点差异异常诚实。"
   },
   {
     id: "lightwell",
-    label: "光井",
-    code: "SCENE 05",
+    label: "光谱井",
+    code: "FIELD 05",
     primaryNode: "lightwell-to-ring",
-    kicker: "服务核心 / 垂直光井 / 白色切口",
-    status: "LIGHTWELL / SERVICE CORE",
-    description: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
-    imagePath: sceneImagePathFor("lightwell"),
-    image: sceneImageFor("lightwell"),
+    kicker: "LIGHT / AUDIO / GENERATIVE VISUAL",
+    status: "视听与生成实验预留区",
+    description: "这里负责把声音、颜色、文字和实时数据转换成可探索的视觉现场。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 58, y: 68, layer: "垂直核心" },
-    zone: "core",
-    discovery: "光井像一条垂直切口，把地下服务层重新拉回核心。",
-    ambience: {
-      brightness: "0.92",
-      contrast: "1.08",
-      saturation: "0.84",
-      unfocusedBrightness: "0.84",
-      unfocusedContrast: "1.12",
-      unfocusedSaturation: "0.8",
-      veilSide: "rgba(0, 0, 0, 0.16)",
-      veilTop: "rgba(255, 255, 255, 0.025)",
-      veilBottom: "rgba(0, 0, 0, 0.16)",
-      scanOpacity: "0.045",
-      gridOpacity: "0.18",
-      hazeOpacity: "0.7",
-      hazeBand: "rgba(232, 238, 234, 0.16)",
-      hazeLeft: "rgba(196, 214, 212, 0.08)",
-      hazeRight: "rgba(236, 241, 238, 0.22)",
-      groundOpacity: "0.28",
-      groundUnfocusedOpacity: "0.36",
-      groundGlow: "rgba(236, 244, 240, 0.09)",
-      groundShadow: "rgba(6, 8, 8, 0.16)"
-    }
+    map: { x: 66, y: 72, layer: "信号与视觉" },
+    zone: "signal",
+    discovery: "光谱井不保存固定画面，它更适合接收信号并即时生成新的形态。"
   },
   {
     id: "far-towers",
-    label: "远塔群",
-    code: "SCENE 06",
+    label: "边界台",
+    code: "FIELD 06",
     primaryNode: "far-to-highland",
-    kicker: "远景塔群 / 世界边界 / 空旷湿地",
-    status: "FAR TOWERS / WORLD EDGE",
-    description: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
-    imagePath: sceneImagePathFor("far-towers"),
-    image: sceneImageFor("far-towers"),
+    kicker: "DRAFT / ARCHIVE / UNKNOWN MODULE",
+    status: "草稿与未来模块停靠区",
+    description: "还没有归类的原型先停在边界台。它们不必成熟，只需要保持可以继续进入。",
+    imagePath: "",
+    image: "",
     position: "center",
-    map: { x: 86, y: 24, layer: "世界边界" },
+    map: { x: 89, y: 54, layer: "边界与草稿" },
     zone: "edge",
-    discovery: "远塔群不是终点，更像雾后仍在延伸的世界边界。",
-    ambience: {
-      brightness: "0.84",
-      contrast: "1.1",
-      saturation: "0.9",
-      unfocusedBrightness: "0.78",
-      unfocusedContrast: "1.12",
-      unfocusedSaturation: "0.86",
-      veilSide: "rgba(4, 14, 18, 0.18)",
-      veilTop: "rgba(10, 30, 38, 0.05)",
-      veilBottom: "rgba(2, 7, 8, 0.15)",
-      scanOpacity: "0.032",
-      gridOpacity: "0.14",
-      hazeOpacity: "0.76",
-      hazeBand: "rgba(184, 214, 220, 0.14)",
-      hazeLeft: "rgba(108, 154, 166, 0.12)",
-      hazeRight: "rgba(210, 232, 228, 0.18)",
-      groundOpacity: "0.24",
-      groundUnfocusedOpacity: "0.32",
-      groundGlow: "rgba(154, 188, 176, 0.08)",
-      groundShadow: "rgba(5, 13, 15, 0.15)"
-    }
+    discovery: "边界台没有最终形态，它只负责让新实验有地方落脚。"
   }
-];
+] as const;
 
 const modes = [
   {
-    id: "structure",
-    label: "结构",
-    code: "FRAME",
-    phrase: "城市被压成一套可插拔骨架。",
-    status: "MASS 92 / GRID 44",
-    accent: "rgba(226, 232, 229, 0.92)",
-    haze: "rgba(154, 170, 170, 0.18)"
-  },
-  {
-    id: "liminal",
-    label: "阈限",
+    id: "drift",
+    label: "偏航",
     code: "DRIFT",
-    phrase: "空间没有路线，只保留进入之后的迟疑。",
-    status: "EXIT 01 / TRUST 03",
-    accent: "rgba(190, 213, 214, 0.9)",
-    haze: "rgba(154, 178, 184, 0.22)"
+    phrase: "从已知入口离开，去看下一条路径会通向哪里。",
+    status: "ROUTE / OPEN",
+    accent: "#a7f3d0",
+    haze: "rgba(72, 221, 176, 0.22)"
   },
   {
-    id: "signal",
-    label: "信号",
+    id: "flow",
+    label: "流动",
+    code: "FLOW",
+    phrase: "让运动留下可读的轨迹。",
+    status: "MOTION / LIVE",
+    accent: "#7dd3fc",
+    haze: "rgba(56, 189, 248, 0.2)"
+  },
+  {
+    id: "trace",
+    label: "记录",
     code: "TRACE",
-    phrase: "每个节点只回传一张小图和一句残留文本。",
-    status: "NOISE 07 / ECHO 19",
-    accent: "rgba(218, 226, 220, 0.88)",
-    haze: "rgba(184, 190, 178, 0.16)"
+    phrase: "把每次抵达变成下一次实验的坐标。",
+    status: "MEMORY / ON",
+    accent: "#c4b5fd",
+    haze: "rgba(167, 139, 250, 0.2)"
   }
-];
+] as const;
+
+const nodeDefaults = {
+  image: "",
+  quality: { integrity: 82, noise: 16, drift: "OPEN" },
+  viewport: { frame: "FIELD ROUTE", x: 50, y: 50, slit: 32 }
+};
 
 const nodes = [
   {
+    ...nodeDefaults,
     id: "atrium-to-highland",
     scene: "atrium",
-    mode: "liminal",
-    label: "高原",
-    code: "A-01",
-    x: 51,
-    y: 70,
-    labelX: -0.3,
-    labelY: 2.5,
+    mode: "flow",
+    label: "风场坡",
+    code: "01—02",
+    x: 27,
+    y: 35,
+    labelX: 0,
+    labelY: 0,
     labelAlign: "center",
     targetScene: "highland",
-    routeLabel: "进入高原盆地",
-    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
-    signal: "LIGHT 12 / ECHO 04"
+    routeLabel: "进入流体模拟预留区",
+    sentence: "空气路径、压力分布和涡流结构将在这里被可视化。",
+    signal: "FLOW / OPEN"
   },
   {
+    ...nodeDefaults,
     id: "atrium-to-cooling",
     scene: "atrium",
-    mode: "signal",
-    label: "冷却层",
-    code: "A-02",
-    x: 15,
-    y: 72,
-    labelX: 2.9,
-    labelY: 0.1,
-    labelAlign: "left",
+    mode: "drift",
+    label: "混沌舱",
+    code: "01—04",
+    x: 35,
+    y: 74,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
     targetScene: "cooling-vault",
-    routeLabel: "下行地下冷却层",
-    sentence: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
-    signal: "PIPE 08 / HUM 21"
+    routeLabel: "进入非线性动力学预留区",
+    sentence: "双摆与敏感初值将在这里绘制各自不同的轨迹。",
+    signal: "CHAOS / OPEN"
   },
   {
+    ...nodeDefaults,
     id: "atrium-to-lightwell",
     scene: "atrium",
-    mode: "signal",
-    label: "光井",
-    code: "A-03",
-    x: 50,
-    y: 34,
-    labelX: 2.8,
-    labelY: 0.1,
-    labelAlign: "left",
+    mode: "trace",
+    label: "光谱井",
+    code: "01—05",
+    x: 72,
+    y: 38,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
     targetScene: "lightwell",
-    routeLabel: "进入垂直光井",
-    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
-    signal: "LUX 19 / CORE 07"
+    routeLabel: "进入视听生成预留区",
+    sentence: "声音、颜色和数据会在这里被转换成实时图形。",
+    signal: "SIGNAL / OPEN"
   },
   {
+    ...nodeDefaults,
     id: "highland-to-atrium",
     scene: "highland",
-    mode: "liminal",
-    label: "中庭",
-    code: "G-11",
-    x: 24,
-    y: 64,
-    labelX: 0,
-    labelY: 2.75,
-    labelAlign: "center",
-    targetScene: "atrium",
-    routeLabel: "回到室内中庭",
-    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    signal: "ENTRY 10 / LOOP 06"
-  },
-  {
-    id: "highland-to-ring",
-    scene: "highland",
-    mode: "structure",
-    label: "环城",
-    code: "G-22",
-    x: 55,
-    y: 50,
-    labelX: 0,
-    labelY: 2.75,
-    labelAlign: "center",
-    targetScene: "ring-city",
-    routeLabel: "进入环形城市",
-    sentence: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
-    signal: "RING 31 / CLOUD 08"
-  },
-  {
-    id: "highland-to-far",
-    scene: "highland",
-    mode: "liminal",
-    label: "远塔",
-    code: "G-41",
-    x: 76,
-    y: 43,
-    labelX: 2.6,
-    labelY: 0.1,
-    labelAlign: "left",
-    targetScene: "far-towers",
-    routeLabel: "眺望远塔群",
-    sentence: "远塔群像边界一样立在地平线后，路径在抵达前先被雾吞掉。",
-    signal: "SKY 14 / DIST 72"
-  },
-  {
-    id: "ring-to-lightwell",
-    scene: "ring-city",
-    mode: "signal",
-    label: "光井",
-    code: "R-09",
-    x: 50,
-    y: 43,
-    labelX: 0,
-    labelY: 2.75,
-    labelAlign: "center",
-    targetScene: "lightwell",
-    routeLabel: "进入垂直光井",
-    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
-    signal: "CORE 17 / LUX 39"
-  },
-  {
-    id: "ring-to-highland",
-    scene: "ring-city",
-    mode: "structure",
-    label: "高原",
-    code: "R-12",
-    x: 50,
-    y: 72,
-    labelX: -0.3,
-    labelY: 2.5,
-    labelAlign: "center",
-    targetScene: "highland",
-    routeLabel: "回到高原盆地",
-    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
-    signal: "BASIN 22 / RING 01"
-  },
-  {
-    id: "cooling-to-lightwell",
-    scene: "cooling-vault",
-    mode: "signal",
-    label: "光井",
-    code: "C-07",
-    x: 50,
-    y: 31,
-    labelX: 2.9,
-    labelY: 0.1,
-    labelAlign: "left",
-    targetScene: "lightwell",
-    routeLabel: "上行垂直光井",
-    sentence: "光井转入室内核心，垂直白光切开服务结构和潮湿地面。",
-    signal: "STEAM 18 / LUX 44"
-  },
-  {
-    id: "cooling-to-atrium",
-    scene: "cooling-vault",
-    mode: "liminal",
-    label: "中庭",
-    code: "C-11",
-    x: 50,
-    y: 72,
-    labelX: 0,
-    labelY: 2.75,
-    labelAlign: "center",
-    targetScene: "atrium",
-    routeLabel: "回到室内中庭",
-    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    signal: "DRAIN 03 / LOOP 11"
-  },
-  {
-    id: "lightwell-to-ring",
-    scene: "lightwell",
-    mode: "signal",
-    label: "环城",
-    code: "H-31",
-    x: 50,
-    y: 24,
-    labelX: 3.25,
-    labelY: 0.2,
-    labelAlign: "left",
-    targetScene: "ring-city",
-    routeLabel: "进入环形城市",
-    sentence: "环城把城市压成巨大的圆形骨架，水域和塔墙围出无人核心。",
-    signal: "RING 44 / LUX 16"
-  },
-  {
-    id: "lightwell-to-atrium",
-    scene: "lightwell",
-    mode: "liminal",
-    label: "中庭",
-    code: "H-18",
-    x: 36,
-    y: 58,
-    labelX: 0,
-    labelY: 2.75,
-    labelAlign: "center",
-    targetScene: "atrium",
-    routeLabel: "回到室内中庭",
-    sentence: "室内中庭保留回路中心，湿冷地面把出口反射成另一条入口。",
-    signal: "VOID 18 / CORE 33"
-  },
-  {
-    id: "lightwell-to-cooling",
-    scene: "lightwell",
-    mode: "structure",
-    label: "冷却层",
-    code: "H-44",
-    x: 50,
-    y: 76,
-    labelX: 2.8,
-    labelY: 0.1,
-    labelAlign: "left",
-    targetScene: "cooling-vault",
-    routeLabel: "下行地下冷却层",
-    sentence: "冷却层压低视线，管线和水汽把地下空间拖进更深处。",
-    signal: "SHAFT 02 / PIPE 18"
-  },
-  {
-    id: "far-to-highland",
-    scene: "far-towers",
-    mode: "liminal",
-    label: "高原",
-    code: "F-01",
-    x: 39,
+    mode: "drift",
+    label: "入口庭",
+    code: "02—01",
+    x: 22,
     y: 70,
     labelX: 0,
-    labelY: 2.75,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "返回网站索引",
+    sentence: "回到所有路径的共同入口。",
+    signal: "HUB / RETURN"
+  },
+  {
+    ...nodeDefaults,
+    id: "highland-to-ring",
+    scene: "highland",
+    mode: "flow",
+    label: "轨道岛",
+    code: "02—03",
+    x: 67,
+    y: 36,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "ring-city",
+    routeLabel: "沿流线进入轨道岛",
+    sentence: "从连续流动切换到循环与轨迹。",
+    signal: "ORBIT / NEXT"
+  },
+  {
+    ...nodeDefaults,
+    id: "highland-to-far",
+    scene: "highland",
+    mode: "trace",
+    label: "边界台",
+    code: "02—06",
+    x: 82,
+    y: 67,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "far-towers",
+    routeLabel: "前往未来模块停靠区",
+    sentence: "把还没有归类的模拟原型暂存在地图边缘。",
+    signal: "EDGE / DRAFT"
+  },
+  {
+    ...nodeDefaults,
+    id: "ring-to-lightwell",
+    scene: "ring-city",
+    mode: "trace",
+    label: "光谱井",
+    code: "03—05",
+    x: 69,
+    y: 34,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "lightwell",
+    routeLabel: "把轨迹发送到光谱井",
+    sentence: "让运动数据继续变成光和颜色。",
+    signal: "TRACE / LIGHT"
+  },
+  {
+    ...nodeDefaults,
+    id: "ring-to-highland",
+    scene: "ring-city",
+    mode: "flow",
+    label: "风场坡",
+    code: "03—02",
+    x: 26,
+    y: 68,
+    labelX: 0,
+    labelY: 0,
     labelAlign: "center",
     targetScene: "highland",
-    routeLabel: "回到高原盆地",
-    sentence: "高原盆地把视野拉远，巨构塔群从湿冷地表垂直升起。",
-    signal: "EDGE 90 / BASIN 01"
+    routeLabel: "返回风场坡",
+    sentence: "回到连续流动的观察区域。",
+    signal: "FLOW / RETURN"
+  },
+  {
+    ...nodeDefaults,
+    id: "cooling-to-lightwell",
+    scene: "cooling-vault",
+    mode: "trace",
+    label: "光谱井",
+    code: "04—05",
+    x: 71,
+    y: 34,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "lightwell",
+    routeLabel: "输出混沌轨迹",
+    sentence: "把不规则运动转换成视觉信号。",
+    signal: "CHAOS / TRACE"
+  },
+  {
+    ...nodeDefaults,
+    id: "cooling-to-atrium",
+    scene: "cooling-vault",
+    mode: "drift",
+    label: "入口庭",
+    code: "04—01",
+    x: 28,
+    y: 68,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "退出混沌舱",
+    sentence: "回到地图并重新选择初始条件。",
+    signal: "RESET / HUB"
+  },
+  {
+    ...nodeDefaults,
+    id: "lightwell-to-ring",
+    scene: "lightwell",
+    mode: "flow",
+    label: "轨道岛",
+    code: "05—03",
+    x: 73,
+    y: 40,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "ring-city",
+    routeLabel: "追踪循环信号",
+    sentence: "让生成图形重新获得运动规则。",
+    signal: "LIGHT / ORBIT"
+  },
+  {
+    ...nodeDefaults,
+    id: "lightwell-to-atrium",
+    scene: "lightwell",
+    mode: "drift",
+    label: "入口庭",
+    code: "05—01",
+    x: 23,
+    y: 65,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "atrium",
+    routeLabel: "返回网站索引",
+    sentence: "停止接收信号，回到实验地图。",
+    signal: "SIGNAL / HUB"
+  },
+  {
+    ...nodeDefaults,
+    id: "lightwell-to-cooling",
+    scene: "lightwell",
+    mode: "trace",
+    label: "混沌舱",
+    code: "05—04",
+    x: 47,
+    y: 78,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "cooling-vault",
+    routeLabel: "进入非线性系统",
+    sentence: "从生成图形追溯到产生它的运动。",
+    signal: "TRACE / CHAOS"
+  },
+  {
+    ...nodeDefaults,
+    id: "far-to-highland",
+    scene: "far-towers",
+    mode: "drift",
+    label: "风场坡",
+    code: "06—02",
+    x: 30,
+    y: 62,
+    labelX: 0,
+    labelY: 0,
+    labelAlign: "center",
+    targetScene: "highland",
+    routeLabel: "从边界返回已开放区域",
+    sentence: "离开草稿区，回到已经建立路径的实验。",
+    signal: "EDGE / RETURN"
   }
 ];
 
-const nodeQuality = {
-  "atrium-to-highland": { integrity: 68, noise: 22, drift: "OUT" },
-  "atrium-to-cooling": { integrity: 55, noise: 34, drift: "DOWN" },
-  "atrium-to-lightwell": { integrity: 72, noise: 20, drift: "CORE" },
-  "highland-to-atrium": { integrity: 64, noise: 29, drift: "ENTRY" },
-  "highland-to-ring": { integrity: 84, noise: 18, drift: "FAR" },
-  "highland-to-far": { integrity: 73, noise: 26, drift: "EDGE" },
-  "ring-to-lightwell": { integrity: 76, noise: 21, drift: "CORE" },
-  "ring-to-highland": { integrity: 69, noise: 27, drift: "BASIN" },
-  "cooling-to-lightwell": { integrity: 58, noise: 37, drift: "UP" },
-  "cooling-to-atrium": { integrity: 52, noise: 40, drift: "BACK" },
-  "lightwell-to-atrium": { integrity: 67, noise: 27, drift: "VOID" },
-  "lightwell-to-ring": { integrity: 71, noise: 24, drift: "RING" },
-  "lightwell-to-cooling": { integrity: 61, noise: 31, drift: "DOWN" },
-  "far-to-highland": { integrity: 70, noise: 24, drift: "BASIN" }
-};
-
-const nodeViewport = {
-  "atrium-to-highland": { frame: "OBS A-01 / BASIN", x: 53, y: 45, slit: 28 },
-  "atrium-to-cooling": { frame: "OBS A-02 / VAULT", x: 52, y: 48, slit: 24 },
-  "atrium-to-lightwell": { frame: "OBS A-03 / LIGHT", x: 51, y: 43, slit: 24 },
-  "highland-to-atrium": { frame: "OBS G-11 / VOID", x: 48, y: 47, slit: 30 },
-  "highland-to-ring": { frame: "OBS G-22 / RING", x: 50, y: 48, slit: 34 },
-  "highland-to-far": { frame: "OBS G-41 / EDGE", x: 50, y: 42, slit: 36 },
-  "ring-to-lightwell": { frame: "OBS R-09 / LIGHT", x: 51, y: 43, slit: 24 },
-  "ring-to-highland": { frame: "OBS R-12 / BASIN", x: 53, y: 45, slit: 28 },
-  "cooling-to-lightwell": { frame: "OBS C-07 / SHAFT", x: 52, y: 42, slit: 22 },
-  "cooling-to-atrium": { frame: "OBS C-11 / VOID", x: 48, y: 47, slit: 30 },
-  "lightwell-to-atrium": { frame: "OBS H-18 / VOID", x: 48, y: 47, slit: 30 },
-  "lightwell-to-ring": { frame: "OBS H-31 / RING", x: 50, y: 48, slit: 34 },
-  "lightwell-to-cooling": { frame: "OBS H-44 / VAULT", x: 52, y: 48, slit: 24 },
-  "far-to-highland": { frame: "OBS F-01 / BASIN", x: 50, y: 45, slit: 28 }
-};
-
-const qualityFor = (nodeId: keyof typeof nodeQuality) => nodeQuality[nodeId] ?? nodeQuality["atrium-to-highland"];
-const viewportFor = (nodeId: keyof typeof nodeViewport) => nodeViewport[nodeId] ?? nodeViewport["atrium-to-highland"];
-const panelSignalFor = (quality: { integrity: number; noise: number }) => {
-  const wear = Math.min(0.58, Math.max(0.2, quality.noise * 0.006 + (100 - quality.integrity) * 0.003));
-  const signalBreak = Math.min(82, Math.max(22, Math.round(quality.noise * 1.42 + 10)));
-  const scratch = Math.min(78, Math.max(22, Math.round(((quality.integrity + quality.noise) % 54) + 22)));
-
-  return {
-    wear: wear.toFixed(2),
-    signalBreak: `${signalBreak}%`,
-    scratch: `${scratch}%`
-  };
-};
-const nodesWithQuality = nodes.map((node) => ({
-  ...node,
-  quality: qualityFor(node.id as keyof typeof nodeQuality),
-  viewport: viewportFor(node.id as keyof typeof nodeViewport),
-  imagePath: nodeImagePathFor(node.id as keyof typeof nodeImagePaths),
-  image: nodeImageFor(node.id as keyof typeof nodeImagePaths)
-}));
 const firstMode = modes[0];
-const firstNode = nodesWithQuality[0];
+const firstNode = nodes[0];
 const firstScene = scenes[0];
-const firstNodeDescription = firstScene.description;
-const firstPanelSignal = panelSignalFor(firstNode.quality);
 const sceneMap = Object.fromEntries(scenes.map((scene) => [scene.id, scene]));
 const mapRoutes = nodes
   .map((node) => ({
@@ -625,270 +434,231 @@ const mapRoutes = nodes
     to: sceneMap[node.targetScene]
   }))
   .filter((route) => route.from?.map && route.to?.map);
+
+const siteLinks = [
+  {
+    label: "灰雨电台",
+    code: "RADIO 00",
+    note: "雨夜、低频与城市频道",
+    href: basePath
+  },
+  {
+    label: "ZATO",
+    code: "ARCHIVE 02",
+    note: "极夜档案与角色记录",
+    href: `${basePath}zato/`
+  }
+];
 ---
 
 <BaseLayout
-  title="巨构主义"
-  description="巨构主义、阈限空间与粗野主义混凝土空间的交互观察器。"
-  image="assets/megastructure/scene-atrium-interior-v2.webp"
-  imageAlt="冷灰混凝土巨构空间中庭"
-  imageWidth={2560}
-  imageHeight={1440}
+  title="偏航实验场｜AFTERTONE"
+  description="一张用于探索现有页面，并持续接入交互实验、物理模拟与生成视觉的动态网站地图。"
   skipTarget="#megastructure-main"
-  preloadImages={[
-    {
-      href: firstScene.imagePath,
-      type: "image/webp",
-      fetchPriority: "high"
-    }
-  ]}
 >
   <main
     id="megastructure-main"
-    class="mega-lab"
+    class="field-lab mega-lab"
     data-mega-lab
     data-active-scene={firstScene.id}
-    style={`--node-image: url("${firstNode.image}"); --focus-x: ${firstNode.x}%; --focus-y: ${firstNode.y}%; --map-x: ${firstNode.x}%; --map-y: ${firstNode.y}%; --scene-position: ${firstScene.position}; --mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --stage-scale: 1.025; --node-integrity: ${firstNode.quality.integrity}; --node-noise: ${firstNode.quality.noise}; --panel-wear: ${firstPanelSignal.wear}; --panel-break: ${firstPanelSignal.signalBreak}; --panel-scratch: ${firstPanelSignal.scratch};`}
+    style={`--mode-accent: ${firstMode.accent}; --mode-haze: ${firstMode.haze}; --drift-x: 0rem; --drift-y: 0rem;`}
   >
-    <section class="mega-lab-stage" aria-label="巨构主义空间观察器">
-      <img
-        class="mega-lab-backdrop"
-        data-scene-backdrop
-        src={firstScene.image}
-        alt=""
-        width="2560"
-        height="1440"
-        loading="eager"
-        decoding="async"
-        fetchpriority="high"
-        draggable="false"
-      />
-      <div class="mega-lab-grid" aria-hidden="true"></div>
-      <div class="mega-lab-haze" aria-hidden="true"></div>
-      <div class="mega-depth-field" aria-hidden="true">
-        <span class="mega-depth-slab mega-depth-slab-1"></span>
-        <span class="mega-depth-slab mega-depth-slab-2"></span>
-        <span class="mega-depth-slab mega-depth-slab-3"></span>
+    <section class="field-stage mega-lab-stage" aria-label="偏航实验场交互地图">
+      <div class="field-ambient" aria-hidden="true">
+        <span class="field-aurora field-aurora-a"></span>
+        <span class="field-aurora field-aurora-b"></span>
+        <span class="field-orbit field-orbit-a"></span>
+        <span class="field-orbit field-orbit-b"></span>
+        <span class="field-noise"></span>
+        <span class="field-grain"></span>
+        <span class="field-star field-star-a"></span>
+        <span class="field-star field-star-b"></span>
+        <span class="field-star field-star-c"></span>
       </div>
-      <div class="mega-ground-sheen" aria-hidden="true"></div>
 
-      <header class="mega-lab-topbar" aria-label="巨构主义页面导航">
-        <a class="mega-topbar-home" href={basePath}>
-          <i aria-hidden="true"></i>
-          <span>返回 / 灰雨电台</span>
+      <header class="field-header">
+        <a class="field-brand" href={basePath} aria-label="返回灰雨电台">
+          <span class="field-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>
+            <b>AFTERTONE</b>
+            <small>EXPERIMENT FIELD</small>
+          </span>
         </a>
-        <div class="mega-topbar-ident">
-          <b>MS—04</b>
-          <span>MEGASTRUCTURE OBSERVER</span>
-          <small>STRUCTURAL SURVEY TERMINAL</small>
-        </div>
-        <div class="mega-topbar-actions">
-          <button class="mega-world-map-button" type="button" data-world-map-toggle aria-expanded="false">
-            <small>01</small>空间地图
-          </button>
-          <button class="mega-comment-toggle" type="button" data-comment-toggle aria-pressed="true">
-            <small>02</small><span data-comment-toggle-label>标记 ON</span>
-          </button>
-          <button class="mega-audio-button" type="button" data-audio-toggle aria-pressed="false">
-            <small>03</small><span data-audio-label>低频</span>
-          </button>
-          <button class="mega-admin-comment-button" type="button" data-comment-admin-open hidden>
-            评论
-            <b data-comment-pending-count>0</b>
-          </button>
-        </div>
-      </header>
 
-      <aside class="mega-world-map" data-world-map hidden aria-label="巨构主义空间地图">
-        <div class="mega-world-map-head">
-          <div>
-            <span>空间地图</span>
-            <strong data-world-map-current>{firstScene.label}</strong>
-          </div>
-          <p data-world-map-progress>已探索 1 / {scenes.length}</p>
-          <button type="button" data-world-map-close aria-label="关闭空间地图">x</button>
-        </div>
-        <div class="mega-world-map-zones" aria-label="区域层级">
-          {
-            sceneZoneList.map((zone) => (
-              <span class={zone.id === firstScene.zone ? "is-active" : ""} data-world-map-zone={zone.id}>
-                <b>{zone.code}</b>
-                {zone.label}
-              </span>
-            ))
-          }
-        </div>
-        <div class="mega-world-map-canvas">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            {
-              mapRoutes.map((route) => (
-                <line
-                  x1={route.from.map.x}
-                  y1={route.from.map.y}
-                  x2={route.to.map.x}
-                  y2={route.to.map.y}
-                />
-              ))
-            }
-          </svg>
-          {
-            scenes.map((scene) => (
-              <button
-                class={`mega-world-map-node${scene.id === firstScene.id ? " is-active" : ""}`}
-                type="button"
-                data-world-map-scene={scene.id}
-                style={`--map-x: ${scene.map.x}%; --map-y: ${scene.map.y}%;`}
-                aria-label={`进入${scene.label}，${scene.map.layer}`}
-              >
-                <span>{scene.code.replace("SCENE ", "")}</span>
-                <strong>{scene.label}</strong>
-                <small>{scene.map.layer}</small>
-              </button>
-            ))
-          }
-        </div>
-      </aside>
-
-      <section class="mega-lab-title" aria-label="页面标题">
-        <div class="mega-title-code">
-          <span data-scene-ordinal>01 / {String(scenes.length).padStart(2, "0")}</span>
+        <div class="field-live" aria-label="系统状态">
+          <i aria-hidden="true"></i>
+          <span>FIELD ONLINE</span>
           <b data-scene-code>{firstScene.code}</b>
         </div>
-        <p data-scene-kicker>{firstScene.kicker}</p>
-        <h1>巨构主义</h1>
-        <strong data-scene-display>{firstScene.label}</strong>
-        <small data-mode-phrase>{firstNodeDescription}</small>
+
+        <nav class="field-actions" aria-label="实验场工具">
+          <button type="button" data-world-map-toggle aria-expanded="false">
+            <span>全域地图</span><b>⌘ M</b>
+          </button>
+          <button type="button" data-comment-toggle aria-pressed="true">
+            <span data-comment-toggle-label>标记 ON</span><b>COMMENTS</b>
+          </button>
+          <button class="field-admin-button" type="button" data-comment-admin-open hidden>
+            审核 <b data-comment-pending-count>0</b>
+          </button>
+        </nav>
+      </header>
+
+      <section class="field-intro" aria-live="polite">
+        <div class="field-sequence">
+          <span data-scene-ordinal>01 / {String(scenes.length).padStart(2, "0")}</span>
+          <i aria-hidden="true"></i>
+          <span>ROUTE ACTIVE</span>
+        </div>
+        <p class="field-kicker" data-scene-kicker>{firstScene.kicker}</p>
+        <h1>偏航<br />实验场</h1>
+        <div class="field-scene-name">
+          <span>NOW ENTERING</span>
+          <strong data-scene-display>{firstScene.label}</strong>
+        </div>
+        <p class="field-description" data-mode-phrase>{firstScene.description}</p>
+
+        <div class="field-site-links" aria-label="现有网站入口">
+          {
+            siteLinks.map((item) => (
+              <a href={item.href}>
+                <span>{item.code}</span>
+                <strong>{item.label}</strong>
+                <small>{item.note}</small>
+                <i aria-hidden="true">↗</i>
+              </a>
+            ))
+          }
+        </div>
       </section>
 
-      <aside class="mega-scale-rail" aria-label="空间比例数据">
-        <span>SCALE</span>
-        <b>001:4000</b>
-        <i aria-hidden="true"></i>
-        <span>ALT</span>
-        <b>+0280 M</b>
-        <i aria-hidden="true"></i>
-        <span>CONCRETE</span>
-        <b>C80 / W12</b>
-      </aside>
-
-      <div class="mega-node-plane" aria-label="空间节点">
+      <div class="field-node-plane" aria-label="当前区域可到达路径">
         {
-          nodesWithQuality.map((node, index) => (
+          nodes.map((node, index) => (
             <button
               type="button"
-              class={`mega-lab-node${index === 0 ? " is-active" : ""}${node.scene !== firstScene.id ? " is-scene-hidden" : ""}`}
+              class={`field-node mega-lab-node${index === 0 ? " is-active" : ""}${node.scene !== firstScene.id ? " is-scene-hidden" : ""}`}
               data-node-button={node.id}
               data-node-mode={node.mode}
               data-node-scene={node.scene}
-              style={`--x: ${node.x}%; --y: ${node.y}%; --label-x: ${node.labelX}rem; --label-y: ${node.labelY}rem; --label-align: ${node.labelAlign};`}
-              aria-label={`路径节点 ${node.code} ${node.label}，${node.routeLabel}`}
+              style={`--x: ${node.x}%; --y: ${node.y}%;`}
+              aria-label={`${node.routeLabel}：${node.label}`}
               aria-pressed={index === 0 ? "true" : "false"}
               aria-hidden={node.scene !== firstScene.id ? "true" : "false"}
               tabindex={node.scene !== firstScene.id ? "-1" : "0"}
             >
-              <span class="mega-node-cross" aria-hidden="true"></span>
-              <span class="mega-node-text">{node.label}</span>
+              <span class="field-node-radar" aria-hidden="true"><i></i><i></i></span>
+              <span class="field-node-copy">
+                <small>{node.code}</small>
+                <strong>{node.label}</strong>
+                <em>进入区域</em>
+              </span>
             </button>
           ))
         }
       </div>
-      <div class="mega-route-console" aria-label="场景路径关系">
-        <div class="mega-route-status">
-          <span data-route-current>{firstScene.label}</span>
-          <b data-route-link>{firstScene.status}</b>
+
+      <aside class="field-area-card" aria-label="当前区域信息">
+        <div class="field-area-head">
+          <span>CURRENT AREA</span>
+          <b data-explore-count>1</b><small> / <b data-explore-total>{scenes.length}</b></small>
         </div>
-        <button class="mega-route-back" type="button" data-route-back disabled>
-          <small data-route-back-context>RETURN</small>
-          <strong data-route-back-label>无返回</strong>
-          <span data-route-back-description>无上一个背景</span>
+        <h2 data-current-zone>{sceneZones[firstScene.zone].label}</h2>
+        <p data-current-zone-detail>{sceneZones[firstScene.zone].detail}</p>
+        <dl>
+          <div>
+            <dt>本次发现</dt>
+            <dd data-last-discovery>{firstScene.discovery}</dd>
+          </div>
+          <div>
+            <dt>开放路径</dt>
+            <dd data-next-routes>风场坡 / 混沌舱 / 光谱井</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <div class="field-route-console" aria-label="区域路径控制">
+        <div>
+          <span data-route-current>{firstScene.label}</span>
+          <small data-route-link>{firstScene.status}</small>
+        </div>
+        <button type="button" data-route-back disabled>
+          <span aria-hidden="true">←</span>
+          <span>
+            <small data-route-back-context>RETURN</small>
+            <strong data-route-back-label>无返回</strong>
+            <em data-route-back-description>无上一个区域</em>
+          </span>
         </button>
       </div>
 
-      <aside class="mega-observer-panel" aria-label="工程观察屏">
-        <button
-          class="mega-panel-resize"
-          type="button"
-          data-panel-resize
-          aria-label="调整观察屏大小"
-        ></button>
-        <div class="mega-panel-head" data-panel-drag>
-          <span>ENGINEERING VIEW / <b data-panel-frame-code>{firstNode.viewport.frame}</b></span>
-          <div class="mega-panel-actions">
-            <button type="button" data-audio-toggle aria-pressed="false"><span data-audio-label>低频</span></button>
-            <button class="mega-panel-collapse" type="button" data-panel-collapse aria-label="收起观察屏"></button>
-          </div>
-        </div>
-        <div
-          class="mega-panel-screen"
-          data-panel-screen
-          style={`--node-image: url("${firstNode.image}"); --viewport-x: ${firstNode.viewport.x}%; --viewport-y: ${firstNode.viewport.y}%; --viewport-slit: ${firstNode.viewport.slit}%;`}
-        >
-          <span class="mega-panel-frame-code" data-panel-frame-code>{firstNode.viewport.frame}</span>
-          <span class="mega-panel-condensation"></span>
-          <span class="mega-panel-faults"></span>
-          <span class="mega-panel-locator">
-            <i class="mega-locator-trace"></i>
-            <i class="mega-locator-mark"></i>
-            <b data-locator-code>{firstNode.code}</b>
-          </span>
-          <i></i>
-        </div>
-        <div class="mega-panel-copy">
-          <div class="mega-panel-copy-head">
-            <small data-node-code>{firstNode.code}</small>
-            <span data-node-signal>{firstNode.signal}</span>
-          </div>
-          <strong data-node-title>{firstNode.label}</strong>
-          <p data-node-sentence>{firstNodeDescription}</p>
-        </div>
-        <div class="mega-signal-readout" aria-label="节点信号质量">
-          <span>
-            <small>INTEGRITY</small>
-            <b><em data-quality-integrity>{firstNode.quality.integrity}</em>%</b>
-            <i data-quality-meter-integrity role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow={firstNode.quality.integrity}></i>
-          </span>
-          <span>
-            <small>NOISE</small>
-            <b><em data-quality-noise>{firstNode.quality.noise}</em>%</b>
-            <i data-quality-meter-noise role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow={firstNode.quality.noise}></i>
-          </span>
-          <span>
-            <small>DRIFT</small>
-            <b data-quality-drift>{firstNode.quality.drift}</b>
-            <i data-quality-drift-line></i>
-          </span>
-        </div>
-        <div class="mega-mode-switch" role="group" aria-label="观察模式">
-          {
-            modes.map((mode, index) => (
-              <button
-                type="button"
-                data-mode-button={mode.id}
-                aria-pressed={index === 0 ? "true" : "false"}
-              >
-                <small>{mode.code}</small>
-                <span>{mode.label}</span>
-              </button>
-            ))
-          }
-        </div>
-        <label class="mega-scale-control">
-          <span>PRESSURE</span>
-          <input type="range" min="0" max="80" value="12" step="1" data-scale-range />
-          <b data-scale-value>12</b>
-        </label>
-      </aside>
-      <button class="mega-panel-reopen" type="button" data-panel-reopen>
-        <span>OBS</span>
-        <strong data-reopen-code>{firstNode.code}</strong>
-      </button>
+      <p class="field-comment-instruction mega-comment-instruction">
+        <span aria-hidden="true"></span>
+        长按画面 620ms，在当前区域留下坐标评论
+      </p>
 
-      <div class="mega-comment-layer" data-comment-layer aria-label="Position comments"></div>
-      <p class="mega-comment-instruction">长按场景 / 创建坐标评论</p>
+      <aside class="field-world-map" data-world-map hidden aria-label="偏航实验场全域地图">
+        <div class="field-map-head">
+          <div>
+            <span>FIELD OVERVIEW / 06 AREAS</span>
+            <strong data-world-map-current>{firstScene.label}</strong>
+          </div>
+          <p data-world-map-progress>已探索 1 / {scenes.length}</p>
+          <button type="button" data-world-map-close aria-label="关闭全域地图">×</button>
+        </div>
+
+        <div class="field-map-body">
+          <div class="field-map-canvas">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              {
+                mapRoutes.map((route) => (
+                  <line
+                    x1={route.from.map.x}
+                    y1={route.from.map.y}
+                    x2={route.to.map.x}
+                    y2={route.to.map.y}
+                  />
+                ))
+              }
+            </svg>
+            {
+              scenes.map((scene, index) => (
+                <button
+                  type="button"
+                  class={`field-map-node${scene.id === firstScene.id ? " is-active" : ""}`}
+                  data-world-map-scene={scene.id}
+                  style={`--map-x: ${scene.map.x}%; --map-y: ${scene.map.y}%;`}
+                  aria-label={`进入${scene.label}，${scene.map.layer}`}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{scene.label}</strong>
+                  <small>{scene.map.layer}</small>
+                </button>
+              ))
+            }
+          </div>
+
+          <div class="field-map-index">
+            <span>区域类型</span>
+            {
+              sceneZoneList.map((zone) => (
+                <div class={zone.id === firstScene.zone ? "is-active" : ""} data-world-map-zone={zone.id}>
+                  <b>{zone.code}</b>
+                  <strong>{zone.label}</strong>
+                  <small>{zone.detail}</small>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </aside>
+
+      <div class="mega-comment-layer" data-comment-layer aria-label="区域坐标评论"></div>
+
       <aside class="mega-comment-popover" data-comment-popover hidden aria-live="polite">
         <div class="mega-comment-head">
           <span data-comment-title>评论</span>
-          <button type="button" data-comment-close aria-label="Close comment panel">x</button>
+          <button type="button" data-comment-close aria-label="关闭评论面板">×</button>
         </div>
         <p class="mega-comment-position" data-comment-position>X 00.0 / Y 00.0</p>
         <div class="mega-comment-auth" data-comment-auth>
@@ -921,52 +691,30 @@ const mapRoutes = nodes
           <div data-comment-review-list></div>
         </div>
       </aside>
+
       <aside class="mega-comment-admin-dialog" data-comment-admin-dialog hidden aria-live="polite" aria-label="评论审核面板">
         <div class="mega-comment-head">
           <span>评论审核</span>
-          <button type="button" data-comment-admin-close aria-label="Close comment review panel">x</button>
+          <button type="button" data-comment-admin-close aria-label="关闭评论审核面板">×</button>
         </div>
         <p class="mega-comment-admin-summary" data-comment-admin-summary>全部评论 / 0</p>
         <div class="mega-comment-admin-filters" aria-label="评论状态筛选">
           <button type="button" class="is-active" data-comment-admin-filter="pending" aria-pressed="true">
-            <span>待审核</span>
-            <b>0</b>
+            <span>待审核</span><b>0</b>
           </button>
           <button type="button" data-comment-admin-filter="approved" aria-pressed="false">
-            <span>已通过</span>
-            <b>0</b>
+            <span>已通过</span><b>0</b>
           </button>
           <button type="button" data-comment-admin-filter="rejected" aria-pressed="false">
-            <span>已拒绝</span>
-            <b>0</b>
+            <span>已拒绝</span><b>0</b>
           </button>
         </div>
         <div class="mega-comment-admin-list" data-comment-admin-list></div>
       </aside>
-
-    </section>
-
-    <section class="mega-design-strip" aria-label="探索状态">
-      <article>
-        <span>01 / EXPLORED</span>
-        <p><b data-explore-count>1</b> / <b data-explore-total>{scenes.length}</b> 已探索</p>
-      </article>
-      <article>
-        <span>02 / ZONE</span>
-        <p><b data-current-zone>{sceneZones[firstScene.zone].label}</b><small data-current-zone-detail>{sceneZones[firstScene.zone].detail}</small></p>
-      </article>
-      <article>
-        <span>03 / RECORD</span>
-        <p data-last-discovery>{firstScene.discovery}</p>
-      </article>
-      <article>
-        <span>04 / ROUTES</span>
-        <p data-next-routes>高原 / 冷却层</p>
-      </article>
     </section>
   </main>
 
-  <script define:vars={{ modes, scenes, nodes: nodesWithQuality, sceneZones, supabaseConfig }}>
+<script define:vars={{ modes, scenes, nodes, sceneZones, supabaseConfig }}>
       const lab = document.querySelector("[data-mega-lab]");
 
       if (lab) {
