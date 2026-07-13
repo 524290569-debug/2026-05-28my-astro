@@ -477,13 +477,28 @@ const siteLinks = [
       </div>
 
       <header class="field-header">
-        <a class="field-brand" href={basePath} aria-label="返回灰雨电台">
-          <span class="field-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span>
-            <b>AFTERTONE</b>
-            <small>EXPERIMENT FIELD</small>
-          </span>
-        </a>
+        <div class="field-header-cluster">
+          <a class="field-brand" href={basePath} aria-label="返回灰雨电台">
+            <span class="field-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>
+              <b>AFTERTONE</b>
+              <small>EXPERIMENT FIELD</small>
+            </span>
+          </a>
+
+          <nav class="field-site-links" aria-label="现有网站入口">
+            {
+              siteLinks.map((item) => (
+                <a href={item.href}>
+                  <span>{item.code}</span>
+                  <strong>{item.label}</strong>
+                  <small>{item.note}</small>
+                  <i aria-hidden="true">↗</i>
+                </a>
+              ))
+            }
+          </nav>
+        </div>
 
         <div class="field-live" aria-label="系统状态">
           <i aria-hidden="true"></i>
@@ -517,19 +532,6 @@ const siteLinks = [
           <strong data-scene-display>{firstScene.label}</strong>
         </div>
         <p class="field-description" data-mode-phrase>{firstScene.description}</p>
-
-        <div class="field-site-links" aria-label="现有网站入口">
-          {
-            siteLinks.map((item) => (
-              <a href={item.href}>
-                <span>{item.code}</span>
-                <strong>{item.label}</strong>
-                <small>{item.note}</small>
-                <i aria-hidden="true">↗</i>
-              </a>
-            ))
-          }
-        </div>
       </section>
 
       <div class="field-node-plane" aria-label="当前区域可到达路径">
@@ -558,24 +560,26 @@ const siteLinks = [
         }
       </div>
 
-      <aside class="field-area-card" aria-label="当前区域信息">
-        <div class="field-area-head">
+      <details class="field-area-card" aria-label="当前区域信息" open>
+        <summary class="field-area-head">
           <span>CURRENT AREA</span>
           <b data-explore-count>1</b><small> / <b data-explore-total>{scenes.length}</b></small>
+        </summary>
+        <div class="field-area-body">
+          <h2 data-current-zone>{sceneZones[firstScene.zone].label}</h2>
+          <p data-current-zone-detail>{sceneZones[firstScene.zone].detail}</p>
+          <dl>
+            <div>
+              <dt>本次发现</dt>
+              <dd data-last-discovery>{firstScene.discovery}</dd>
+            </div>
+            <div>
+              <dt>开放路径</dt>
+              <dd data-next-routes>风场坡 / 混沌舱 / 光谱井</dd>
+            </div>
+          </dl>
         </div>
-        <h2 data-current-zone>{sceneZones[firstScene.zone].label}</h2>
-        <p data-current-zone-detail>{sceneZones[firstScene.zone].detail}</p>
-        <dl>
-          <div>
-            <dt>本次发现</dt>
-            <dd data-last-discovery>{firstScene.discovery}</dd>
-          </div>
-          <div>
-            <dt>开放路径</dt>
-            <dd data-next-routes>风场坡 / 混沌舱 / 光谱井</dd>
-          </div>
-        </dl>
-      </aside>
+      </details>
 
       <div class="field-route-console" aria-label="区域路径控制">
         <div>
