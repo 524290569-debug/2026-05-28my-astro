@@ -428,25 +428,38 @@ const initialTrack = soundtrack[31];
             已从本地游戏资源中整理完整 32 曲原声。页面默认从 <strong>Menu</strong> 开始播放；底部播放器可暂停、切歌和调整音量。
           </p>
           <button type="button" data-tracklist-toggle aria-expanded="false" aria-controls="zato-tracklist">
-            查看完整曲目
-            <span aria-hidden="true">＋</span>
+            <span data-tracklist-label>展开全部 32 首</span>
+            <span data-tracklist-icon aria-hidden="true">＋</span>
           </button>
         </div>
-        <div id="zato-tracklist" class="zato-tracklist" hidden>
-          {soundtrack.map((track) => (
-            <button
-              type="button"
-              data-track-option
-              data-track-index={track.index}
-              data-track-src={track.src}
-              data-track-title={track.title}
-              aria-pressed={track.index === initialTrack.index ? "true" : "false"}
-            >
-              <span>{track.number}</span>
-              <strong>{track.title}</strong>
-              <small>PLAY</small>
-            </button>
-          ))}
+        <div class="zato-tracklist-panel zato-reveal">
+          <header>
+            <div>
+              <span>LOCAL AUDIO ARCHIVE</span>
+              <strong>VORKUTA-5 / SIGNAL LIBRARY</strong>
+            </div>
+            <small>32 TRACKS / MP3 + OGG</small>
+          </header>
+          <div id="zato-tracklist" class="zato-tracklist" data-expanded="false">
+            {soundtrack.map((track) => (
+              <button
+                type="button"
+                data-track-option
+                data-track-index={track.index}
+                data-track-src={track.src}
+                data-track-title={track.title}
+                aria-pressed={track.index === initialTrack.index ? "true" : "false"}
+              >
+                <span>{track.number}</span>
+                <strong>{track.title}</strong>
+                <small>PLAY</small>
+              </button>
+            ))}
+          </div>
+          <footer>
+            <span>SCROLL TO BROWSE</span>
+            <span>CLICK A SIGNAL TO PLAY</span>
+          </footer>
         </div>
       </section>
 
@@ -717,11 +730,13 @@ const initialTrack = soundtrack[31];
       const tracklist = document.getElementById("zato-tracklist");
       tracklistToggle?.addEventListener("click", () => {
         if (!tracklist) return;
-        const willOpen = tracklist.hidden;
-        tracklist.hidden = !willOpen;
-        tracklistToggle.setAttribute("aria-expanded", String(willOpen));
-        const icon = tracklistToggle.querySelector("span");
-        if (icon) icon.textContent = willOpen ? "−" : "＋";
+        const willExpand = tracklist.dataset.expanded !== "true";
+        tracklist.dataset.expanded = String(willExpand);
+        tracklistToggle.setAttribute("aria-expanded", String(willExpand));
+        const label = tracklistToggle.querySelector("[data-tracklist-label]");
+        const icon = tracklistToggle.querySelector("[data-tracklist-icon]");
+        if (label) label.textContent = willExpand ? "收起完整曲目" : "展开全部 32 首";
+        if (icon) icon.textContent = willExpand ? "−" : "＋";
       });
 
       const dialog = page.querySelector("[data-gallery-dialog]");
@@ -1365,7 +1380,8 @@ const initialTrack = soundtrack[31];
       position: relative;
       z-index: 2;
       align-self: center;
-      padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem) clamp(3rem, 6vw, 6rem) 0;
+      padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem) clamp(3rem, 6vw, 6rem)
+        clamp(1.5rem, 2vw, 2.75rem);
     }
 
     .zato-world-copy h2 {
@@ -1743,20 +1759,92 @@ const initialTrack = soundtrack[31];
       cursor: pointer;
     }
 
-    [data-tracklist-toggle] span {
+    [data-tracklist-toggle]:hover,
+    [data-tracklist-toggle]:focus-visible {
+      border-color: rgba(240, 82, 158, 0.72);
+      outline: none;
+    }
+
+    [data-tracklist-icon] {
       color: var(--z-pink-bright);
       font-size: 1.1rem;
+    }
+
+    .zato-tracklist-panel {
+      position: relative;
+      align-self: start;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(240, 232, 220, 0.18);
+      background:
+        linear-gradient(145deg, rgba(211, 51, 133, 0.08), transparent 32%),
+        rgba(255, 255, 255, 0.012);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+    }
+
+    .zato-tracklist-panel > header,
+    .zato-tracklist-panel > footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1rem 1.1rem;
+      font-family: "Courier New", monospace;
+    }
+
+    .zato-tracklist-panel > header {
+      min-height: 4.7rem;
+      border-bottom: 1px solid rgba(240, 232, 220, 0.14);
+    }
+
+    .zato-tracklist-panel > header div {
+      min-width: 0;
+    }
+
+    .zato-tracklist-panel > header span,
+    .zato-tracklist-panel > header small,
+    .zato-tracklist-panel > footer {
+      color: rgba(245, 240, 232, 0.38);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+    }
+
+    .zato-tracklist-panel > header strong {
+      display: block;
+      overflow: hidden;
+      margin-top: 0.35rem;
+      color: #fff8ef;
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .zato-tracklist-panel > header small {
+      flex: 0 0 auto;
+      color: var(--z-pink-bright);
+    }
+
+    .zato-tracklist-panel > footer {
+      min-height: 3rem;
+      border-top: 1px solid rgba(240, 232, 220, 0.14);
     }
 
     .zato-tracklist {
       display: grid;
       align-self: start;
+      max-height: 31rem;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       border-top: 1px solid rgba(240, 232, 220, 0.18);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-color: rgba(211, 51, 133, 0.72) rgba(240, 232, 220, 0.08);
+      scrollbar-width: thin;
     }
 
-    .zato-tracklist[hidden] {
-      display: none;
+    .zato-tracklist[data-expanded="true"] {
+      max-height: none;
+      overflow: visible;
     }
 
     .zato-tracklist button {
@@ -2439,7 +2527,18 @@ const initialTrack = soundtrack[31];
       }
 
       .zato-tracklist {
+        max-height: 27rem;
         grid-template-columns: 1fr;
+      }
+
+      .zato-tracklist[data-expanded="true"] {
+        max-height: none;
+      }
+
+      .zato-tracklist-panel > header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.55rem;
       }
 
       .zato-tracklist button,
