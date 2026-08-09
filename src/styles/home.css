@@ -228,6 +228,8 @@
   .gr-pointer-glow, .gr-floating-status { display:none; }
   .gr-nav { min-height:58px; padding-inline:16px; grid-template-columns:1fr auto; }
   .gr-brand span { font-size:11px; }
+  .gr-nav-routes { max-width:calc(100vw - 150px); overflow-x:auto; white-space:nowrap; scrollbar-width:none; }
+  .gr-nav-routes::-webkit-scrollbar { display:none; }
   .gr-nav-routes a { padding-block:18px; font-size:10px; }
   .gr-nav-routes a:first-child { display:none; }
   .gr-hero { min-height:auto; }

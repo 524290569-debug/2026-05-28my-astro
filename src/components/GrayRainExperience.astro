@@ -124,7 +124,6 @@ const waveBars = Array.from({ length: 42 });
 
 <div class="gr-home" data-gr-home data-channel="rain">
   <div class="gr-progress" aria-hidden="true"><span data-scroll-progress></span></div>
-  <div class="gr-pointer-glow" aria-hidden="true"></div>
   <div class="gr-crt" aria-hidden="true"></div>
 
   <header class="gr-nav" data-gr-nav>
@@ -138,8 +137,12 @@ const waveBars = Array.from({ length: 42 });
       <a href="#routes">线路</a>
     </nav>
     <div class="gr-nav-routes" aria-label="独立专题页">
-      <a href={`${basePath}megastructure/`}>巨构主义 ↗</a>
+      <a href={`${basePath}position/`}>位置改变 ↗</a>
+      <a href={`${basePath}megastructure/`}>偏航试验场 ↗</a>
       <a href={`${basePath}zato/`}>Z.A.T.O. ↗</a>
+      <a href={`${basePath}tools/`}>工具 ↗</a>
+      <a href={`${basePath}md-reader/`}>MD 阅读器 ↗</a>
+      <a href={`${basePath}ai-manager/`}>AI 管理 ↗</a>
     </div>
   </header>
 
@@ -317,8 +320,10 @@ const waveBars = Array.from({ length: 42 });
       <nav class="gr-route-list" aria-label="下一条线路" data-reveal>
         <a href="#field"><small>01 / LIVE</small><span>现场</span><i>继续扫描城市边缘</i><b>↘</b></a>
         <a href="#archive"><small>02 / ARCHIVE</small><span>档案</span><i>回到夜航磁带索引</i><b>↘</b></a>
-        <a href={`${basePath}megastructure/`}><small>03 / EXTERNAL ROUTE</small><span>巨构主义</span><i>进入无人建筑体</i><b>↗</b></a>
+        <a href={`${basePath}megastructure/`}><small>03 / EXTERNAL ROUTE</small><span>偏航试验场</span><i>进入无人建筑体</i><b>↗</b></a>
         <a href={`${basePath}zato/`}><small>04 / EXTERNAL ROUTE</small><span>Z.A.T.O.</span><i>接收封闭城市信号</i><b>↗</b></a>
+        <a href={`${basePath}tools/`}><small>05 / UTILITY ROUTE</small><span>工具</span><i>格式化、修复与处理文本</i><b>↗</b></a>
+        <a href={`${basePath}ai-manager/`}><small>06 / AI OPERATIONS</small><span>AI 管理</span><i>配置模型、密钥与多模型竞技场</i><b>↗</b></a>
       </nav>
       <footer class="gr-footer">
         <p>GRAY RAIN RADIO © 2026</p>
@@ -412,13 +417,6 @@ const waveBars = Array.from({ length: 42 });
       parallaxScene.addEventListener("pointerleave", () => {
         parallaxLayers.forEach((layer) => { layer.style.transform = "translate3d(0,0,0) scale(1.06)"; });
       });
-    }
-
-    if (finePointer.matches) {
-      window.addEventListener("pointermove", (event) => {
-        page.style.setProperty("--pointer-x", `${event.clientX}px`);
-        page.style.setProperty("--pointer-y", `${event.clientY}px`);
-      }, { passive: true });
     }
 
     const updateScroll = () => {
