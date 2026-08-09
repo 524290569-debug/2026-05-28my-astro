@@ -203,3 +203,51 @@
 - **原因**：本机没有安装 GitHub CLI，部署脚本此前没有先核对命令可用性。
 - **修正**：不在部署过程中临时安装工具，改用 GitHub 公共 REST API 查询 Actions，确认 Pages 工作流完成且结论为 `success`。
 - **复用规则**：本项目部署状态默认使用 GitHub REST API；需要调用 `gh` 前先执行 `Get-Command gh -ErrorAction SilentlyContinue`。
+
+### E-034｜把 GitHub Pages 成功误当成 aftert.one 生产站已更新
+- **现象**：GitHub Pages 工作流显示 `success`，但公网 `https://aftert.one/position/` 仍返回 404，首页也没有新入口。
+- **原因**：自定义域名当前实际指向 `server: nginx` 的 VPS，响应 `Last-Modified` 仍为旧 release；GitHub Pages 是仓库发布链路，但不是该域名当前的生产文件源。
+- **修正**：查询公网响应头与真实路径后，改走 VPS `/var/www/aftert.one/current` 的 release 原子切换流程。
+- **复用规则**：部署 aftert.one 必须区分“GitHub Pages 工作流成功”和“VPS production release 成功”；最终以 Nginx current、API health 和公网页面标记为准。
+
+### E-035｜公网复核命令同时触发旧 PowerShell TLS 和 `$HOME` 保留变量问题
+- **现象**：`Invoke-WebRequest` 访问线上页面时提示连接发送错误；同一命令把 `$home` 当普通响应变量，又触发只读变量错误，后续空对象检查连锁报错。
+- **原因**：Windows PowerShell 旧网络栈的 TLS 协商失败，同时变量名大小写不敏感导致 `$home` 命中内置 `$HOME`。
+- **修正**：改用 Node `fetch`，并使用 `positionResponse`、`homeResponse` 等明确变量名。
+- **复用规则**：aftert.one 公网内容复核优先使用 Node fetch；PowerShell 中继续禁用 `$home` 及其大小写变体作为临时变量。
+
+### E-036｜Node stdin 检查脚本使用顶层 `await` 和易受传输影响的正则
+- **现象**：一次性 Node stdin 脚本报 `await is only valid in async functions`，同时 title 正则显示为未终止表达式。
+- **原因**：`node -` 默认按 CommonJS stdin 执行，不支持顶层 await；多层 PowerShell/Node 转义让正则写法变得脆弱。
+- **修正**：用 async IIFE 包裹逻辑，并用 `indexOf` 截取 title，避免额外正则转义。
+- **复用规则**：通过 PowerShell here-string 调用 `node -` 时统一使用 async IIFE，字符串解析优先使用稳定的字面操作。
+
+### E-037｜PowerShell 双引号提前解释远端 Bash 的 `$(...)`
+- **现象**：SSH 清单命令中的 `$(readlink ...)` 被本地 PowerShell 当成子表达式执行，出现本机找不到 `readlink`，远端命令随后引号不闭合。
+- **原因**：远端 Bash 代码放进 PowerShell 双引号字符串，`$()` 在传给 SSH 前已经被本地解析。
+- **修正**：简单查询改用不含本地插值的远端单引号命令；复杂发布逻辑写入 `.sh` 后通过 SCP 上传执行。
+- **复用规则**：不要把包含 `$()`、循环和复杂引号的 Bash 直接嵌入 PowerShell 双引号；远端复杂操作一律使用脚本文件。
+
+### E-038｜新静态目录缺少 Nginx 显式 `/position/` 路由
+- **现象**：首轮 VPS release 的文件和 SHA-256 全部通过，Nginx 配置语法正常，但切换后 `/position/` 返回 404，脚本自动回滚。
+- **原因**：站点 Nginx 为每个 Astro 目录配置显式 location，通用 `location /` 只执行 `try_files $uri =404`，不会自动解析目录下的 `index.html`。
+- **修正**：基于线上配置精确新增 `/position -> /position/` 重定向和 `/position/ -> /position/index.html` 映射；配置本身也纳入哈希、备份和回滚。
+- **复用规则**：新增 Astro 顶级目录页面时，部署包必须同步检查 Nginx 是否需要显式目录路由。
+
+### E-039｜Nginx reload 后立即验证命中新旧 worker 交接窗口
+- **现象**：已安装新 location 并切换 release 后，首页返回新内容，但紧接着请求 `/position/` 仍短暂得到 404，触发回滚。
+- **原因**：`systemctl reload nginx` 返回时旧 worker 仍可能短暂处理连接，新 route 尚未由全部 worker 接管。
+- **修正**：reload 后等待 2 秒再开始页面验证。
+- **复用规则**：涉及 Nginx 路由变更的发布在 reload 后保留短暂接管窗口，再做首次 HTTP 断言。
+
+### E-040｜图片唯一性验证把 Astro preload 也算成页面图片
+- **现象**：新页面已经可访问，但脚本按文件名总出现次数检查时，首屏两张图片各得到 2 次并触发回滚。
+- **原因**：Astro 为 eager 图片生成 `<link rel="preload">`，文件名会同时出现在 preload 和 `<img src>` 中。
+- **修正**：唯一性检查改为统计精确的 `src="/assets/position/<name>"`，与浏览器 DOM 图片口径一致。
+- **复用规则**：静态 HTML 图片数量检查统计 `<img src>`，不要统计资源文件名的全部文本出现次数。
+
+### E-041｜按行提取结尾 section 不适用于 Astro 压缩成单行的 HTML
+- **现象**：结尾实际没有链接，但 `sed -n` 提取结果包含顶部导航，脚本报 `ENDING_NAV_STILL_PRESENT` 并自动回滚。
+- **原因**：Astro 产物被压缩为单行，基于起止“行”的 sed 范围会返回整行 HTML。
+- **修正**：使用 Python 对 `<section id="after">...</section>` 做非贪婪跨行匹配，只统计该片段内的 `<a>`。
+- **复用规则**：检查压缩 HTML 的局部结构时使用 DOM、HTML parser 或非贪婪片段提取，不使用行范围工具。
