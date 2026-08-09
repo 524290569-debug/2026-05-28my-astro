@@ -257,3 +257,9 @@
 - **原因**：命令可能委托给已有 Edge 进程并提前返回；退出码只代表启动调用成功，不代表截图文件已经写入。
 - **修正**：改用独立临时 user-data-dir，通过 `Start-Process -Wait -PassThru` 等待专用 Edge 进程结束，并在结束后校验文件存在且大小大于 `0`；最终生产截图成功生成。
 - **复用规则**：浏览器截图验收必须同时检查进程结束、目标文件存在和文件大小，不能只依据退出码判断成功。
+
+### E-043｜PowerShell here-string 向 Node 传递中文断言时变成问号
+- **现象**：公网 HTML 明确包含中文标题与文案，但 Node 校验中的中文 `includes` 全部返回 `false`，调试输出显示断言文本已变成 `??`。
+- **原因**：Windows PowerShell 通过管道把 here-string 传给 `node -` 时使用了当前控制台编码，脚本内的中文源码在 Node 执行前已丢失。
+- **修正**：跨 PowerShell/Node 的一次性校验脚本改用 JavaScript Unicode 转义或纯 ASCII DOM 标记；重新断言生产页标题与关键内容。
+- **复用规则**：通过 PowerShell 管道发送 Node 源码时不直接嵌入中文匹配字面量，避免把传输编码问题误判成网页内容缺失。
