@@ -197,3 +197,9 @@
 - **原因**：本机旧版 Git/OpenSSL 与当前网络链路的默认 HTTPS 协商偶发失败；远端地址和仓库权限本身正常。
 - **修正**：单次命令增加 `-c http.version=HTTP/1.1` 后重新 fetch，成功取得 `origin/main`，并确认远端 main 是部署提交的祖先。
 - **复用规则**：本项目 GitHub HTTPS 若出现握手型 `SSL_ERROR_SYSCALL`，先使用命令级 HTTP/1.1 兼容参数重试，不永久修改全局 Git 配置。
+
+### E-033｜部署状态检查误以为本机已安装 GitHub CLI
+- **现象**：推送完成后执行 `gh run list`，PowerShell 返回 `gh is not recognized`。
+- **原因**：本机没有安装 GitHub CLI，部署脚本此前没有先核对命令可用性。
+- **修正**：不在部署过程中临时安装工具，改用 GitHub 公共 REST API 查询 Actions，确认 Pages 工作流完成且结论为 `success`。
+- **复用规则**：本项目部署状态默认使用 GitHub REST API；需要调用 `gh` 前先执行 `Get-Command gh -ErrorAction SilentlyContinue`。
