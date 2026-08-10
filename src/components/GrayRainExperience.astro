@@ -16,6 +16,7 @@ const channels = [
     title: "让雨声成为页面的底噪。",
     copy: "天线收拢旧城上空的湿冷频段。远处的灯没有变亮，只是被雨水拉成了更长的回声。",
     meta: "18 MM / NORTH ROOF",
+    background: assetPath("assets/position/position-high.webp"),
   },
   {
     id: "city",
@@ -26,6 +27,7 @@ const channels = [
     title: "沿着高架，听见无人值守的城市。",
     copy: "末班车、便利店灯箱与远处机房的低鸣被压进同一条频带，像一份仍在更新的夜间地图。",
     meta: "04 NODES / EAST LOOP",
+    background: assetPath("assets/position/position-hero.webp"),
   },
   {
     id: "static",
@@ -36,6 +38,7 @@ const channels = [
     title: "失真不是故障，是这座站点的纹理。",
     copy: "在空白与噪点之间，未被命名的消息短暂浮现。你不必理解全部，只需要确认它曾经抵达。",
     meta: "NOISE 04% / OPEN BAND",
+    background: assetPath("assets/position/position-below.webp"),
   },
 ];
 
@@ -46,6 +49,8 @@ const scenes = [
     code: "ANT-03",
     title: "屋顶回声",
     meta: "北区天线 / 雨压 18 mm / 02:17",
+    coordinate: "41.08N / ROOF-03",
+    signal: "72%",
     image: assetPath("assets/works/postpunk-rooftop.webp"),
     alt: "灰雨中的旧楼屋顶与远处城市灯光",
     note: "风从广告牌背面穿过，天线把同一段低频重复了三次。水面上的第二排窗光并不属于这栋楼。",
@@ -60,6 +65,8 @@ const scenes = [
     code: "SUB-11",
     title: "地下通道",
     meta: "南侧回路 / 底噪 —6 dB / 00:43",
+    coordinate: "SOUTH LOOP / B1",
+    signal: "46%",
     image: assetPath("assets/works/postpunk-passage.webp"),
     alt: "冷白灯照亮的潮湿地下通道",
     note: "白光被瓷砖拆成碎片。脚步声比广播更清楚，出口标识却一直指向刚刚走过的方向。",
@@ -74,8 +81,10 @@ const scenes = [
     code: "TRK-07",
     title: "高架余光",
     meta: "东环轨道 / 反射 41% / 23:58",
-    image: assetPath("assets/works/postpunk-bridge.webp"),
-    alt: "雨夜高架桥与冷蓝色远城反光",
+    coordinate: "EAST RAIL / KM-07",
+    signal: "61%",
+    image: assetPath("assets/position/position-between.webp"),
+    alt: "雨夜高架轨道与远处密集城市楼群",
     note: "车流被雨雾削平，轮廓还在，声音却像从另一座城市延迟送达。末班车仍停在高架下面。",
     hotspots: [
       { x: 64, y: 28, code: "B-1", title: "高架余光", body: "亮度没有上来，雨幕只留下车灯移动过的空壳。" },
@@ -120,6 +129,7 @@ const logs = [
 ];
 
 const waveBars = Array.from({ length: 42 });
+const traceBars = Array.from({ length: 12 });
 ---
 
 <div class="gr-home" data-gr-home data-channel="rain">
@@ -136,7 +146,6 @@ const waveBars = Array.from({ length: 42 });
       <a href="#archive">夜航日志</a>
     </nav>
     <div class="gr-nav-routes" aria-label="独立专题页">
-      <a href={`${basePath}position/`}>位置改变 ↗</a>
       <a href={`${basePath}megastructure/`}>偏航试验场 ↗</a>
       <a href={`${basePath}zato/`}>Z.A.T.O. ↗</a>
       <a href={`${basePath}tools/`}>工具 ↗</a>
@@ -148,10 +157,20 @@ const waveBars = Array.from({ length: 42 });
   <main>
     <section id="station" class="gr-hero" data-section-name="ROOFTOP STATION">
       <div class="gr-hero-scene" aria-hidden="true" data-parallax-scene>
-        <img class="gr-sky" src={assetPath("assets/hero/sky-v5.webp")} width="1600" height="686" alt="" data-depth="0.08" />
-        <img class="gr-city" src={assetPath("assets/hero/city-v5.webp")} width="1600" height="556" alt="" data-depth="0.18" />
+        {channels.map((channel, index) => (
+          <img
+            class="gr-channel-backdrop"
+            src={channel.background}
+            width="1672"
+            height="941"
+            alt=""
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchpriority={index === 0 ? "high" : "auto"}
+            data-channel-background={channel.id}
+            data-depth="0.12"
+          />
+        ))}
         <div class="gr-haze" data-depth="0.1"></div>
-        <img class="gr-rooftop" src={assetPath("assets/hero/rooftop-v5.webp")} width="1600" height="267" alt="" data-depth="0.34" />
         <div class="gr-rain"></div>
         <div class="gr-hero-veil"></div>
       </div>
@@ -231,6 +250,11 @@ const waveBars = Array.from({ length: 42 });
             <article class="gr-scene" data-scene={scene.id} hidden={sceneIndex !== 0}>
               <img src={scene.image} width="1280" height="720" alt={scene.alt} loading={sceneIndex === 0 ? "eager" : "lazy"} />
               <div class="gr-scene-shade"></div>
+              <div class="gr-scene-frame" aria-hidden="true">
+                <i></i><i></i><i></i><i></i>
+                <span>{scene.code} / VISUAL ACQUISITION</span>
+                <b>SIGNAL {scene.signal}</b>
+              </div>
               {scene.hotspots.map((hotspot, hotspotIndex) => (
                 <button
                   type="button"
@@ -248,12 +272,19 @@ const waveBars = Array.from({ length: 42 });
               ))}
               <div class="gr-scene-title">
                 <span>{scene.number}</span>
-                <div><p>{scene.meta}</p><h3>{scene.title}</h3></div>
+                <div>
+                  <p>{scene.meta}</p>
+                  <h3>{scene.title}</h3>
+                  <small>{scene.coordinate} / SIGNAL {scene.signal}</small>
+                </div>
               </div>
             </article>
           ))}
           <aside class="gr-hotspot-readout" data-hotspot-readout aria-live="polite">
-            <span data-hotspot-code>{scenes[0].code}</span>
+            <header><span data-hotspot-code>{scenes[0].code}</span><em data-hotspot-state>POINT / STANDBY</em></header>
+            <div class="gr-readout-trace" aria-hidden="true">
+              {traceBars.map((_, index) => <i style={`--i:${index}`}></i>)}
+            </div>
             <strong data-hotspot-title>等待读取信号点</strong>
             <p data-hotspot-body>点击画面中的琥珀色节点，现场细节会在这里显影。</p>
           </aside>
@@ -332,6 +363,7 @@ const waveBars = Array.from({ length: 42 });
     const channelTitle = page.querySelector("[data-channel-title]");
     const channelCopy = page.querySelector("[data-channel-copy]");
     const channelMeta = page.querySelector("[data-channel-meta]");
+    const channelBackgrounds = [...page.querySelectorAll("[data-channel-background]")];
     const floatingFrequency = page.querySelector("[data-floating-frequency]");
     const timeOutput = page.querySelector("[data-local-time]");
     const scrollProgress = page.querySelector("[data-scroll-progress]");
@@ -346,6 +378,9 @@ const waveBars = Array.from({ length: 42 });
       page.dataset.channel = channel.id;
       channelButtons.forEach((button, buttonIndex) => {
         button.setAttribute("aria-pressed", buttonIndex === activeChannel ? "true" : "false");
+      });
+      channelBackgrounds.forEach((background) => {
+        background.toggleAttribute("data-active", background.dataset.channelBackground === channel.id);
       });
       if (frequency) frequency.textContent = channel.frequency;
       if (frequencyUnit) frequencyUnit.textContent = channel.unit;
@@ -445,6 +480,7 @@ const waveBars = Array.from({ length: 42 });
       const sceneNote = sceneConsole.querySelector("[data-scene-note]");
       const hotspotReadout = sceneConsole.querySelector("[data-hotspot-readout]");
       const hotspotCode = hotspotReadout?.querySelector("[data-hotspot-code]");
+      const hotspotState = hotspotReadout?.querySelector("[data-hotspot-state]");
       const hotspotTitle = hotspotReadout?.querySelector("[data-hotspot-title]");
       const hotspotBody = hotspotReadout?.querySelector("[data-hotspot-body]");
       let activeScene = 0;
@@ -455,6 +491,7 @@ const waveBars = Array.from({ length: 42 });
         });
         if (hotspotReadout) hotspotReadout.removeAttribute("data-active");
         if (hotspotCode) hotspotCode.textContent = scenes[activeScene].code;
+        if (hotspotState) hotspotState.textContent = "POINT / STANDBY";
         if (hotspotTitle) hotspotTitle.textContent = "等待读取信号点";
         if (hotspotBody) hotspotBody.textContent = "点击画面中的琥珀色节点，现场细节会在这里显影。";
       };
@@ -484,6 +521,7 @@ const waveBars = Array.from({ length: 42 });
         button.setAttribute("aria-pressed", isActive ? "false" : "true");
         hotspotReadout?.toggleAttribute("data-active", !isActive);
         if (hotspotCode) hotspotCode.textContent = isActive ? scenes[activeScene].code : button.dataset.hotspotCode;
+        if (hotspotState) hotspotState.textContent = isActive ? "POINT / STANDBY" : "SIGNAL / LOCKED";
         if (hotspotTitle) hotspotTitle.textContent = isActive ? "等待读取信号点" : button.dataset.hotspotTitle;
         if (hotspotBody) hotspotBody.textContent = isActive ? "点击画面中的琥珀色节点，现场细节会在这里显影。" : button.dataset.hotspotBody;
       });
