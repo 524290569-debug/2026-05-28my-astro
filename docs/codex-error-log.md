@@ -289,3 +289,15 @@
 - **原因**：重复触发了 E-037 的跨 PowerShell、OpenSSH 与 Bash 多层引号问题；Windows SSH 参数传递还会继续剥离远端 `grep` 模式的引号。
 - **修正**：立即废弃两次内联结果，把完整校验写入纯 ASCII 的 `verify-gray-rain-route-removal.sh`，通过 SCP 上传后执行；基线、新版、当前 release 与回滚检查均得到无错误输出。
 - **复用规则**：远程命令只允许简单的单动作查询；凡包含变量、带空格模式、多个 `grep` 或控制流，必须先写成 `.sh` 上传执行，不再尝试调整内联引号。
+
+### E-048｜在本机 PowerShell 中假定存在 `bash`
+- **现象**：复核回滚脚本语法时，PowerShell 提示无法识别 `bash`；随后打印的 `ROLLBACK_SYNTAX_EXIT=0` 仍是上一个原生命令遗留的退出码，不能作为成功证据。
+- **原因**：本机 PATH 没有 Bash，且 PowerShell 的 command-not-found 异常不会可靠刷新 `$LASTEXITCODE`。
+- **修正**：回滚脚本的 `bash -n` 改到已上传脚本的 Linux VPS 上执行，并直接使用 SSH 命令退出状态验收。
+- **复用规则**：调用可选运行时前先使用 `Get-Command`；命令解析失败时不得读取旧 `$LASTEXITCODE`，脚本语法应在其实际目标运行环境中验证。
+
+### E-049｜补丁生成早于最后两次文档提交导致反向检查失败
+- **现象**：对当前 HEAD 执行旧补丁的 `git apply --check --reverse` 时，`docs/codex-error-log.md` 上下文不匹配。
+- **原因**：补丁在功能提交前生成，随后错误日志又追加了新条目；当前工作树已经不是该补丁的精确 postimage。
+- **修正**：完成全部提交后，从部署前基线 commit 到最终 HEAD 重新生成完整补丁，再执行反向 `git apply --check`。
+- **复用规则**：交付补丁必须在最后一次提交之后生成，并明确记录 base commit 与 final commit；不要复用流程中途的临时 diff 作为最终补丁。
