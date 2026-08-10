@@ -283,3 +283,9 @@
 - **原因**：脚本执行 `window.scrollTo` 时继承了页面的平滑滚动，截图等待不足，画面落在两个内容区之间的过渡位置；这不是生产资源缺失。
 - **修正**：截图前把 `document.documentElement.style.scrollBehavior` 设为 `auto`，滚动到底部后等待交互显现动画结束，同时记录 `scrollY`、档案区坐标和内容透明度；第二张生产截图正常。
 - **复用规则**：长页面定位截图先禁用平滑滚动，再验证目标元素位于视口且 `opacity` 接近 `1`，不能只依据滚动命令已经发出来判断取景完成。
+
+### E-047｜再次把复杂 Bash 校验内联进 Windows SSH 命令
+- **现象**：第一条远程校验报 `unexpected EOF`；改用 PowerShell 单引号后虽然主命令退出为 `0`，`grep` 仍把带空格的模式拆成文件名并输出 `SELECT/LOG/ARCHIVE: No such file`，结果不具备验收效力。
+- **原因**：重复触发了 E-037 的跨 PowerShell、OpenSSH 与 Bash 多层引号问题；Windows SSH 参数传递还会继续剥离远端 `grep` 模式的引号。
+- **修正**：立即废弃两次内联结果，把完整校验写入纯 ASCII 的 `verify-gray-rain-route-removal.sh`，通过 SCP 上传后执行；基线、新版、当前 release 与回滚检查均得到无错误输出。
+- **复用规则**：远程命令只允许简单的单动作查询；凡包含变量、带空格模式、多个 `grep` 或控制流，必须先写成 `.sh` 上传执行，不再尝试调整内联引号。
