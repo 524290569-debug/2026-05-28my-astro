@@ -387,3 +387,9 @@
 - **原因**：当前受限执行上下文可修改工作树文件，但没有写主仓库 Git 元数据的权限。
 - **修正**：确认变更范围只有 `docs/codex-error-log.md` 后，使用受控的 Git 提权执行暂存与提交。
 - **复用规则**：遇到 index.lock 权限错误先确认不存在真实残留锁和变更范围，再对精确 Git 命令申请权限；不删除 `.git` 文件或重建仓库。
+
+### E-064｜PowerShell 默认编码导致 UTF-8 审计 JSON 解析失败
+- **现象**：`Get-Content -Raw | ConvertFrom-Json` 读取生产浏览器审计时出现中文乱码并报告 JSON 结构无效。
+- **原因**：Windows PowerShell 按系统默认编码读取 Node 以 UTF-8 写出的 JSON，中文多字节序列被错误解释。
+- **修正**：改用 Node `fs.readFileSync(path, 'utf8')` 后再 `JSON.parse`；确认 `passed=true`、全部 12 项检查为 true、`errors=[]`。
+- **复用规则**：PowerShell 读取 Node 生成的 JSON 时显式指定 `-Encoding UTF8`，或直接用 Node 按 UTF-8 解析；不把默认编码错误当作产物损坏。
