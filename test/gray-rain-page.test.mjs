@@ -17,7 +17,7 @@ test("位置改变独立页面、组件和样式已移除", async () => {
 test("灰雨电台导航移除位置改变并保留其他独立入口", async () => {
   const source = await read("src/components/GrayRainExperience.astro");
   assert.doesNotMatch(source, /href=\{`\$\{basePath\}position\/`\}|位置改变/);
-  for (const label of ["偏航试验场", "Z.A.T.O.", "工具", "MD 阅读器", "AI 管理"]) {
+  for (const label of ["偏航试验场", "Z.A.T.O.", "工具", "MD 阅读器", "AI 管理", "GitHub 高分项目"]) {
     assert.ok(source.includes(label), `缺少导航入口：${label}`);
   }
   assert.doesNotMatch(source, /ROUTE SELECT|href="#routes"|id="routes"/);

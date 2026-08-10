@@ -321,3 +321,9 @@
 - **原因**：`document.querySelector('[data-hotspot-title]')` 首先命中了带同名数据属性的热点按钮，其文本内容恰好是节点编号。
 - **修正**：选择器限定为 `[data-hotspot-readout] [data-hotspot-title]`，重新执行全套浏览器审计后得到“高架余光”，同时验证 `SIGNAL / LOCKED`。
 - **复用规则**：页面中同一 data 名同时用于数据载体和输出节点时，审计选择器必须以所属组件容器限定作用域。
+
+### E-053｜部署前发现生产 release 已前进且本地缺少最新独立入口
+- **现象**：准备沿用上一轮 release 部署时，重新读取 VPS 发现 current 已变为 `20260810-github-projects-managed-ai-v2`；生产导航新增“GitHub 高分项目”，本地组件尚未包含该入口。
+- **原因**：上一轮任务结束后生产站又有独立页面上线，旧对话中的 current 路径和本地页面导航已经过期。
+- **修正**：停止沿用旧基线，改为以最新 current 创建新 release，并把生产中新增的 GitHub 高分项目入口补回本地导航和回归测试；部署包只覆盖灰雨电台首页及其新 CSS，不覆盖独立页面目录。
+- **复用规则**：每次 VPS 发布前必须重新读取 current、生产导航和浅层页面清单；发现 production 前进时以实时 release 为基线，逐项保留独立页面与入口。
