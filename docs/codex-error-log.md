@@ -327,3 +327,63 @@
 - **原因**：上一轮任务结束后生产站又有独立页面上线，旧对话中的 current 路径和本地页面导航已经过期。
 - **修正**：停止沿用旧基线，改为以最新 current 创建新 release，并把生产中新增的 GitHub 高分项目入口补回本地导航和回归测试；部署包只覆盖灰雨电台首页及其新 CSS，不覆盖独立页面目录。
 - **复用规则**：每次 VPS 发布前必须重新读取 current、生产导航和浅层页面清单；发现 production 前进时以实时 release 为基线，逐项保留独立页面与入口。
+
+### E-054｜本机 PowerShell 环境没有 Bash 运行时
+- **现象**：尝试在本机执行 `bash -n` 校验部署与回滚脚本时，PowerShell 返回“无法将 bash 识别为命令”。
+- **原因**：当前 Windows PATH 未安装或未暴露 Bash；脚本实际目标环境是 Linux VPS。
+- **修正**：不读取失效命令后的旧退出码，先上传脚本，再在 VPS 使用 `bash -n` 校验；部署脚本和回滚脚本均通过。
+- **复用规则**：调用可选运行时前先用 `Get-Command` 确认；Linux 发布脚本统一在目标 VPS 做语法校验。
+
+### E-055｜SSH 双引号再次让 PowerShell 提前展开远端命令替换
+- **现象**：远端校验命令中的 `$(readlink -f ...)` 被本机 PowerShell 执行，出现本机找不到 `readlink`，远端状态输出为空。
+- **原因**：远端 Bash 表达式嵌入了 PowerShell 双引号字符串，重复触发 E-037。
+- **修正**：状态查询改为 PowerShell 单引号包裹的远端命令，不再让本机插值；随后正确读到最新 current。
+- **复用规则**：SSH 中出现 `$()` 时使用远端脚本文件或 PowerShell 单引号参数，禁止放进本机双引号字符串。
+
+### E-056｜上传配置后生产 Nginx 哈希再次前进
+- **现象**：部署前复核发现实时 Nginx 哈希已从准备阶段的基线变化，新配置增加了 GitHub 头像域名 CSP，若继续部署会覆盖并发改动。
+- **原因**：准备发布包期间生产环境发生了同期配置更新。
+- **修正**：暂停切换，重新下载实时配置，仅删除 `/position` 与 `/position/` 两个 location，保留新增 CSP；部署前再次按完整 SHA-256 校验。
+- **复用规则**：配置文件上传前和执行前都校验实时哈希；出现漂移必须重新生成最小差异，禁止覆盖旧快照。
+
+### E-057｜远端哈希前置检查的 `cut` 分隔符被多层引号破坏
+- **现象**：首次部署前置命令返回 `cut: the delimiter must be a single character`，发布脚本没有启动。
+- **原因**：PowerShell、SSH 与 Bash 的多层引号剥离了 `cut -d" "` 的预期参数边界。
+- **修正**：废弃 `cut` 与命令替换，改用 `echo "<hash>  <path>" | sha256sum -c -`；两个文件均显示 `OK` 后才启动部署。
+- **复用规则**：跨 PowerShell/SSH 做文件哈希验证统一使用 `sha256sum -c`，不拼接 `cut`、`awk` 或嵌套命令替换。
+
+### E-058｜OneDrive 锁定 Astro 自动生成的类型文件
+- **现象**：主仓库回归测试 6/6 通过，但 `npm run build` 写入 `.astro/content.d.ts` 时返回 `EPERM`。
+- **原因**：该生成文件被 OneDrive 或仍存活的 Node 进程占用，文件不是只读，但无法以独占写模式打开。
+- **修正**：不强行终止未确认归属的 Node 进程，改在交付目录创建隔离源码副本完成构建。
+- **复用规则**：主仓库 `.astro` 被锁时不反复重试或杀死未知进程，转入隔离副本验证，并把构建缓存留在副本目录。
+
+### E-059｜查询 Node 命令行时再次触发 CIM 权限拒绝
+- **现象**：为识别占用文件的 Node 进程调用 `Get-CimInstance Win32_Process`，返回“拒绝访问”。
+- **原因**：当前 Windows 会话无权读取该 CIM 进程类，与 Node 或网站本身无关。
+- **修正**：停止沿 CIM 路径追查，不终止无法确认归属的进程，直接采用隔离构建。
+- **复用规则**：本项目进程诊断不依赖 CIM；优先使用端口、已知 PID 和隔离工作区，无法确认归属时不杀进程。
+
+### E-060｜创建 Git worktree 被 `.git/worktrees` 权限拒绝且组合命令继续运行
+- **现象**：`git worktree add` 无权写入主仓库 `.git/worktrees`；同一 PowerShell 命令中的后续测试和构建仍继续在原工作目录执行。
+- **原因**：验证目录可写不代表主仓库 Git 元数据可写；使用分号串联时前一步失败不会自动中止。
+- **修正**：废弃 worktree 方案，后续命令用显式退出码门禁，并改用 `git archive` 提取已跟踪文件。
+- **复用规则**：任何准备步骤与验证步骤分开执行，或在每一步后检查 `$LASTEXITCODE`；无 Git 元数据写权限时用 archive，不用 worktree。
+
+### E-061｜Robocopy 漏排除 `.tmp` 浏览器 profile 导致锁文件重试超时
+- **现象**：复制仓库到验证目录时把 `.tmp` 下的 Edge profile 一并复制，遇到 LevelDB `LOCK` 后按默认百万次重试策略等待并超时。
+- **原因**：复制排除项只有 `.git/.astro/dist/node_modules`，遗漏了体积大且含运行时锁的 `.tmp`。
+- **修正**：确认失败副本位于交付目录且没有 reparse point 后删除；改用 `git archive HEAD`，天然只包含已跟踪源码。
+- **复用规则**：隔离验证优先 `git archive`；若必须 Robocopy，显式排除 `.tmp` 并设置有限的 `/R`、`/W`。
+
+### E-062｜共享 node_modules 时 Vite 默认缓存仍写入被占用目录
+- **现象**：隔离源码通过 junction 复用主仓库 `node_modules` 后，构建尝试删除 `node_modules/.vite/deps/*.map` 并返回 `EPERM`。
+- **原因**：源码已隔离，但 Vite 的默认 `cacheDir` 仍位于共享依赖目录。
+- **修正**：只在验证副本的 `astro.config.mjs` 增加 `vite.cacheDir: '.vite-cache'`；随后 3 个页面构建成功，主仓库配置未改。
+- **复用规则**：隔离构建复用 node_modules 时必须把 Vite cacheDir 指向隔离目录；验证结束先解除 junction，再清理副本。
+
+### E-063｜最终文档提交无法创建 `.git/index.lock`
+- **现象**：`git add` 与 `git commit` 均返回 `Unable to create .git/index.lock: Permission denied`，工作区仍保留未暂存的错误日志。
+- **原因**：当前受限执行上下文可修改工作树文件，但没有写主仓库 Git 元数据的权限。
+- **修正**：确认变更范围只有 `docs/codex-error-log.md` 后，使用受控的 Git 提权执行暂存与提交。
+- **复用规则**：遇到 index.lock 权限错误先确认不存在真实残留锁和变更范围，再对精确 Git 命令申请权限；不删除 `.git` 文件或重建仓库。
