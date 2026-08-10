@@ -134,7 +134,6 @@ const waveBars = Array.from({ length: 42 });
     <nav aria-label="首页导航">
       <a href="#field">现场</a>
       <a href="#archive">夜航日志</a>
-      <a href="#routes">线路</a>
     </nav>
     <div class="gr-nav-routes" aria-label="独立专题页">
       <a href={`${basePath}position/`}>位置改变 ↗</a>
@@ -311,26 +310,6 @@ const waveBars = Array.from({ length: 42 });
       </div>
     </section>
 
-    <section id="routes" class="gr-routes" data-section-name="ROUTE SELECT">
-      <div class="gr-route-intro" data-reveal>
-        <span>03 / ROUTE SELECT</span>
-        <p>本次接收结束</p>
-        <h2>选择下一条线路</h2>
-      </div>
-      <nav class="gr-route-list" aria-label="下一条线路" data-reveal>
-        <a href="#field"><small>01 / LIVE</small><span>现场</span><i>继续扫描城市边缘</i><b>↘</b></a>
-        <a href="#archive"><small>02 / ARCHIVE</small><span>档案</span><i>回到夜航磁带索引</i><b>↘</b></a>
-        <a href={`${basePath}megastructure/`}><small>03 / EXTERNAL ROUTE</small><span>偏航试验场</span><i>进入无人建筑体</i><b>↗</b></a>
-        <a href={`${basePath}zato/`}><small>04 / EXTERNAL ROUTE</small><span>Z.A.T.O.</span><i>接收封闭城市信号</i><b>↗</b></a>
-        <a href={`${basePath}tools/`}><small>05 / UTILITY ROUTE</small><span>工具</span><i>格式化、修复与处理文本</i><b>↗</b></a>
-        <a href={`${basePath}ai-manager/`}><small>06 / AI OPERATIONS</small><span>AI 管理</span><i>配置模型、密钥与多模型竞技场</i><b>↗</b></a>
-      </nav>
-      <footer class="gr-footer">
-        <p>GRAY RAIN RADIO © 2026</p>
-        <p>BUILT IN RAIN / KEPT IN LOW FREQUENCY</p>
-        <a href="#station">BACK TO SIGNAL ↑</a>
-      </footer>
-    </section>
   </main>
 
   <aside class="gr-floating-status" data-floating-status aria-label="当前接收状态">

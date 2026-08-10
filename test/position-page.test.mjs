@@ -11,11 +11,16 @@ test("位置改变路由装配独立体验组件和页面元信息", async () =>
   assert.match(source, /skipTarget="#position-main"/);
 });
 
-test("灰雨电台保留新入口和全部旧导航且没有黄色鼠标光圈", async () => {
+test("灰雨电台保留独立页面入口并移除线路选择区与黄色鼠标光圈", async () => {
   const source = await read("src/components/GrayRainExperience.astro");
+  const css = await read("src/styles/home.css");
   for (const label of ["位置改变", "偏航试验场", "Z.A.T.O.", "工具", "MD 阅读器", "AI 管理"]) {
     assert.ok(source.includes(label), `缺少导航入口：${label}`);
   }
+  for (const token of ["03 / ROUTE SELECT", "选择下一条线路", 'href="#routes"', 'id="routes"']) {
+    assert.ok(!source.includes(token), `线路选择残留：${token}`);
+  }
+  assert.doesNotMatch(css, /gr-routes|gr-route-intro|gr-route-list|gr-footer/);
   assert.doesNotMatch(source, /gr-pointer-glow/);
   assert.doesNotMatch(source, /--gr-pointer-x|--gr-pointer-y/);
 });

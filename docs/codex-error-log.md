@@ -263,3 +263,17 @@
 - **原因**：Windows PowerShell 通过管道把 here-string 传给 `node -` 时使用了当前控制台编码，脚本内的中文源码在 Node 执行前已丢失。
 - **修正**：跨 PowerShell/Node 的一次性校验脚本改用 JavaScript Unicode 转义或纯 ASCII DOM 标记；重新断言生产页标题与关键内容。
 - **复用规则**：通过 PowerShell 管道发送 Node 源码时不直接嵌入中文匹配字面量，避免把传输编码问题误判成网页内容缺失。
+
+## 2026-08-10｜移除灰雨电台线路选择区
+
+### E-044｜使用 `Get-NetTCPConnection` 查询本地预览 PID 时权限不足
+- **现象**：本地预览首页已返回 `200`，但同一条检查命令中的 `Get-NetTCPConnection -LocalPort 4329` 返回“拒绝访问”，导致整条命令退出码为 `1`。
+- **原因**：当前 Windows 会话没有查询该 CIM 网络连接类所需的权限；与 Astro Preview 是否正常无关。
+- **修正**：改用无需 CIM 权限的 `netstat -ano` 精确筛选监听端口，再核对 PID 对应进程名为 `node` 后终止本轮预览进程。
+- **复用规则**：本项目临时预览的端口/PID 检查优先使用 `netstat -ano`；停止前必须同时核对端口、PID 和进程名。
+
+### E-045｜浏览器插件启动辅助进程被 Windows 取消
+- **现象**：连接本地预览进行可视化检查时，浏览器运行内核以 `ShellExecuteExW failed ... 1223` 退出。
+- **原因**：浏览器插件所需的 Windows sandbox setup helper 启动被当前权限流程取消。
+- **修正**：跳过该权限路径，改用隔离临时 profile 的本地 Edge CDP 脚本；DOM 断言和底部截图均通过，并在结束后删除临时 profile。
+- **复用规则**：本项目浏览器插件若遇到 `1223`，不重复触发权限流程；直接复用隔离 Edge CDP，并以断言结果和实际截图共同验收。

@@ -51,7 +51,7 @@
 .gr-home[data-channel="static"] .gr-rain { opacity:.62; animation-duration:.24s; }
 
 .gr-hero-grid { position:relative; z-index:2; width:min(100%,1600px); min-height:calc(100svh - 64px); margin:auto; padding:clamp(110px,13vh,160px) clamp(20px,4vw,64px) 86px; display:grid; grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr); align-items:center; gap:clamp(44px,7vw,120px); }
-.gr-kicker, .gr-en-title, .gr-hero-foot, .gr-tuner-head, .gr-channel-switch, .gr-section-head div, .gr-scene-topline, .gr-log-columns, .gr-tape-footer, .gr-floating-status, .gr-route-intro>span, .gr-footer { font-family:Consolas,"SFMono-Regular",monospace; }
+.gr-kicker, .gr-en-title, .gr-hero-foot, .gr-tuner-head, .gr-channel-switch, .gr-section-head div, .gr-scene-topline, .gr-log-columns, .gr-tape-footer, .gr-floating-status { font-family:Consolas,"SFMono-Regular",monospace; }
 .gr-kicker { margin:0 0 28px; color:#aebabc; font-size:11px; letter-spacing:.15em; }
 .gr-kicker span { display:inline-block; margin-right:7px; padding:5px 8px; color:#18150e; background:var(--amber); font-weight:800; }
 .gr-hero-copy h1 { margin:0; font-family:"Arial Narrow","Microsoft YaHei UI",sans-serif; font-size:clamp(82px,10.6vw,178px); font-weight:900; line-height:.76; letter-spacing:-.095em; }
@@ -94,7 +94,7 @@
 .gr-hero-foot { position:absolute; z-index:3; inset:auto clamp(20px,4vw,64px) 22px; display:flex; justify-content:space-between; color:#718084; font-size:9px; letter-spacing:.12em; }
 .gr-hero-foot b { color:#aeb9ba; }
 
-.gr-field, .gr-archive, .gr-routes { position:relative; padding:clamp(100px,13vw,190px) clamp(20px,4vw,64px); }
+.gr-field, .gr-archive { position:relative; padding:clamp(100px,13vw,190px) clamp(20px,4vw,64px); }
 .gr-field { background:linear-gradient(180deg,#0b0d0e,#101618 45%,#0a0c0d); }
 .gr-field::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.2; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:100% 80px,calc((100vw - 8vw)/12) 100%; mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent); }
 .gr-section-head { position:relative; z-index:1; width:min(100%,1480px); margin:0 auto clamp(56px,7vw,100px); display:grid; grid-template-columns:1fr 2.1fr 1.2fr; align-items:end; gap:30px; }
@@ -171,24 +171,6 @@
 .gr-tape-footer { height:54px; padding:0 20px; display:flex; align-items:center; gap:18px; color:#495354; font-size:9px; letter-spacing:.1em; }
 .gr-tape-footer i { flex:1; border-top:1px dashed #798080; }
 
-.gr-routes { padding-bottom:34px; background:#080a0b; }
-.gr-route-intro { width:min(100%,1480px); margin:0 auto 80px; }
-.gr-route-intro>span { color:var(--amber); font-size:10px; letter-spacing:.13em; }
-.gr-route-intro>p { margin:42px 0 4px; color:#7c898b; font-size:14px; }
-.gr-route-intro h2 { margin:0; font-size:clamp(54px,8vw,122px); line-height:.88; letter-spacing:-.07em; }
-.gr-route-list { width:min(100%,1480px); margin:auto; border-top:1px solid var(--line-strong); }
-.gr-route-list a { position:relative; min-height:150px; display:grid; grid-template-columns:170px 1fr 280px 40px; align-items:center; gap:22px; border-bottom:1px solid var(--line-strong); overflow:hidden; }
-.gr-route-list a::before { content:""; position:absolute; inset:0; z-index:-1; transform:translateX(-101%); background:var(--amber); transition:transform .5s cubic-bezier(.2,.8,.2,1); }
-.gr-route-list small { color:#6f7e80; font:10px Consolas,monospace; letter-spacing:.1em; }
-.gr-route-list span { font-size:clamp(42px,6vw,90px); font-weight:800; line-height:.9; letter-spacing:-.06em; }
-.gr-route-list i { color:#718082; font-size:13px; font-style:normal; }
-.gr-route-list b { justify-self:end; color:var(--amber); font-size:28px; }
-.gr-route-list a:hover::before, .gr-route-list a:focus-visible::before { transform:translateX(0); }
-.gr-route-list a:hover, .gr-route-list a:focus-visible { color:#101313; }
-.gr-route-list a:hover small, .gr-route-list a:hover i, .gr-route-list a:hover b { color:#293031; }
-.gr-footer { width:min(100%,1480px); min-height:90px; margin:70px auto 0; display:flex; align-items:flex-end; justify-content:space-between; color:#5f6d70; font-size:9px; letter-spacing:.09em; }
-.gr-footer a { color:#a7b2b1; }
-
 .gr-floating-status { position:fixed; z-index:70; right:18px; bottom:18px; min-width:190px; padding:12px 14px; border:1px solid var(--line); background:rgba(8,12,13,.78); backdrop-filter:blur(14px); font-size:8px; letter-spacing:.1em; pointer-events:none; }
 .gr-floating-status span { display:flex; align-items:center; gap:7px; color:var(--teal); }
 .gr-floating-status span i { width:5px; height:5px; background:var(--teal); box-shadow:0 0 8px var(--teal); }
@@ -220,8 +202,6 @@
   .gr-log-columns, .gr-log summary { grid-template-columns:90px 80px 1fr 60px; }
   .gr-log-columns span:nth-child(3), .gr-log summary>b { display:none; }
   .gr-log-body { padding-left:202px; grid-template-columns:1fr; }
-  .gr-route-list a { grid-template-columns:130px 1fr 40px; }
-  .gr-route-list i { display:none; }
 }
 
 @media (max-width: 680px) {
@@ -247,7 +227,7 @@
   .gr-hero-foot { display:none; }
   .gr-city { height:54%; bottom:24%; }
   .gr-rooftop { height:23%; }
-  .gr-field, .gr-archive, .gr-routes { padding:94px 16px; }
+  .gr-field, .gr-archive { padding:94px 16px; }
   .gr-section-head { display:block; margin-bottom:48px; }
   .gr-section-head h2 { margin:36px 0 24px; font-size:58px; }
   .gr-section-head>p { max-width:42ch; }
@@ -271,13 +251,6 @@
   .gr-log-body { padding:4px 20px 30px 82px; gap:22px; }
   .gr-log-body div { display:none; }
   .gr-tape-footer { font-size:8px; }
-  .gr-route-intro { margin-bottom:46px; }
-  .gr-route-intro h2 { font-size:57px; }
-  .gr-route-list a { min-height:112px; grid-template-columns:1fr 34px; gap:8px; }
-  .gr-route-list small { grid-column:1; margin-top:12px; }
-  .gr-route-list span { grid-column:1; font-size:48px; }
-  .gr-route-list b { grid-column:2; grid-row:1/3; }
-  .gr-footer { display:grid; gap:10px; align-items:start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
